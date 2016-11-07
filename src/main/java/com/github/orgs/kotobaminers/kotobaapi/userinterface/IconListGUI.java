@@ -1,0 +1,99 @@
+package com.github.orgs.kotobaminers.kotobaapi.userinterface;
+
+import java.util.List;
+import java.util.stream.Stream;
+
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+
+import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaAPIUtility;
+
+public interface IconListGUI {
+	public static final int PAGE_FAILED = -1;
+	public static final int INVENGTORY_SIZE = 9 * 6;
+	public static final int ICON_NUMBER = 9 * 5;
+	public static final String PREVIOUS = "<= Previous =";
+	public static final String NEXT = "= Next =>";
+
+	abstract List<ItemStack> getIcons();
+	abstract String getTitle();
+	abstract void onIconLeftClickEvent(InventoryClickEvent event);
+	abstract void onIconRightClickEvent(InventoryClickEvent event);
+
+	default public Inventory createInventory(int page) {
+		List<ItemStack> items = getIcons();
+		int start = (page - 1) * ICON_NUMBER;
+		int limit = Math.min(ICON_NUMBER + start, items.size());
+		Inventory inventory = Bukkit.createInventory(null, INVENGTORY_SIZE, getTitle() + String.valueOf(page));
+		Stream.iterate(start, i -> i + 1)
+			.limit(limit - start)
+			.forEach(i -> inventory.setItem(i - start, items.get(i)));
+		inventory.setItem(INVENGTORY_SIZE - 9, KotobaAPIUtility.createCustomItem(Material.COOKIE, 1, (short) 0, PREVIOUS, null).get());
+		inventory.setItem(INVENGTORY_SIZE - 1, KotobaAPIUtility.createCustomItem(Material.CAKE, 1, (short) 0, NEXT, null).get());
+		return inventory;
+	}
+
+	default Integer getCurrentPage(Inventory inventory) {
+		String title2 = inventory.getTitle();
+		if(title2.startsWith(getTitle())) {
+			String str = title2.substring(getTitle().length(), getTitle().length() + 1);
+			if(KotobaAPIUtility.isNumber(str)) {
+				return Integer.parseInt(str);
+			}
+		}
+		return PAGE_FAILED;
+	}
+	default Integer getMaxPage() {
+		if(getIcons().size() % ICON_NUMBER == 0) {
+			return getIcons().size() / ICON_NUMBER;
+		}
+		return getIcons().size() / ICON_NUMBER + 1;
+	}
+	default Integer getPreviousPage(Inventory inventory) {
+		int page = getCurrentPage(inventory);
+		if(page == 1) {
+			return getMaxPage();
+		} else {
+			return page - 1;
+		}
+	}
+	default Integer getNextPage(Inventory inventory) {
+		int page = getCurrentPage(inventory);
+		if(page == getMaxPage()) {
+			return 1;
+		} else {
+			return page + 1;
+		}
+	}
+
+	default boolean isIconClicked(int rawSlot) {
+		if(0 <=rawSlot && rawSlot < ICON_NUMBER) {
+			return true;
+		}
+		return false;
+	}
+	default boolean isPreviousClicked(int rawSlot) {
+		if(rawSlot == INVENGTORY_SIZE - 9) {
+			return true;
+		}
+		return false;
+	}
+	default boolean isNextClicked(int rawSlot) {
+		if(rawSlot == INVENGTORY_SIZE - 1) {
+			return true;
+		}
+		return false;
+	}
+
+	default boolean isIconListGUI(Inventory inventory) {
+		if(getCurrentPage(inventory) != PAGE_FAILED) {
+			return true;
+		}
+		return false;
+	}
+
+
+}
