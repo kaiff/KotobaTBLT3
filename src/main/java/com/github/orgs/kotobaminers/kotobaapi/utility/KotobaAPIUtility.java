@@ -1,7 +1,6 @@
 package com.github.orgs.kotobaminers.kotobaapi.utility;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
@@ -18,7 +17,6 @@ import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.DisplaySlot;
@@ -45,20 +43,6 @@ public class KotobaAPIUtility {
 		itemMeta.setOwner(owner);
 		skull.setItemMeta(itemMeta);
 		return skull;
-	}
-
-	public static Optional<ItemStack> createCustomItem(Material material, int amount, short data, String name, List<String> lore) {
-		ItemStack itemStack = new ItemStack(material, amount, data);
-		ItemMeta itemMeta = itemStack.getItemMeta();
-		if(itemMeta != null) {
-			itemMeta.setDisplayName(name);
-			if(lore != null) {
-				itemMeta.setLore(lore);
-			}
-			itemStack.setItemMeta(itemMeta);
-			return Optional.of(itemStack);
-		}
-		return Optional.empty();
 	}
 
 	public static void lookAt(Player player, Location lookat) {
@@ -89,7 +73,7 @@ public class KotobaAPIUtility {
 		loc.setPitch(loc.getPitch() * 180f / (float) Math.PI);
 		player.teleport(loc);
 	}
-	
+
 	public static Location randomizeLocation(Location location, Integer radius) {
 		Random random = new Random();
 		int x =  - radius + random.nextInt(radius + 1) * 2;
@@ -97,7 +81,7 @@ public class KotobaAPIUtility {
 		int z =  - radius + random.nextInt(radius + 1) * 2;
 		return location.clone().add(new Vector(x, y, z));
 	}
-	
+
 	public static void playCountDown(JavaPlugin plugin, List<Player> players, int delay) {
 		for(int i = delay - 3; i < delay; i++) {
 			plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
@@ -114,7 +98,7 @@ public class KotobaAPIUtility {
 			}
 		}, delay * 20);
 	}
-	
+
 	public static void setCoundDownScoreboard(JavaPlugin plugin, List<Player> players, String title, String name, Integer second) {
 		Scoreboard scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
 		Objective objective = scoreboard.registerNewObjective("Test", "Test2");
@@ -143,7 +127,7 @@ public class KotobaAPIUtility {
 			}
 		}, (second + 5) * 20L);
 	 }
-	
+
 	public static boolean isNumber(String str) {
 		try {
 			Integer.parseInt(str);

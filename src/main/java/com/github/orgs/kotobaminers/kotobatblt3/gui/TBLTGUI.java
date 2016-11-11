@@ -13,9 +13,20 @@ import com.github.orgs.kotobaminers.kotobatblt3.player.TBLTJob.TBLTJobEnum;
 import com.github.orgs.kotobaminers.kotobatblt3.player.TBLTJob.TBLTNoneJobEnum;
 
 public enum TBLTGUI implements MinimumGUI {
+	INVESTIGATE("Investigating...") {
+		@Override
+		public void onInventoryClick(InventoryClickEvent event) {
+		}
+	},
 	BLOCK_REPLACER("Block Replacer") {
 		@Override
 		public void onInventoryClick(InventoryClickEvent event) {
+			Optional<TBLTIcon> icon = Stream.of(TBLTIcon.values())
+				.filter(i -> i.isIcon(event.getCurrentItem()))
+				.findAny();
+			if(icon.isPresent()) {
+				icon.get().onClickEvent(event);
+			}
 		}
 	},
 

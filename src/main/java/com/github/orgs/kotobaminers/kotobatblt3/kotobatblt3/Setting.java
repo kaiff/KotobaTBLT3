@@ -28,5 +28,6 @@ public class Setting {
 
 	public static void saveAll() {
 		TBLTArena.saveAll();
+		BlockReplacer.saveAll();
 	}
 }

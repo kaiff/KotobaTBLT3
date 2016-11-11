@@ -128,30 +128,32 @@ public enum ClickAbility implements ItemAbilityInterface {
 		public void perform(PlayerInteractEvent event) {
 			Block block = event.getClickedBlock();
 			if(block == null) return;
-			if(block .getType().equals(Material.AIR)) return;
+			if(block.getType().equals(Material.AIR)) return;
 
 			Optional<BlockReplacer> replacer = BlockReplacer.getReplacers().stream()
 				.filter(r -> r.isLocationIn(block.getLocation()))
-				.filter(r -> r.getBlock().equals(block.getType()))
+				.filter(r -> r.getBlockTrigger() != null)
+				.filter(r -> r.getBlockTrigger().equals(block.getType()))
 				.findAny();
 			if(replacer.isPresent()) {
 				KotobaAPISound.CLICK.play(event.getPlayer());
-				TBLTGUI.BLOCK_REPLACER.create(replacer.get().getGUIIcons()).ifPresent(i -> event.getPlayer().openInventory(i));
+				TBLTGUI.INVESTIGATE.create(replacer.get().getInvestigateIcons()).ifPresent(i -> event.getPlayer().openInventory(i));
 				return;
 			}
 			KotobaAPISound.SHEAR.play(event.getPlayer());
 		}
 	},
 	TALK(
-		Material.SKULL,
-		(short) 0,
+		Material.SKULL_ITEM,
+		(short) 3,
 		"Talk with people",
 		Arrays.asList("lore"),
 		Arrays.asList(Action.RIGHT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR)) {
 		@Override
 		public void perform(PlayerInteractEvent event) {
 		}
-	},;
+	},
+	;
 
 	private Material material;
 	private short data;

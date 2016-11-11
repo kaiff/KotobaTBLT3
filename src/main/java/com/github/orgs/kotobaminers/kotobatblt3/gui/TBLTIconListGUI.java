@@ -5,13 +5,16 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.bukkit.Effect;
 import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import com.github.orgs.kotobaminers.kotobaapi.userinterface.IconListGUI;
-import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaAPIUtility;
+import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaAPIItemStack;
 import com.github.orgs.kotobaminers.kotobatblt3.game.BlockReplacer;
 
 public enum TBLTIconListGUI implements IconListGUI {
@@ -21,9 +24,7 @@ public enum TBLTIconListGUI implements IconListGUI {
 			List<BlockReplacer> replacers = BlockReplacer.getReplacers().stream().collect(Collectors.toList());
 			return Stream.iterate(0, i -> i + 1)
 				.limit(BlockReplacer.getReplacers().size())
-				.map(i -> KotobaAPIUtility.createCustomItem(Material.ANVIL, i + 1, (short) 0, replacers.get(i).getName(), null))
-				.filter(Optional::isPresent)
-				.map(Optional::get)
+				.map(i -> KotobaAPIItemStack.create(Material.ANVIL, i + 1, (short) 0, replacers.get(i).getName(), null))
 				.collect(Collectors.toList());
 		}
 
@@ -37,10 +38,7 @@ public enum TBLTIconListGUI implements IconListGUI {
 		}
 		public void onIconClickEvent(InventoryClickEvent event) {
 			String name = event.getCurrentItem().getItemMeta().getDisplayName();
-			BlockReplacer.getReplacers().stream()
-				.filter(r -> r.getName().equalsIgnoreCase(name))
-				.findAny()
-				.ifPresent(r -> r.getGUIIcons().stream().forEach(i -> System.out.println(i.getType())));
+			System.out.println(name);
 			BlockReplacer.getReplacers().stream()
 				.filter(r -> r.getName().equalsIgnoreCase(name))
 				.findAny()
@@ -54,20 +52,71 @@ public enum TBLTIconListGUI implements IconListGUI {
 		public List<ItemStack> getIcons() {
 			return Stream.of(Material.values())
 				.filter(m -> m.isBlock() && m.isSolid())
-				.map(m -> KotobaAPIUtility.createCustomItem(m, 1, (short) 0, m.name(), null))
-				.filter(Optional::isPresent)
-				.map(Optional::get)
+				.map(m -> KotobaAPIItemStack.create(m, 1, (short) 0, m.name(), null))
 				.collect(Collectors.toList());
 		}
 
 		@Override
 		public void onIconLeftClickEvent(InventoryClickEvent event) {
 		}
-
 		@Override
 		public void onIconRightClickEvent(InventoryClickEvent event) {
 		}
+	},
+	EFFECT("Effect ") {
+		@Override
+		public List<ItemStack> getIcons() {
+			return Stream.of(Effect.values())
+				.map(e -> KotobaAPIItemStack.create(Material.NETHER_STAR, 1, (short) 0, e.name(), null))
+				.collect(Collectors.toList());
+		}
 
+		@Override
+		public void onIconLeftClickEvent(InventoryClickEvent event) {
+			onIconClickEvent(event);
+		}
+		@Override
+		public void onIconRightClickEvent(InventoryClickEvent event) {
+			onIconClickEvent(event);
+		}
+		private void onIconClickEvent(InventoryClickEvent event) {
+			HumanEntity clicker = event.getWhoClicked();
+			String name = event.getCurrentItem().getItemMeta().getDisplayName();
+			Stream.of(Effect.values())
+				.filter(e -> e.name().equalsIgnoreCase(name))
+				.findAny()
+				.ifPresent(e -> {
+					clicker.getWorld().playEffect(clicker.getLocation(), e, 1);
+				});
+			clicker.closeInventory();
+		}
+	},
+	SOUND("Sound ") {
+		@Override
+		public List<ItemStack> getIcons() {
+			return Stream.of(Sound.values())
+				.map(s -> KotobaAPIItemStack.create(Material.NOTE_BLOCK, 1, (short) 0, s.name(), null))
+				.collect(Collectors.toList());
+		}
+
+		@Override
+		public void onIconLeftClickEvent(InventoryClickEvent event) {
+			onIconClickEvent(event);
+		}
+		@Override
+		public void onIconRightClickEvent(InventoryClickEvent event) {
+			onIconClickEvent(event);
+		}
+		private void onIconClickEvent(InventoryClickEvent event) {
+			HumanEntity clicker = event.getWhoClicked();
+			String name = event.getCurrentItem().getItemMeta().getDisplayName();
+			Stream.of(Sound.values())
+				.filter(s -> s.name().equalsIgnoreCase(name))
+				.findAny()
+				.ifPresent(s -> {
+					clicker.getWorld().playSound(clicker.getLocation(), s, 1, 1);
+				});
+		}
 	},
 	;
 

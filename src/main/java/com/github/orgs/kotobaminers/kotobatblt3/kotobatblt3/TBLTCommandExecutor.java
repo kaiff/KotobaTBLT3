@@ -3,12 +3,14 @@ package com.github.orgs.kotobaminers.kotobatblt3.kotobatblt3;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -51,7 +53,7 @@ public class TBLTCommandExecutor implements CommandExecutor {
 		TEST(Arrays.asList(Arrays.asList("test")), "", "Command Test", PermissionEnum.OP) {
 			@Override
 			public boolean perform(Player player , String[] args) {
-				player.openInventory(TBLTIconListGUI.SOLID_BLOCK.createInventory(1));
+				player.openInventory(TBLTIconListGUI.SOUND.createInventory(1));
 				return true;
 			}
 		},
@@ -127,6 +129,33 @@ public class TBLTCommandExecutor implements CommandExecutor {
 					return true;
 				}
 				return false;
+			}
+		},
+		REPLACER_SETTRIGGER(Arrays.asList(Arrays.asList("replacer"), Arrays.asList("settrigger", "st")), "<Replacer>", "", PermissionEnum.OP) {
+			@Override
+			public boolean perform(Player player , String[] args) {
+				Block block = player.getTargetBlock((Set<Material>) null, 10);
+				if(block.getType().equals(Material.AIR)) {
+					player.sendMessage("No block");
+					return true;
+				}
+				Optional<BlockReplacer> replacer = BlockReplacer.getReplacers().stream()
+					.filter(r -> r.isLocationIn(block.getLocation()))
+					.findAny();
+				if(replacer.isPresent()) {
+					Material material = player.getItemInHand().getType();
+					if(BlockReplacer.isTrigger(material)) {
+						replacer.get().setTrigger(material);
+					}
+					if(BlockReplacer.isBlock(block.getType())) {
+						replacer.get().setBlock(block.getType());
+					}
+					TBLTGUI.BLOCK_REPLACER.create(replacer.get().getGUIIcons())
+						.ifPresent(inventory -> player.openInventory(inventory));
+				} else {
+					player.sendMessage("Replacer Not Found");
+				}
+				return true;
 			}
 		},
 		REPLACER_SAVE(Arrays.asList(Arrays.asList("replacer"), Arrays.asList("save", "s")), "<Replacer>", "Save Arena", PermissionEnum.OP) {
@@ -268,7 +297,7 @@ public class TBLTCommandExecutor implements CommandExecutor {
 						.filter(arena -> arena.getName().equalsIgnoreCase(options.get(0)))
 						.findAny()
 						.map(arena -> {
-							arena.setDataFromConfig(Bukkit.getWorlds());
+							arena.load(Bukkit.getWorlds());
 							return true;
 						}).orElse(false);
 				}

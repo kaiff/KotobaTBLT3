@@ -18,6 +18,7 @@ public interface MinimumGUI {
 		setSize(icons.size());
 		if(6 * 9 < getSize()) return Optional.empty();
 		Inventory inventory = Bukkit.createInventory(null, (getSize() / 9 + 1) * 9, getTitle());
+
 		Stream.iterate(0, i -> i + 1)
 			.limit(icons.size())
 			.forEach(i -> inventory.setItem(i, icons.get(i)));

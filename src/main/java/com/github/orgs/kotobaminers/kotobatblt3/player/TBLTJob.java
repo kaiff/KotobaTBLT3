@@ -8,13 +8,12 @@ import java.util.stream.Stream;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.github.orgs.kotobaminers.kotobatblt3.ability.ClickAbility;
 
-public class TBLTJob implements Listener {
+public class TBLTJob {
 	public interface KotobaJobInterface {
 		ItemStack getIcon();
 		void become(Player player);

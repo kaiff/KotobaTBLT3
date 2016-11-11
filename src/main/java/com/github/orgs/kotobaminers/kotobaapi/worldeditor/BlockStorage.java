@@ -2,6 +2,7 @@ package com.github.orgs.kotobaminers.kotobaapi.worldeditor;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -21,7 +22,7 @@ import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.selections.Selection;
 
 public abstract class BlockStorage {
-	
+
 	private static final String NAME = "Name";
 	private static final String WORLD = "World";
 	private static final String SPAWN_X = "Spawn.X";
@@ -39,7 +40,7 @@ public abstract class BlockStorage {
 	private Integer XMin;
 	private Integer YMin;
 	private Integer ZMin;
-	
+
 	public BlockStorage setData(Player player, String name) {
 		WorldEditPlugin worldEdit = (WorldEditPlugin) Bukkit.getServer().getPluginManager().getPlugin("WorldEdit");
 		if (worldEdit == null) {
@@ -57,7 +58,7 @@ public abstract class BlockStorage {
 			sel.getMinimumPoint().getBlockZ()
 		);
 	}
-	
+
 	public BlockStorage setData(String name, World world, Integer XMax, Integer YMax, Integer ZMax, Integer XMin, Integer YMin, Integer ZMin) {
 		this.name = name;
 		this.world = world;
@@ -69,7 +70,7 @@ public abstract class BlockStorage {
 		this.ZMin = ZMin;
 		return this;
 	}
-	
+
 	public boolean isLocationIn(Location location) {
 		int pX = location.getBlockX();
 		int pY = location.getBlockY();
@@ -105,7 +106,7 @@ public abstract class BlockStorage {
 			e.printStackTrace();
 		}
 	}
-	
+
 	@SuppressWarnings("deprecation")
 	public void load(List<World> worlds) {
 		YamlConfiguration config = YamlConfiguration.loadConfiguration(getFile());
@@ -128,7 +129,7 @@ public abstract class BlockStorage {
 			}
 		);
 	}
-	
+
 	public void setDataFromConfig(List<World> worlds) {
 		YamlConfiguration config = YamlConfiguration.loadConfiguration(getFile());
 		Optional<World> worldOpt = worlds.stream()
@@ -149,7 +150,7 @@ public abstract class BlockStorage {
 			Optional<Integer> yMin = vectors.stream().map(loc -> loc.getY()).min(Comparator.naturalOrder()).map(d -> d.intValue());
 			Optional<Integer> zMax = vectors.stream().map(loc -> loc.getZ()).max(Comparator.naturalOrder()).map(d -> d.intValue());
 			Optional<Integer> zMin = vectors.stream().map(loc -> loc.getZ()).min(Comparator.naturalOrder()).map(d -> d.intValue());
-			
+
 			if(xMax.isPresent() && xMin.isPresent() && yMax.isPresent() && yMin.isPresent() && zMax.isPresent() && zMin.isPresent()) {
 				this.setData(name, world, xMax.get(), yMax.get(), zMax.get(), xMin.get(), yMin.get(), zMin.get());
 				if(config.isInt(SPAWN_X) && config.isInt(SPAWN_Y) && config.isInt(SPAWN_Z)) {
@@ -161,7 +162,19 @@ public abstract class BlockStorage {
 			}
 		}
 	}
-	
+
+	public List<Block> getBlocks() {
+		List<Block> blocks = new ArrayList<>();
+		for (int x = getXMin(); x <= getXMax(); x++) {
+			for (int y = getYMin(); y <= getYMax(); y++) {
+				for (int z = getZMin(); z <= getZMax(); z++) {
+					blocks.add(getWorld().getBlockAt(x, y, z));
+				}
+			}
+		}
+		return blocks;
+	}
+
 	public Location getCenter() {
 		int xCenter = (getXMax() + getXMin()) / 2;
 		int yCenter = (getYMax() + getYMin()) / 2;
@@ -218,5 +231,5 @@ public abstract class BlockStorage {
 	public void setSpawn(Location location) {
 		this.spawn = location;
 	}
-	
+
 }

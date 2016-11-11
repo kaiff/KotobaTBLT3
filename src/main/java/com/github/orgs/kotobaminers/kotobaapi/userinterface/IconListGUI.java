@@ -9,6 +9,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaAPIItemStack;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaAPIUtility;
 
 public interface IconListGUI {
@@ -31,8 +32,8 @@ public interface IconListGUI {
 		Stream.iterate(start, i -> i + 1)
 			.limit(limit - start)
 			.forEach(i -> inventory.setItem(i - start, items.get(i)));
-		inventory.setItem(INVENGTORY_SIZE - 9, KotobaAPIUtility.createCustomItem(Material.COOKIE, 1, (short) 0, PREVIOUS, null).get());
-		inventory.setItem(INVENGTORY_SIZE - 1, KotobaAPIUtility.createCustomItem(Material.CAKE, 1, (short) 0, NEXT, null).get());
+		inventory.setItem(INVENGTORY_SIZE - 9, KotobaAPIItemStack.create(Material.COOKIE, 1, (short) 0, PREVIOUS, null));
+		inventory.setItem(INVENGTORY_SIZE - 1, KotobaAPIItemStack.create(Material.CAKE, 1, (short) 0, NEXT, null));
 		return inventory;
 	}
 

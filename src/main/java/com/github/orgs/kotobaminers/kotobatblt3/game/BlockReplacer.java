@@ -2,6 +2,7 @@ package com.github.orgs.kotobaminers.kotobatblt3.game;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -18,8 +19,10 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaAPIUtility;
+import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaAPIItemStack;
 import com.github.orgs.kotobaminers.kotobaapi.worldeditor.BlockStorage;
+import com.github.orgs.kotobaminers.kotobatblt3.ability.ClickAbility;
+import com.github.orgs.kotobaminers.kotobatblt3.gui.TBLTIcon;
 import com.github.orgs.kotobaminers.kotobatblt3.kotobatblt3.Setting;
 
 public class BlockReplacer extends BlockStorage {
@@ -28,23 +31,13 @@ public class BlockReplacer extends BlockStorage {
 		void perform(BlockReplacer replacer);
 	}
 
-	public enum BlockReplacerEvent implements BlockReplaceEventInterface {
-		REPLACE {
-			@Override
-			public void perform(BlockReplacer replacer) {
-				replacer.load(Bukkit.getWorlds());
-			}
-		}
-	}
-
 	private static final File DIRECTORY = new File(Setting.getPlugin().getDataFolder().getAbsolutePath() + "/BlockReplacer/");
 	private static final String BLOCK_PATH = "Block";
 	private static final String TRIGGER_PATH = "Trigger";
 
 	private static Set<BlockReplacer> replacers = new HashSet<>();
-	private Material block;
-	private Material trigger;
-	private List<BlockReplacerEvent> events;
+	private Material blockTrigger;
+	private Material itemTrigger;
 
 	private static final List<Material> BLOCKS = Stream.of(Material.values())
 		.filter(m -> m.isBlock() && m.isSolid())
@@ -99,17 +92,17 @@ public class BlockReplacer extends BlockStorage {
 		return replacers;
 	}
 
-	public Material getBlock() {
-		return block;
+	public Material getBlockTrigger() {
+		return blockTrigger;
 	}
-	public Material getTrigger() {
-		return trigger;
+	public Material getItemTrigger() {
+		return itemTrigger;
 	}
 	public void setBlock(Material block) {
-		this.block = block;
+		this.blockTrigger = block;
 	}
 	public void setTrigger(Material trigger) {
-		this.trigger = trigger;
+		this.itemTrigger = trigger;
 	}
 	public static boolean isBlock(Material material) {
 		return BLOCKS.contains(material);
@@ -120,8 +113,8 @@ public class BlockReplacer extends BlockStorage {
 
 	public void saveOptions() {
 		YamlConfiguration config = YamlConfiguration.loadConfiguration(getFile());
-		if(block != null) config.set(BLOCK_PATH, block.name());
-		if(trigger != null) config.set(TRIGGER_PATH, trigger.name());
+		if(blockTrigger != null) config.set(BLOCK_PATH, blockTrigger.name());
+		if(itemTrigger != null) config.set(TRIGGER_PATH, itemTrigger.name());
 		try {
 			config.save(getFile());
 		} catch (IOException e) {
@@ -147,20 +140,48 @@ public class BlockReplacer extends BlockStorage {
 	}
 
 	public boolean isValidBlockAndTrigger(Player player, Block clicked) {
-		if(clicked.getType().equals(block) && player.getItemInHand().getType().equals(trigger)) return true;
+		if(clicked.getType().equals(blockTrigger) && player.getItemInHand().getType().equals(itemTrigger)) return true;
+		return false;
+	}
+	public boolean isInvestigateBlock(Player player, Block clicked) {
+		if(player.getItemInHand().getType().equals(ClickAbility.INVESTIGATE.getMaterial()) && clicked.getType().equals(blockTrigger)) return false;
 		return false;
 	}
 
 	public List<ItemStack> getGUIIcons() {
-		ItemStack blockItem = Optional.ofNullable(getBlock())
-			.map(m -> new ItemStack(getBlock(), 1))
-			.orElse(KotobaAPIUtility.createCustomItem(Material.GLASS, 1, (short) 0, "Block Not Set", null).get());
-		ItemStack triggerItem = Optional.ofNullable(getTrigger())
-			.map(m -> new ItemStack(getTrigger(), 1))
-			.orElse(KotobaAPIUtility.createCustomItem(Material.STICK, 1, (short) 0, "Trigger Not Set", null).get());
-		ItemStack teleport = KotobaAPIUtility.createCustomItem(Material.COMPASS, 1, (short) 0, "Teleport", null).get();
-		return Arrays.asList(blockItem, triggerItem, teleport);
+		List<ItemStack> icons = new ArrayList<ItemStack>();
+		KotobaAPIItemStack information = TBLTIcon.INFORMATION.createItemStack();
+		information.setLore(Arrays.asList(getName()));
+
+		KotobaAPIItemStack blockItem = Optional.ofNullable(getBlockTrigger())
+			.map(m -> KotobaAPIItemStack.create(m, 1, (short) 0, "Block Trigger", null))
+			.orElse(KotobaAPIItemStack.create(Material.GLASS, 1, (short) 0, "Block Not Set", null));
+		icons.add(blockItem);
+
+		KotobaAPIItemStack triggerItem = Optional.ofNullable(getItemTrigger())
+				.map(m -> KotobaAPIItemStack.create(m, 1, (short) 0, "Item Trigger", null))
+			.orElse(KotobaAPIItemStack.create(Material.STICK, 1, (short) 0, "Trigger Not Set", null));
+		icons.add(triggerItem);
+
+		KotobaAPIItemStack teleport = TBLTIcon.TELEPORT.createItemStack();
+		teleport.setLore(Arrays.asList(getWorld().getName(), String.valueOf(getCenter().getBlockX()) + "," + String.valueOf(getCenter().getBlockY()) + "," + String.valueOf(getCenter().getBlockZ())));
+		return Arrays.asList(information, blockItem, triggerItem, teleport);
 	}
 
+	public List<ItemStack> getInvestigateIcons() {
+		List<ItemStack> icons = new ArrayList<ItemStack>();
+
+		KotobaAPIItemStack blockItem = Optional.ofNullable(getBlockTrigger())
+			.map(m -> KotobaAPIItemStack.create(m, 1, (short) 0, "Block Trigger", null))
+			.orElse(KotobaAPIItemStack.create(Material.GLASS, 1, (short) 0, "Block Not Set", null));
+			icons.add(blockItem);
+
+		KotobaAPIItemStack triggerItem = Optional.ofNullable(getItemTrigger())
+			.map(m -> KotobaAPIItemStack.create(m, 1, (short) 0, "Item Trigger", null))
+			.orElse(KotobaAPIItemStack.create(Material.STICK, 1, (short) 0, "Trigger Not Set", null));
+			icons.add(triggerItem);
+
+		return icons;
+	}
 
 }

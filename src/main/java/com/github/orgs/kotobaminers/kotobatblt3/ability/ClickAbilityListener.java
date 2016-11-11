@@ -1,6 +1,7 @@
 package com.github.orgs.kotobaminers.kotobatblt3.ability;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.bukkit.ChatColor;
@@ -30,7 +31,6 @@ import net.citizensnpcs.api.event.NPCRightClickEvent;
 import net.citizensnpcs.api.npc.NPC;
 
 public class ClickAbilityListener implements Listener {
-
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
@@ -55,9 +55,13 @@ public class ClickAbilityListener implements Listener {
 
 	@EventHandler
 	public void onRightClickNPC(NPCRightClickEvent event) {
-		NPC npc = event.getNPC();
 		Player player = event.getClicker();
 
+		Optional<ClickAbility> ability = ClickAbility.find(player.getItemInHand())
+			.filter(a -> a.equals(ClickAbility.TALK));
+		if(!ability.isPresent()) return;
+
+		NPC npc = event.getNPC();
 		PlayerDatabase playerDatabase = new PlayerDatabase();
 		PlayerData data = playerDatabase.getOrDefault(player.getUniqueId()).npc(npc.getId());
 		SentenceDatabase sentenceDatabase = new SentenceDatabase();
