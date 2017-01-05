@@ -9,8 +9,8 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaAPIItemStack;
-import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaAPIUtility;
+import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStack;
+import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaUtility;
 
 public interface IconListGUI {
 	public static final int PAGE_FAILED = -1;
@@ -32,8 +32,8 @@ public interface IconListGUI {
 		Stream.iterate(start, i -> i + 1)
 			.limit(limit - start)
 			.forEach(i -> inventory.setItem(i - start, items.get(i)));
-		inventory.setItem(INVENGTORY_SIZE - 9, KotobaAPIItemStack.create(Material.COOKIE, 1, (short) 0, PREVIOUS, null));
-		inventory.setItem(INVENGTORY_SIZE - 1, KotobaAPIItemStack.create(Material.CAKE, 1, (short) 0, NEXT, null));
+		inventory.setItem(INVENGTORY_SIZE - 9, KotobaItemStack.create(Material.COOKIE, (short) 0, 1, PREVIOUS, null));
+		inventory.setItem(INVENGTORY_SIZE - 1, KotobaItemStack.create(Material.CAKE, (short) 0, 1, NEXT, null));
 		return inventory;
 	}
 
@@ -41,7 +41,7 @@ public interface IconListGUI {
 		String title2 = inventory.getTitle();
 		if(title2.startsWith(getTitle())) {
 			String str = title2.substring(getTitle().length(), getTitle().length() + 1);
-			if(KotobaAPIUtility.isNumber(str)) {
+			if(KotobaUtility.isNumber(str)) {
 				return Integer.parseInt(str);
 			}
 		}

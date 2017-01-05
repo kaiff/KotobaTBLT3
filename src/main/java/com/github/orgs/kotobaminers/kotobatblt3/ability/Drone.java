@@ -2,17 +2,22 @@ package com.github.orgs.kotobaminers.kotobatblt3.ability;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.bukkit.Effect;
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
-import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaAPIUtility;
+import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaUtility;
 import com.github.orgs.kotobaminers.kotobatblt3.kotobatblt3.Setting;
 
 public class Drone {
@@ -48,8 +53,8 @@ public class Drone {
 
 	private static void returnToLocation(Player player) {
 		if(location.containsKey(player.getUniqueId())) {
+			player.setNoDamageTicks(20);
 			player.teleport(location.get(player.getUniqueId()));
-			player.setVelocity(new Vector(0, 0.1, 0));
 			location.remove(player.getUniqueId());
 		}
 	}
@@ -68,8 +73,12 @@ public class Drone {
 				}
 			}, second * 20L);
 			setTask(player, task);
-			scheduleDroneEffect(player, second);
-			KotobaAPIUtility.playCountDown(Setting.getPlugin(), Arrays.asList(player), second);
+			List<Entity> entities = Stream.iterate(0, i -> i)
+				.limit(1)
+				.map(i -> player.getWorld().spawnEntity(player.getLocation(), EntityType.BAT))
+				.collect(Collectors.toList());
+			scheduleDroneEffect(player, second, entities);
+			KotobaUtility.playCountDown(Setting.getPlugin(), Arrays.asList(player), second);
 		}
 	}
 
@@ -94,16 +103,22 @@ public class Drone {
 		player.setWalkSpeed(0.2F);
 		player.removePotionEffect(PotionEffectType.INVISIBILITY);
 	}
-
-	private static void scheduleDroneEffect(Player player, int second) {
+	private static void scheduleDroneEffect(Player player, int second, List<Entity> entities) {
 		player.getWorld().playEffect(player.getLocation(), Effect.BLAZE_SHOOT, 4);
 		for(int i = 1; i < second * 20; i++) {
 			Setting.getPlugin().getServer().getScheduler().scheduleSyncDelayedTask(Setting.getPlugin(), new Runnable() {
 				@Override
 				public void run() {
 					player.getWorld().playEffect(player.getLocation(), Effect.SMOKE, 4);
+					entities.stream().forEach(entity -> entity.teleport(player.getLocation().clone().add(player.getLocation().getDirection().clone().multiply(1.5))));
 				}
 			}, i);
 		}
+		Setting.getPlugin().getServer().getScheduler().scheduleSyncDelayedTask(Setting.getPlugin(), new Runnable() {
+			@Override
+			public void run() {
+				entities.stream().forEach(Entity::remove);
+			}
+		}, second * 20);
 	}
 }

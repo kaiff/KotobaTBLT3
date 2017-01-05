@@ -1,10 +1,10 @@
 package com.github.orgs.kotobaminers.kotobatblt3.kotobatblt3;
 
 import com.github.orgs.kotobaminers.kotobaapi.sentence.HologramsManager;
+import com.github.orgs.kotobaminers.kotobatblt3.block.BlockReplacerMap;
+import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaMap;
 import com.github.orgs.kotobaminers.kotobatblt3.database.PlayerDatabase;
 import com.github.orgs.kotobaminers.kotobatblt3.database.SentenceDatabase;
-import com.github.orgs.kotobaminers.kotobatblt3.game.BlockReplacer;
-import com.github.orgs.kotobaminers.kotobatblt3.game.TBLTArena;
 
 public class Setting {
 	private static KotobaTBLT3 plugin;
@@ -12,8 +12,8 @@ public class Setting {
 	public static void initialize(KotobaTBLT3 plugin) {
 		Setting.plugin = plugin;
 
-		TBLTArena.importAll();
-		BlockReplacer.importAll();
+		new TBLTArenaMap().importAll();
+		new BlockReplacerMap().importAll();
 
 		new PlayerDatabase().loadConfig();
 		new SentenceDatabase().loadConfig();
@@ -27,7 +27,5 @@ public class Setting {
 	}
 
 	public static void saveAll() {
-		TBLTArena.saveAll();
-		BlockReplacer.saveAll();
 	}
 }

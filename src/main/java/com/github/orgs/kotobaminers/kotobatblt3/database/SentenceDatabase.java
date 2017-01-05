@@ -2,6 +2,7 @@ package com.github.orgs.kotobaminers.kotobatblt3.database;
 
 import java.io.File;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -11,7 +12,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.apache.commons.lang.BooleanUtils;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import com.github.orgs.kotobaminers.kotobaapi.database.DatabaseManager;
@@ -33,61 +33,63 @@ public class SentenceDatabase extends DatabaseManager {
 
 	public synchronized void update(Sentence sentence) {
 		String update = "";
+		PreparedStatement prepared = null;
 		Connection connection = null;
-		Statement statement = null;
-		if(sentence.getId() == null) {
-			update = "INSERT INTO " + sentenceTable + " "
-				+ "(npc, conversation, ordering, task, keyBool, japanese, english, owner) "
-				+ "VALUES "
-					+ "('" + sentence.getNPC() + "', '"
-					+ sentence.getConversation() + "', '"
-					+ sentence.getOrder() + "', '"
-					+ sentence.getTask() + "', '"
-					+ BooleanUtils.toInteger(sentence.getKey()) + "', '"
-					+ sentence.getLines(Arrays.asList(Expression.KANJI)).get(0).replace("'", "''") + "', '"
-					+ sentence.getLines(Arrays.asList(Expression.ENGLISH)).get(0).replace("'", "''") + "', '"
-					+ sentence.getOwner().map(UUID::toString).orElse("") + "') ";
-		} else {
-			update = "INSERT INTO " + sentenceTable + " "
-				+ "(id, npc, conversation, ordering, task, keyBool, japanese, english, owner) "
-				+ "VALUES "
-					+ "('" + sentence.getId() + "', '"
-					+ sentence.getNPC() + "', '"
-					+ sentence.getConversation() + "', '"
-					+ sentence.getOrder() + "', '"
-					+ sentence.getTask() + "', '"
-					+ BooleanUtils.toInteger(sentence.getKey()) + "', '"
-					+ sentence.getLines(Arrays.asList(Expression.KANJI)).get(0).replace("'", "''") + "', '"
-					+ sentence.getLines(Arrays.asList(Expression.ENGLISH)).get(0).replace("'", "''") + "', '"
-					+ sentence.getOwner().map(UUID::toString).orElse("") + "') "
-				+ "ON DUPLICATE KEY UPDATE "
-					+ "id = '" + sentence.getId() + "', "
-					+ "npc = '" + sentence.getNPC() + "', "
-					+ "conversation = '" + sentence.getConversation() + "', "
-					+ "ordering = '" + sentence.getOrder() + "', "
-					+ "task = '" + sentence.getTask() + "', "
-					+ "keyBool = '" + BooleanUtils.toInteger(sentence.getKey()) + "', "
-					+ "japanese = '" + sentence.getLines(Arrays.asList(Expression.KANJI)).get(0).replace("'", "''") + "', "
-					+ "english = '" + sentence.getLines(Arrays.asList(Expression.ENGLISH)).get(0).replace("'", "''") + "', "
-					+ "owner = '" + sentence.getOwner().map(UUID::toString).orElse("") + "';";
-		}
 		try {
 			connection = openConnection();
 			if(connection != null) {
-				statement = connection.createStatement();
-				statement.executeUpdate(update);
+				if(sentence.getId() == null) {
+					update = "INSERT INTO " + sentenceTable + " "
+						+ "(npc, conversation, ordering, task, keyBool, japanese, english, owner) "
+						+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+					prepared = connection.prepareStatement(update);
+					prepared.setInt(1, sentence.getNPC());
+					prepared.setInt(2, sentence.getConversation());
+					prepared.setInt(3, sentence.getOrder());
+					prepared.setString(4, sentence.getTask());
+					prepared.setBoolean(5, sentence.getKey());
+					prepared.setString(6, sentence.getLines(Arrays.asList(Expression.KANJI)).get(0).replace("'", "''"));
+					prepared.setString(7, sentence.getLines(Arrays.asList(Expression.ENGLISH)).get(0).replace("'", "''"));
+					prepared.setString(8, sentence.getOwner().map(UUID::toString).orElse(""));
+				} else {
+					update = "INSERT INTO " + sentenceTable + " "
+						+ "(id, npc, conversation, ordering, task, keyBool, japanese, english, owner) "
+						+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) "
+						+ "ON DUPLICATE KEY UPDATE "
+							+ "id = VALUES(id), "
+							+ "npc = VALUES(npc), "
+							+ "conversation = VALUES(conversation), "
+							+ "ordering = VALUES(ordering), "
+							+ "task = VALUES(task), "
+							+ "keyBool = VALUES(keyBool), "
+							+ "japanese = VALUES(japanese), "
+							+ "english = VALUES(english), "
+							+ "owner = VALUES(owner);";
+					prepared = connection.prepareStatement(update);
+					prepared.setInt(1, sentence.getId());
+					prepared.setInt(2, sentence.getNPC());
+					prepared.setInt(3, sentence.getConversation());
+					prepared.setInt(4, sentence.getOrder());
+					prepared.setString(5, sentence.getTask());
+					prepared.setBoolean(6, sentence.getKey());
+					prepared.setString(7, sentence.getLines(Arrays.asList(Expression.KANJI)).get(0).replace("'", "''"));
+					prepared.setString(8, sentence.getLines(Arrays.asList(Expression.ENGLISH)).get(0).replace("'", "''"));
+					prepared.setString(9, sentence.getOwner().map(UUID::toString).orElse(""));
+					prepared.executeUpdate();
+				}
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
 			try {
-				if(statement != null) statement.close();
+				if(prepared != null) prepared.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
 			closeConnection(connection);
 		}
 	}
+
 
 	public synchronized Optional<Sentence> find(int id) {
  		Optional<Sentence> sentence = Optional.empty();

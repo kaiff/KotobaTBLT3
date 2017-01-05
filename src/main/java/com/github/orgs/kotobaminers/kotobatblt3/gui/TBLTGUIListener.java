@@ -5,7 +5,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
-import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaAPISound;
+import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaSound;
 
 public class TBLTGUIListener implements Listener {
 	@EventHandler
@@ -13,13 +13,8 @@ public class TBLTGUIListener implements Listener {
 		TBLTGUI.find(event.getInventory())
 			.ifPresent(e -> {
 				event.setCancelled(true);
-				if(e.isIconClicked(event.getRawSlot())) {
-					KotobaAPISound.CLICK.play((Player) event.getWhoClicked());
-					e.onInventoryClick(event);
-					return;
-				} else {
-					return;
-				}
+				KotobaSound.CLICK.play(((Player) event.getWhoClicked()).getLocation());
+				e.onInventoryClick(event);
 			});
 	}
 }

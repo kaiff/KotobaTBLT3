@@ -2,49 +2,92 @@ package com.github.orgs.kotobaminers.kotobaapi.worldeditor;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.block.Chest;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.util.Vector;
 
+import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaBlockData;
+import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaUtility;
+import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaYamlConfiguration;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.selections.Selection;
 
-public abstract class BlockStorage {
+//TODO: torch cannot be set correctry
+public abstract class BlockStorage extends KotobaYamlConfiguration {
+	private enum Path {
+		NAME("NAME"),
+		WORLD("WORLD"),
+		SPAWN("SPAWN"),
+		BLOCKS("BLOCKS"),
+		CHESTS("CHESTS"),
+		;
+		private String path;
+		private Path(String path) {
+			this.path = path;
+		}
+		public String getPath() {
+			return path;
+		}
+	}
 
-	private static final String NAME = "Name";
-	private static final String WORLD = "World";
-	private static final String SPAWN_X = "Spawn.X";
-	private static final String SPAWN_Y = "Spawn.Y";
-	private static final String SPAWN_Z = "Spawn.Z";
-	private static final String EXTENSION = ".yml";
+
+	private static final List<Material> LIQUID = Arrays.asList(
+		Material.STATIONARY_WATER,
+		Material.WATER,
+		Material.STATIONARY_LAVA,
+		Material.LAVA,
+		Material.TORCH
+	);
+
 
 	private String name;
-	private File directory;
 	private World world;
 	private Location spawn;
-	private Integer XMax;
-	private Integer YMax;
-	private Integer ZMax;
-	private Integer XMin;
-	private Integer YMin;
-	private Integer ZMin;
+	private Integer xMax;
+	private Integer yMax;
+	private Integer zMax;
+	private Integer xMin;
+	private Integer yMin;
+	private Integer zMin;
 
-	public BlockStorage setData(Player player, String name) {
+
+	protected BlockStorage(String name) {
+		this.name = name;
+	}
+
+
+	public abstract BlockStorage create(String name);
+	protected abstract void saveOptions(YamlConfiguration config);
+	protected abstract void setOptions(YamlConfiguration config);
+
+	protected BlockStorage setData(String name, World world, Integer XMax, Integer YMax, Integer ZMax, Integer XMin, Integer YMin, Integer ZMin) {
+		this.name = name;
+		this.world = world;
+		this.xMax = XMax;
+		this.yMax = YMax;
+		this.zMax = ZMax;
+		this.xMin = XMin;
+		this.yMin = YMin;
+		this.zMin = ZMin;
+		return this;
+	}
+
+	protected BlockStorage setData(String name, Player player) {
 		WorldEditPlugin worldEdit = (WorldEditPlugin) Bukkit.getServer().getPluginManager().getPlugin("WorldEdit");
 		if (worldEdit == null) {
 			player.sendMessage("WorldEdit Not Load");
+			return this;
 		}
 		Selection sel = worldEdit.getSelection(player);
 		return setData(
@@ -59,120 +102,116 @@ public abstract class BlockStorage {
 		);
 	}
 
-	public BlockStorage setData(String name, World world, Integer XMax, Integer YMax, Integer ZMax, Integer XMin, Integer YMin, Integer ZMin) {
-		this.name = name;
-		this.world = world;
-		this.XMax = XMax;
-		this.YMax = YMax;
-		this.ZMax = ZMax;
-		this.XMin = XMin;
-		this.YMin = YMin;
-		this.ZMin = ZMin;
+	protected BlockStorage setDataFromConfig() {
+		YamlConfiguration config = getConfiguration();
+		if(!config.contains(Path.WORLD.getPath())) return this;
+
+		Bukkit.getWorlds().stream()
+			.filter(w -> w.getName().equalsIgnoreCase(config.getString(Path.WORLD.getPath())))
+			.findFirst()
+			.ifPresent(world -> {
+				String name = config.getString(Path.NAME.getPath());
+				List<Location> locations = KotobaYamlConfiguration.loadBlocksData(config, Path.BLOCKS.getPath(), Path.WORLD.getPath()).stream()
+					.map(KotobaBlockData::getLocation)
+					.collect(Collectors.toList());
+				int xMax = locations.stream().map(loc -> loc.getX()).max(Comparator.naturalOrder()).map(d -> d.intValue()).orElse(0);
+				int xMin = locations.stream().map(loc -> loc.getX()).min(Comparator.naturalOrder()).map(d -> d.intValue()).orElse(0);
+				int yMax = locations.stream().map(loc -> loc.getY()).max(Comparator.naturalOrder()).map(d -> d.intValue()).orElse(0);
+				int yMin = locations.stream().map(loc -> loc.getY()).min(Comparator.naturalOrder()).map(d -> d.intValue()).orElse(0);
+				int zMax = locations.stream().map(loc -> loc.getZ()).max(Comparator.naturalOrder()).map(d -> d.intValue()).orElse(0);
+				int zMin = locations.stream().map(block -> block.getZ()).min(Comparator.naturalOrder()).map(d -> d.intValue()).orElse(0);
+
+				setData(name, world, xMax, yMax, zMax, xMin, yMin, zMin);
+				if(config.contains(Path.SPAWN.getPath())) {
+					this.setSpawn((Location) config.get(Path.SPAWN.getPath()));
+				}
+				setOptions(config);
+			});
 		return this;
 	}
 
-	public boolean isLocationIn(Location location) {
-		int pX = location.getBlockX();
-		int pY = location.getBlockY();
-		int pZ = location.getBlockZ();
-		if (pX <= getXMax() && pX >= getXMin() && pY <= getYMax() && pY >= getYMin() && pZ <= getZMax() && pZ >= getZMin()) {
-			return true;
-		}
-		return false;
+
+	public List<BlockStorage> importAll() {
+		return Stream.of(getDirectory().listFiles())
+			.map(f -> f.getName().substring(0, f.getName().length()-".yml".length()))
+			.map(name -> create(name))
+			.map(storage -> storage.setDataFromConfig())
+			.collect(Collectors.toList());
 	}
 
-	@SuppressWarnings("deprecation")
+	public BlockStorage resize(Player player) {
+		return setData(this.getName(), player);
+	}
+
+
+	@Override
+	public void delete() {
+		if(getFileEvenCreate().exists()) getFileEvenCreate().delete();
+	}
+
+	@Override
 	public void save() {
-		YamlConfiguration config = YamlConfiguration.loadConfiguration(getFile());
-		config.set(NAME, getName());
-		config.set(WORLD, getWorld().getName());
-		if(getSpawn() != null) {
-			Location s = getSpawn();
-			config.set(SPAWN_X, s.getBlockX());
-			config.set(SPAWN_Y, s.getBlockY());
-			config.set(SPAWN_Z, s.getBlockZ());
-		}
-		for (int x = getXMin(); x <= getXMax(); x++) {
-			for (int y = getYMin(); y <= getYMax(); y++) {
-				for (int z = getZMin(); z <= getZMax(); z++) {
-					Block block = getWorld().getBlockAt(x, y, z);
-					config.set("Blocks." + x + "," + y + "," + z, block.getType().toString() + ":" + block.getData());
-				}
-			}
-		}
+		File file = getFileEvenCreate();
+		delete();
 		try {
-			config.save(getFile());
+			file.createNewFile();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return;
+		}
+		YamlConfiguration config = getConfiguration();
+
+		config.set(Path.NAME.getPath(), getName());
+		config.set(Path.WORLD.getPath(), getWorld().getName());
+		if(getSpawn() != null) config.set(Path.SPAWN.getPath(), spawn);
+
+		List<Block> blocks = getBlocks();
+		KotobaYamlConfiguration.setBlocks(blocks, config, Path.BLOCKS.getPath());
+
+		List<Chest> chests = blocks.stream()
+			.filter(b -> b.getState() instanceof Chest)
+			.map(b -> (Chest) b.getState())
+			.collect(Collectors.toList());
+		KotobaYamlConfiguration.setChests(chests, config, Path.CHESTS.getPath());
+
+		saveOptions(config);
+
+		try {
+			config.save(file);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	@SuppressWarnings("deprecation")
-	public void load(List<World> worlds) {
-		YamlConfiguration config = YamlConfiguration.loadConfiguration(getFile());
-		worlds.stream()
-			.filter(w -> w.getName().equalsIgnoreCase(config.getString(WORLD)))
-			.findFirst()
-			.ifPresent(w -> {
-				ConfigurationSection privateSection = config.getConfigurationSection("Blocks");
-				for (String location : privateSection.getKeys(false)) {
-					String[] cords = location.split(",");
-					int X = Integer.valueOf(cords[0]);
-					int Y = Integer.valueOf(cords[1]);
-					int Z = Integer.valueOf(cords[2]);
-					String[] Blockdata = config.getString("Blocks." + location).split(":");
-					String material = Blockdata[0];
-					byte data = Byte.valueOf(Blockdata[1]);
-					w.getBlockAt(X, Y, Z).setType(Material.getMaterial(material));
-					w.getBlockAt(X, Y, Z).setData(data);
-				}
-			}
-		);
-	}
+	@Override
+	public void load() {
+		YamlConfiguration config = YamlConfiguration.loadConfiguration(getFileEvenCreate());
 
-	public void setDataFromConfig(List<World> worlds) {
-		YamlConfiguration config = YamlConfiguration.loadConfiguration(getFile());
-		Optional<World> worldOpt = worlds.stream()
-			.filter(w -> w.getName().equalsIgnoreCase(config.getString(WORLD)))
-			.findFirst();
-		if(worldOpt.isPresent()) {
-			String name = config.getString(NAME);
-			World world = worldOpt.get();
-			List<Vector> vectors = config.getConfigurationSection("Blocks").getKeys(false)
-				.stream()
-				.map(str -> str.split(","))
-				.map(cords -> new Vector(Integer.valueOf(cords[0]), Integer.valueOf(cords[1]), Integer.valueOf(cords[2])))
+		List<KotobaBlockData> blocksData = KotobaYamlConfiguration.loadBlocksData(config, Path.BLOCKS.getPath(), Path.WORLD.getPath());
+
+		List<KotobaBlockData> liquid = blocksData.stream()
+			.filter(data -> LIQUID.contains(data.getMaterial()))
+			.collect(Collectors.toList());
+		List<KotobaBlockData> solid = blocksData.stream()
+				.filter(data -> !LIQUID.contains(data.getMaterial()))
 				.collect(Collectors.toList());
 
-			Optional<Integer> xMax = vectors.stream().map(loc -> loc.getX()).max(Comparator.naturalOrder()).map(d -> d.intValue());
-			Optional<Integer> xMin = vectors.stream().map(loc -> loc.getX()).min(Comparator.naturalOrder()).map(d -> d.intValue());
-			Optional<Integer> yMax = vectors.stream().map(loc -> loc.getY()).max(Comparator.naturalOrder()).map(d -> d.intValue());
-			Optional<Integer> yMin = vectors.stream().map(loc -> loc.getY()).min(Comparator.naturalOrder()).map(d -> d.intValue());
-			Optional<Integer> zMax = vectors.stream().map(loc -> loc.getZ()).max(Comparator.naturalOrder()).map(d -> d.intValue());
-			Optional<Integer> zMin = vectors.stream().map(loc -> loc.getZ()).min(Comparator.naturalOrder()).map(d -> d.intValue());
+		blocksData.stream()
+			.map(data -> data.getLocation().getBlock())
+			.filter(block -> LIQUID.contains(block.getType()))
+			.forEach(block -> block.setType(Material.AIR));
 
-			if(xMax.isPresent() && xMin.isPresent() && yMax.isPresent() && yMin.isPresent() && zMax.isPresent() && zMin.isPresent()) {
-				this.setData(name, world, xMax.get(), yMax.get(), zMax.get(), xMin.get(), yMin.get(), zMin.get());
-				if(config.isInt(SPAWN_X) && config.isInt(SPAWN_Y) && config.isInt(SPAWN_Z)) {
-					int spawnX = config.getInt(SPAWN_X);
-					int spawnY= config.getInt(SPAWN_Y);
-					int spawnZ = config.getInt(SPAWN_Z);
-					setSpawn(new Location(world, spawnX, spawnY, spawnZ));
-				}
-			}
-		}
+		solid.forEach(KotobaBlockData::placeBlock);
+		liquid.forEach(KotobaBlockData::placeBlock);
+
+		KotobaYamlConfiguration.loadChests(config, Path.CHESTS.getPath(), Path.WORLD.getPath(), true);
+		loadFromWorld();
 	}
+	protected abstract void loadFromWorld();
+
 
 	public List<Block> getBlocks() {
-		List<Block> blocks = new ArrayList<>();
-		for (int x = getXMin(); x <= getXMax(); x++) {
-			for (int y = getYMin(); y <= getYMax(); y++) {
-				for (int z = getZMin(); z <= getZMax(); z++) {
-					blocks.add(getWorld().getBlockAt(x, y, z));
-				}
-			}
-		}
-		return blocks;
+		return KotobaUtility.getBlocks(getWorld(), getXMax(), getYMax(), getZMax(), getXMin(), getYMin(), getZMin());
 	}
 
 	public Location getCenter() {
@@ -182,23 +221,44 @@ public abstract class BlockStorage {
 		return new Location(getWorld(), xCenter, yCenter, zCenter);
 	}
 
-	public File getFile() {
-		File file = new File(getDirectory().getAbsolutePath() + "/" + getName() + EXTENSION);
-		if(!file.exists()) {
-			try {
-				file.createNewFile();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+	public boolean isOverlap(BlockStorage storage) {
+		Integer xMax1 = this.getXMax();
+		Integer xMin1 = this.getXMin();
+		Integer xMax2 = storage.getXMax();
+		Integer xMin2 = storage.getXMin();
+		boolean overlapX = (xMin2 <= xMax1 && xMax1 <= xMax2) || (xMin2 <= xMin1  && xMin1 <= xMax2);
+
+		Integer yMax1 = this.getYMax();
+		Integer yMin1 = this.getYMin();
+		Integer yMax2 = storage.getYMax();
+		Integer yMin2 = storage.getYMin();
+		boolean overlapY = (yMin2 <= yMax1 && yMax1 <= yMax2) || (yMin2 <= yMin1  && yMin1 <= yMax2);
+
+		Integer zMax1 = this.getZMax();
+		Integer zMin1 = this.getZMin();
+		Integer zMin2 = storage.getZMin();
+		Integer zMax2 = storage.getZMax();
+		boolean overlapZ = (zMin2 <= zMax1 && zMax1 <= zMax2) || (zMin2 <= zMin1  && zMin1 <= zMax2);
+
+		if(overlapX && overlapY && overlapZ) {
+			return true;
 		}
-		return file;
+		return false;
+
+	}
+
+	public boolean isIn(Location location) {
+		int pX = location.getBlockX();
+		int pY = location.getBlockY();
+		int pZ = location.getBlockZ();
+		if (pX <= getXMax() && pX >= getXMin() && pY <= getYMax() && pY >= getYMin() && pZ <= getZMax() && pZ >= getZMin()) {
+			return true;
+		}
+		return false;
 	}
 
 	public String getName() {
 		return name;
-	}
-	public File getDirectory() {
-		return directory;
 	}
 	public World getWorld() {
 		return world;
@@ -207,24 +267,23 @@ public abstract class BlockStorage {
 		return spawn;
 	}
 	public Integer getXMax() {
-		return XMax;
+		return xMax;
 	}
 	public Integer getYMax() {
-		return YMax;
+		return yMax;
 	}
 	public Integer getZMax() {
-		return ZMax;
+		return zMax;
 	}
 	public Integer getXMin() {
-		return XMin;
+		return xMin;
 	}
 	public Integer getYMin() {
-		return YMin;
+		return yMin;
 	}
 	public Integer getZMin() {
-		return ZMin;
+		return zMin;
 	}
-
 	protected void setName(String name) {
 		this.name= name;
 	}
@@ -232,4 +291,9 @@ public abstract class BlockStorage {
 		this.spawn = location;
 	}
 
+	@Override
+	public String getFileName() {
+		return name;
+	}
+	public abstract File getDirectory();
 }

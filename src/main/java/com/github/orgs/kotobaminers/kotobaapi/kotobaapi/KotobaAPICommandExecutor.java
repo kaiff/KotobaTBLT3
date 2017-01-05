@@ -42,7 +42,7 @@ public class KotobaAPICommandExecutor implements CommandExecutor {
 		},
 		;
 
-		public static final String label = "kotobaapi";
+		public static final String LABEL = "kotobaapi";
 
 		private List<List<String>> tree;
 		private String option;
@@ -72,11 +72,11 @@ public class KotobaAPICommandExecutor implements CommandExecutor {
 
 		@Override
 		public String getLabel() {
-			return label;
+			return LABEL;
 		}
 
 		@Override
-		public boolean canPerform(Player player) {
+		public boolean hasPermission(Player player) {
 			return getPermission().canPerform(player);
 		}
 
@@ -96,7 +96,7 @@ public class KotobaAPICommandExecutor implements CommandExecutor {
 
 			if(commandEnum.isPresent()) {
 				CommandEnum com = commandEnum.get();
-				if(!com.canPerform(player)) {
+				if(!com.hasPermission(player)) {
 					player.sendMessage(com.getUsage());
 					return false;
 				}

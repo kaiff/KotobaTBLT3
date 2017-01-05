@@ -19,9 +19,9 @@ public interface CommandEnumInterface {
 		}
 		return false;
 	}
-	
+
 	default String getUsage() {
-		return String.join(" ", 
+		return String.join(" ",
 			Arrays.asList(
 				"" + ChatColor.DARK_GREEN + ChatColor.BOLD + "/" + getLabel(),
 				ChatColor.GREEN + getName(),
@@ -46,8 +46,8 @@ public interface CommandEnumInterface {
 	String getOption();
 	String getDescription();
 
-	boolean canPerform(Player player);
-	
+	boolean hasPermission(Player player);
+
 	boolean perform(Player player, String[] args);
-	
+
 }

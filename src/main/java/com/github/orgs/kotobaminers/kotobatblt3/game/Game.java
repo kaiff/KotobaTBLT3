@@ -14,7 +14,7 @@ public class Game {
 		public Integer getPeriod();
 	}
 	
-	public enum GameMode implements GameModeEnumInterface {
+	public enum TBLTGameMode implements GameModeEnumInterface {
 		RESEARCH(
 			180,
 			Arrays.asList("Research", "Talk with people and find who to be rescued.", "Go around and find the way to rescue and extinguish.")
@@ -52,15 +52,15 @@ public class Game {
 		
 		private Integer period;
 		private List<String> startMessage;
-		public static List<GameMode> order = Arrays.asList(RESEARCH, DISCUSS, RESCUE, EXTINGUISH_A_FIRE);
+		public static List<TBLTGameMode> order = Arrays.asList(RESEARCH, DISCUSS, RESCUE, EXTINGUISH_A_FIRE);
 		
-		private GameMode(Integer period, List<String> startMessage) {
+		private TBLTGameMode(Integer period, List<String> startMessage) {
 			this.period = period;
 			this.startMessage = startMessage;
 		}
 		
-		public static Optional<GameMode> findNext(GameMode current) {
-			for(GameMode c : order) {
+		public static Optional<TBLTGameMode> findNext(TBLTGameMode current) {
+			for(TBLTGameMode c : order) {
 				if(c.equals(current)) {
 					if(c.equals(order.get(order.size()-1))) {
 						return Optional.empty();

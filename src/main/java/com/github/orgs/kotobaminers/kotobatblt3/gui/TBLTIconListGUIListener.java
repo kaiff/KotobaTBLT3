@@ -11,7 +11,7 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 
-import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaAPISound;
+import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaSound;
 
 public class TBLTIconListGUIListener implements Listener {
 	@EventHandler
@@ -28,24 +28,24 @@ public class TBLTIconListGUIListener implements Listener {
 				Inventory inventory = event.getInventory();
 
 				if(gui.isPreviousClicked(rawSlot)) {
-					KotobaAPISound.CLICK.play((Player) event.getWhoClicked());
+					KotobaSound.CLICK.play(((Player) event.getWhoClicked()).getLocation());
 					clicker.openInventory(gui.createInventory(gui.getPreviousPage(inventory)));
 					return;
 				}
 				if(gui.isNextClicked(rawSlot)) {
-					KotobaAPISound.CLICK.play((Player) event.getWhoClicked());
+					KotobaSound.CLICK.play(((Player) event.getWhoClicked()).getLocation());
 					clicker.openInventory(gui.createInventory(gui.getNextPage(inventory)));
 					return;
 				}
 				if(gui.isIconClicked(rawSlot)) {
 					ClickType click = event.getClick();
 					if(Arrays.asList(ClickType.LEFT, ClickType.SHIFT_LEFT).contains(click)) {
-						KotobaAPISound.CLICK.play((Player) event.getWhoClicked());
+						KotobaSound.CLICK.play(((Player) event.getWhoClicked()).getLocation());
 						gui.onIconLeftClickEvent(event);
 						return;
 					}
 					if(Arrays.asList(ClickType.RIGHT, ClickType.SHIFT_RIGHT).contains(click)) {
-						KotobaAPISound.CLICK.play((Player) event.getWhoClicked());
+						KotobaSound.CLICK.play(((Player) event.getWhoClicked()).getLocation());
 						gui.onIconRightClickEvent(event);
 						return;
 					}

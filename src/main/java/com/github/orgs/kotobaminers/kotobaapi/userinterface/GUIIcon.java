@@ -6,11 +6,14 @@ import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaAPIItemStack;
+import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStack;
 
 public interface GUIIcon {
-	default KotobaAPIItemStack createItemStack() {
-		return KotobaAPIItemStack.create(getMaterial(), getAmount(), getData(), getDisplayName(), getLore());
+	default ItemStack createItemStack() {
+		return KotobaItemStack.create(getMaterial(), getData(), getAmount(), getDisplayName(), getLore());
+	}
+	default ItemStack createItemStack(List<String> lore) {
+		return KotobaItemStack.create(getMaterial(), getData(), getAmount(), getDisplayName(), lore);
 	}
 
 	default boolean isIcon(ItemStack itemStack) {

@@ -1,30 +1,39 @@
 package com.github.orgs.kotobaminers.kotobatblt3.ability;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-public interface ItemAbilityInterface {
-	boolean canPerform(Player player, Action action);
-	void perform(PlayerInteractEvent event);
+import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStack;
 
-	short getData();
+public interface ItemAbilityInterface {
 	Material getMaterial();
-	String getDisplayName();
+	short getData();
+	String getName();
 	List<String> getLore();
-	List<Action> getTriggers();
+	int getConsumption();
+
+	List<ItemFlag> flags = Arrays.asList(ItemFlag.HIDE_ATTRIBUTES);
 
 	default ItemStack createItem(int amount) {
 		ItemStack item = new ItemStack(getMaterial(), amount, getData());
 		ItemMeta meta = item.getItemMeta();
-		meta.setDisplayName(getDisplayName());
-		meta.setLore(getLore());
+		meta.setDisplayName(getName());
+		if(getLore() != null) {
+			meta.setLore(getLore());
+		}
+
+		flags.stream().forEach(flag -> meta.addItemFlags(flag));
+
 		item.setItemMeta(meta);
 		return item;
+	}
+	default void consumeInHand(Player player) {
+		KotobaItemStack.consume(player.getInventory(), player.getItemInHand(), getConsumption());
 	}
 }

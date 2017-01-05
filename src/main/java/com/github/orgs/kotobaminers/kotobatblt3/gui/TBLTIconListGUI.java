@@ -14,17 +14,49 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import com.github.orgs.kotobaminers.kotobaapi.userinterface.IconListGUI;
-import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaAPIItemStack;
-import com.github.orgs.kotobaminers.kotobatblt3.game.BlockReplacer;
+import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStack;
+import com.github.orgs.kotobaminers.kotobaapi.worldeditor.BlockStorage;
+import com.github.orgs.kotobaminers.kotobatblt3.block.BlockReplacer;
+import com.github.orgs.kotobaminers.kotobatblt3.block.BlockReplacerMap;
+import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArena;
+import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaMap;
 
 public enum TBLTIconListGUI implements IconListGUI {
+	ARENA("Arenas ") {
+		@Override
+		public List<ItemStack> getIcons() {
+			List<BlockStorage> arenas = new TBLTArenaMap().getStorages();
+			return Stream.iterate(0, i -> i + 1)
+				.limit(arenas.size())
+				.map(i -> KotobaItemStack.create(Material.GLASS, (short) 0, i + 1, arenas.get(i).getName(), null))
+				.collect(Collectors.toList());
+		}
+
+		@Override
+		public void onIconLeftClickEvent(InventoryClickEvent event) {
+			onIconClickEvent(event);
+		}
+
+		@Override
+		public void onIconRightClickEvent(InventoryClickEvent event) {
+			onIconClickEvent(event);
+		}
+
+		private void onIconClickEvent(InventoryClickEvent event) {
+			String name = event.getCurrentItem().getItemMeta().getDisplayName();
+			new TBLTArenaMap().findUnique(name)
+				.flatMap(arena -> TBLTGUI.ARENA.create(IconCreatorUtility.getIcons((TBLTArena) arena)))
+				.ifPresent(i -> event.getWhoClicked().openInventory(i));
+		}
+	},
+
 	BLOCK_REPLACER("Block Replacers ") {
 		@Override
 		public List<ItemStack> getIcons() {
-			List<BlockReplacer> replacers = BlockReplacer.getReplacers().stream().collect(Collectors.toList());
+			List<BlockStorage> replacers = new BlockReplacerMap().getStorages();
 			return Stream.iterate(0, i -> i + 1)
-				.limit(BlockReplacer.getReplacers().size())
-				.map(i -> KotobaAPIItemStack.create(Material.ANVIL, i + 1, (short) 0, replacers.get(i).getName(), null))
+				.limit(replacers.size())
+				.map(i -> KotobaItemStack.create(Material.ANVIL, (short) 0, i + 1, replacers.get(i).getName(), null))
 				.collect(Collectors.toList());
 		}
 
@@ -38,21 +70,17 @@ public enum TBLTIconListGUI implements IconListGUI {
 		}
 		public void onIconClickEvent(InventoryClickEvent event) {
 			String name = event.getCurrentItem().getItemMeta().getDisplayName();
-			System.out.println(name);
-			BlockReplacer.getReplacers().stream()
-				.filter(r -> r.getName().equalsIgnoreCase(name))
-				.findAny()
-				.flatMap(r -> TBLTGUI.BLOCK_REPLACER.create(r.getGUIIcons()))
+			new BlockReplacerMap().findUnique(name)
+				.flatMap(arena -> TBLTGUI.BLOCK_REPLACER.create(IconCreatorUtility.getIcons((BlockReplacer) arena)))
 				.ifPresent(i -> event.getWhoClicked().openInventory(i));
 		}
-
 	},
 	SOLID_BLOCK("Blocks ") {
 		@Override
 		public List<ItemStack> getIcons() {
 			return Stream.of(Material.values())
 				.filter(m -> m.isBlock() && m.isSolid())
-				.map(m -> KotobaAPIItemStack.create(m, 1, (short) 0, m.name(), null))
+				.map(m -> KotobaItemStack.create(m, (short) 0, 1, m.name(), null))
 				.collect(Collectors.toList());
 		}
 
@@ -67,7 +95,7 @@ public enum TBLTIconListGUI implements IconListGUI {
 		@Override
 		public List<ItemStack> getIcons() {
 			return Stream.of(Effect.values())
-				.map(e -> KotobaAPIItemStack.create(Material.NETHER_STAR, 1, (short) 0, e.name(), null))
+				.map(e -> KotobaItemStack.create(Material.NETHER_STAR, (short) 0, 1, e.name(), null))
 				.collect(Collectors.toList());
 		}
 
@@ -95,7 +123,7 @@ public enum TBLTIconListGUI implements IconListGUI {
 		@Override
 		public List<ItemStack> getIcons() {
 			return Stream.of(Sound.values())
-				.map(s -> KotobaAPIItemStack.create(Material.NOTE_BLOCK, 1, (short) 0, s.name(), null))
+				.map(s -> KotobaItemStack.create(Material.NOTE_BLOCK, (short) 0, 1, s.name(), null))
 				.collect(Collectors.toList());
 		}
 

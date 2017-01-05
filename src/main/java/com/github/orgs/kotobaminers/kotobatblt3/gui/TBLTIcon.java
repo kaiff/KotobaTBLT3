@@ -8,6 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
 import com.github.orgs.kotobaminers.kotobaapi.userinterface.GUIIcon;
+import com.github.orgs.kotobaminers.kotobatblt3.ability.TBLTItem;
 
 public enum TBLTIcon implements GUIIcon {
 	INFORMATION(Material.BOOK, 1, (short) 0, "Information", null) {
@@ -15,6 +16,7 @@ public enum TBLTIcon implements GUIIcon {
 		public void onClickEvent(InventoryClickEvent event) {
 		}
 	},
+
 	TELEPORT(Material.ENDER_PEARL, 1, (short) 0, "Teleport", null) {
 		@Override
 		public void onClickEvent(InventoryClickEvent event) {
@@ -38,6 +40,39 @@ public enum TBLTIcon implements GUIIcon {
 					}
 				}
 			}
+		}
+	},
+
+	CHECK_POINT(Material.ENDER_PEARL, 1, (short) 0, "Check Point", null) {
+		@Override
+		public void onClickEvent(InventoryClickEvent event) {
+			List<String> itemLore = event.getCurrentItem().getItemMeta().getLore();
+			if(itemLore != null) {
+				if(1 < itemLore.size()) {
+					String world = itemLore.get(0);
+					String[] coordinate = itemLore.get(1).split(",");
+					if(2 < coordinate.length) {
+						try {
+							int x = Integer.parseInt(coordinate[0]);
+							int y = Integer.parseInt(coordinate[1]);
+							int z = Integer.parseInt(coordinate[2]);
+							Bukkit.getWorlds().stream()
+								.filter(w -> w.getName().equalsIgnoreCase(world))
+								.findAny()
+								.ifPresent(w -> event.getWhoClicked().teleport(new Location(w, x, y, z)));
+						} catch(NumberFormatException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+		}
+	},
+
+	WARP_CRYSTAL(Material.NETHER_STAR, 1, (short) 0, TBLTItem.WARP_CRYSTAL.getName(), null) {
+		@Override
+		public void onClickEvent(InventoryClickEvent event) {
+			event.getWhoClicked().getInventory().addItem(event.getCurrentItem());
 		}
 	},
 	;

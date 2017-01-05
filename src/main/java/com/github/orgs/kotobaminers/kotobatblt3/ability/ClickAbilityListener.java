@@ -1,83 +1,120 @@
 package com.github.orgs.kotobaminers.kotobatblt3.ability;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
-import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Snowball;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
 
-import com.github.orgs.kotobaminers.kotobaapi.sentence.Holograms;
-import com.github.orgs.kotobaminers.kotobaapi.sentence.HologramsManager;
-import com.github.orgs.kotobaminers.kotobaapi.sentence.Sentence;
-import com.github.orgs.kotobaminers.kotobaapi.sentence.Sentence.Expression;
-import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaAPISound;
-import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaAPIUtility;
-import com.github.orgs.kotobaminers.kotobatblt3.database.PlayerData;
-import com.github.orgs.kotobaminers.kotobatblt3.database.PlayerDatabase;
-import com.github.orgs.kotobaminers.kotobatblt3.database.SentenceDatabase;
-import com.github.orgs.kotobaminers.kotobatblt3.game.TBLTArena;
-import com.github.orgs.kotobaminers.kotobatblt3.kotobatblt3.NPCManager;
-import com.github.orgs.kotobaminers.kotobatblt3.kotobatblt3.Setting;
-import com.github.orgs.kotobaminers.kotobatblt3.kotobatblt3.Utility;
-
-import net.citizensnpcs.api.event.NPCRightClickEvent;
-import net.citizensnpcs.api.npc.NPC;
+import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaSound;
+import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArena;
+import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaMap;
+import com.github.orgs.kotobaminers.kotobatblt3.utility.Utility;
 
 public class ClickAbilityListener implements Listener {
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
+		Block block = event.getClickedBlock();
+
 		if(player.getItemInHand().getType() == Material.AIR) return;
-		if(!Utility.isTBLTPlaying(player)) return;
-		Action action = event.getAction();
-		ClickAbility.find(player.getItemInHand())
-			.filter(a -> a.canPerform(player, action))
+		if(!Utility.isTBLTPlayer(player)) return;
+
+		List<ClickBlockAbilityInterface> abilities = new ArrayList<>();
+		ClickBlockChestAbility.find(event).stream()
+			.forEach(ability -> abilities.add(ability));
+
+		ClickBlockAbility.find(player.getItemInHand()).stream()
+			.forEach(ability -> abilities.add(ability));
+		ProjectileAbility.find(player.getItemInHand()).stream()
+			.forEach(ability -> abilities.add(ability));
+
+		if(0 < abilities.size()) {
+			event.setCancelled(true);
+			new TBLTArenaMap().findUnique(player.getLocation())
+				.ifPresent(storage -> abilities.stream().forEach(
+					ability -> {
+						if(!ability.isCorrectAction(event.getAction())) return;
+						TBLTArena arena = (TBLTArena) storage;
+						if(!arena.hasResources(ability.getResourceConsumption(block))) {
+							player.openInventory(arena.getResourceConsumptionInventory(ability.getResourceConsumption(block)));
+							KotobaSound.SHEAR.play(player.getLocation());
+							return;
+						}
+
+						boolean successed = false;
+						successed = ability.perform(event);//Perform ability here
+						if(successed) {
+							arena.consumeResources(ability.getResourceConsumption(block));
+							ability.consumeInHand(player);
+						} else {
+							KotobaSound.SHEAR.play(player.getLocation());
+							return;
+						}
+					}));
+		}
+	}
+
+	@EventHandler
+	public void onPlayerInteractEntityEvent(PlayerInteractEntityEvent event) {
+		Player player = event.getPlayer();
+		ItemStack itemStack = player.getItemInHand();
+		if(itemStack.getType() == Material.AIR) return;
+		if(!Utility.isTBLTPlayer(player)) return;
+		ClickEntityAbility.find(event.getPlayer().getItemInHand())
 			.ifPresent(ability -> {
 				event.setCancelled(true);
-				ability.perform(event);
+				new TBLTArenaMap().findUnique(player.getLocation())
+					.map(arena -> (TBLTArena) arena)
+					.ifPresent(arena -> {
+						if(!arena.hasResources(ability.getResourceConsumption(null))) {
+							player.openInventory(arena.getResourceConsumptionInventory(ability.getResourceConsumption(null)));
+							KotobaSound.SHEAR.play(player.getLocation());
+							return;
+						}
+
+						boolean successed = false;
+						successed = ability.perform(event);//Perform ability here
+						if(successed) {
+							arena.consumeResources(ability.getResourceConsumption(null));
+							ability.consumeInHand(player);
+						} else {
+							KotobaSound.SHEAR.play(player.getLocation());
+							return;
+						}
+					});
 		});
 	}
 
 	@EventHandler
 	public void onPotionSplash(PotionSplashEvent event) {
 		if(event.getPotion().getEffects().size() == 0) {
-			if(!TBLTArena.isInArena(event.getEntity().getLocation())) return;
+			if(!new TBLTArenaMap().isInAny(event.getEntity().getLocation())) return;
 			TBLTPotion.find(event).eventSplash(event);
 		}
 	}
-
 	@EventHandler
-	public void onRightClickNPC(NPCRightClickEvent event) {
-		Player player = event.getClicker();
-
-		Optional<ClickAbility> ability = ClickAbility.find(player.getItemInHand())
-			.filter(a -> a.equals(ClickAbility.TALK));
-		if(!ability.isPresent()) return;
-
-		NPC npc = event.getNPC();
-		PlayerDatabase playerDatabase = new PlayerDatabase();
-		PlayerData data = playerDatabase.getOrDefault(player.getUniqueId()).npc(npc.getId());
-		SentenceDatabase sentenceDatabase = new SentenceDatabase();
-		List<Expression> expressions = data.getExpressions();
-
-		playerDatabase.updateDisplay(data, npc.getId())
-			.ifPresent(d ->sentenceDatabase.find(d.getDisplay())
-			.ifPresent(s ->NPCManager.findNPC(s.getNPC()).map(n -> n.getStoredLocation())
-				.ifPresent(loc -> {
-					List<String> lines = s.getLines(expressions);
-					sentenceDatabase.findSentencesByConversation(s.getConversation())
-						.ifPresent(sentences -> lines.add(0, Utility.patternProgress("", "", sentences.size(), sentences.stream().map(Sentence::getId).collect(Collectors.toList()).indexOf(s.getId()), ChatColor.GREEN)));
-					HologramsManager.updateHologram(Setting.getPlugin(), Holograms.create(loc), s.getConversation(), lines, 20 * 10);
-					KotobaAPIUtility.lookAt(player, loc.add(0, -1, 0));
-					KotobaAPISound.ATTENTION.play(player);
-				})));
+	public void onProjectileHit(ProjectileHitEvent event) {
+		Location location = event.getEntity().getLocation();
+		if(!new TBLTArenaMap().isInAny(location)) return;
+		ProjectileAbility.find(event.getEntity())
+			.ifPresent(p -> p.onHit(event));
 	}
 
+	@EventHandler
+	public void onEntityDamagedByEntity(EntityDamageByEntityEvent event) {
+		if(event.getDamager() instanceof Snowball) {
+		}
+	}
 }
