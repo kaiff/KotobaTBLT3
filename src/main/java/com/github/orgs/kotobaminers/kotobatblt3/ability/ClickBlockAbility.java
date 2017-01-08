@@ -2,6 +2,7 @@ package com.github.orgs.kotobaminers.kotobatblt3.ability;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.util.Vector;
 
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaEffect;
@@ -35,6 +37,7 @@ import com.github.orgs.kotobaminers.kotobatblt3.resource.TBLTResourceBlock;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.Utility;
 
 public enum ClickBlockAbility implements ClickBlockAbilityInterface {
+
 	CRUSH_CRYSTAL(
 		Material.DIAMOND_PICKAXE,
 		(short) 0,
@@ -132,6 +135,57 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 							return true;
 						}).orElse(false)
 				).orElse(false);
+		}
+	},
+
+	PREDICTION(
+		Material.ENCHANTED_BOOK,
+		(short) 0,
+		"Write a prediction",
+		null,
+		Arrays.asList(Action.RIGHT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR),
+		0,
+		new HashMap<TBLTResource, Integer>() {{
+			put(TBLTResource.MAGIC_MANA, 1);
+		}}
+	) {
+		@Override
+		public boolean perform(PlayerInteractEvent event) {
+			Player player = event.getPlayer();
+			ItemStack prediction = new TBLTArenaMap().findUnique(player.getLocation())
+				.map(a -> (TBLTArena) a)
+				.map(a -> {
+					ItemStack base = TBLTItem.PREDICTION.createItem(1);
+					BookMeta baseMeta = (BookMeta) base.getItemMeta();
+					List<String> pages = ((BookMeta) a.getPredictionWrittenBook().getItemMeta()).getPages();
+					baseMeta.setPages(pages);
+					base.setItemMeta(baseMeta);
+					return base;
+				})
+				.orElse(null);
+			if(prediction == null) return false;
+			List<ItemStack> currentPrediction = Stream.of(player.getInventory().getContents())
+				.filter(i -> i != null)
+				.filter(i -> TBLTItem.PREDICTION.isTBLTItem(i))
+				.collect(Collectors.toList());
+			int currentPage = currentPrediction.stream()
+					.map(i -> ((BookMeta) i.getItemMeta()).getPageCount())
+					.max(Comparator.naturalOrder()).orElse(0);
+
+			BookMeta meta = (BookMeta) prediction.getItemMeta();
+			if(currentPage < meta.getPageCount()) {
+				currentPrediction.forEach(i -> KotobaItemStack.consume(player.getInventory(), i, i.getAmount()));
+
+				meta.setPages(meta.getPages().subList(0, currentPage + 1));
+				meta.setAuthor(player.getName());
+				prediction.setItemMeta(meta);
+				player.getInventory().addItem(prediction);
+
+				KotobaEffect.MAGIC_MIDIUM.playSound(player.getLocation());
+
+				return true;
+			}
+			return false;
 		}
 	},
 

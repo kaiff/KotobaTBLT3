@@ -7,16 +7,17 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -29,10 +30,12 @@ import org.bukkit.potion.Potion;
 
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaEffect;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStack;
+import com.github.orgs.kotobaminers.kotobatblt3.ability.ProjectileAbility;
 import com.github.orgs.kotobaminers.kotobatblt3.gui.TBLTGUI;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.Utility;
 
 public class TBLTArenaListener implements Listener {
+
 	@EventHandler
 	public void onBlockReplacerPlayerInteract(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
@@ -41,46 +44,55 @@ public class TBLTArenaListener implements Listener {
 		if(Utility.isTBLTPlayer(player)) {
 			new BlockReplacerMap().findUnique(block.getLocation())
 				.ifPresent(replacer -> {
-					((BlockReplacer) replacer).replace(player, block);
-					KotobaItemStack.consume(player.getInventory(), player.getItemInHand(), 1);
+					boolean success = ((BlockReplacer) replacer).replace(player, block);
+					if(success) KotobaItemStack.consume(player.getInventory(), player.getItemInHand(), 1);
 				});
 		}
 	}
 
 	@EventHandler
 	void onHitEnemy(EntityDamageByEntityEvent event) {
-		if(new TBLTArenaMap().isInAny(event.getEntity().getLocation())) {
-			if(!event.getEntity().getType().equals(EntityType.PLAYER)) {
+		Entity damager = event.getDamager();
+		Entity damaged = event.getEntity();
+		if(new TBLTArenaMap().isInAny(damaged.getLocation())) {
+			if(damager.getType() == EntityType.PLAYER) {
 				event.setCancelled(true);
+			} else if(damager instanceof Projectile) {
+				Projectile projectile =(Projectile) damager;
+				ProjectileAbility.find(projectile)
+					.ifPresent(a -> event.setCancelled(true));
 			}
 		}
 	}
 
 	@EventHandler
 	void onEntityDamage(EntityDamageEvent event) {
-			if(event.getEntity() instanceof Player) {
-				Player player = (Player) event.getEntity();
-				if(!Utility.isTBLTPlayer(player)) return;
+		if(event.getEntity() instanceof Player) {
+			Player player = (Player) event.getEntity();
+			if(!Utility.isTBLTPlayer(player)) return;
 
-				double damage = 0;
-
-				//Fall damage multiply
-				if(event.getCause() == DamageCause.FALL) {
-					int rate = 5;
-					damage = event.getDamage() * rate;
-					event.setCancelled(true);
-				}
-
-				if(player.getHealth() - damage <= 0) {
-					Bukkit.getOnlinePlayers().forEach(p -> p.sendMessage(player.getName() + " died"));
-					event.setCancelled(true);
-					player.setHealth(20);
-					new TBLTArenaMap().findUnique(player.getLocation())
-						.ifPresent(arena -> ((TBLTArena) arena).startSpawn(player));
-				} else {
-					player.damage(damage);
-				}
+			double damage = 0;
+			//Fall damage multiply
+			switch(event.getCause()) {
+			case FALL:
+				int rate = 5;
+				damage = event.getDamage() * rate;
+				event.setCancelled(true);
+				break;
+			default:
+				break;
 			}
+
+			if(player.getHealth() - damage <= 0) {
+				Bukkit.getOnlinePlayers().forEach(p -> p.sendMessage(player.getName() + " died"));
+				event.setCancelled(true);
+				player.setHealth(20);
+				new TBLTArenaMap().findUnique(player.getLocation())
+				.ifPresent(arena -> ((TBLTArena) arena).startSpawn(player));
+			} else {
+				player.damage(damage);
+			}
+		}
 	}
 
 

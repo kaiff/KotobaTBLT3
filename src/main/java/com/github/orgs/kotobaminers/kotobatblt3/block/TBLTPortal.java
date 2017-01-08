@@ -52,14 +52,14 @@ public enum TBLTPortal {
 							.filter(p -> Utility.isTBLTPlayer(p))
 						.collect(Collectors.toList());
 					if(1 < players.size()) {
-						if(players.stream().allMatch(p ->
-							p.getWorld().getBlockAt(p.getLocation()).getType() == Material.ENDER_PORTAL)) {
-							ItemStack warp = TBLTItem.WARP_CRYSTAL.createItem(1);
+						if(players.stream().allMatch(p -> p.getWorld().getBlockAt(p.getLocation()).getType() == Material.ENDER_PORTAL)
+							&& players.stream().allMatch(p -> from.distance(p.getLocation()) < 4)
+						) {
 							players.stream()
 								.filter(p ->
 									Stream.of(p.getInventory().getContents())
 										.filter(i -> i != null)
-										.anyMatch(i -> warp.isSimilar(i)))
+										.anyMatch(i -> TBLTItem.WARP_CRYSTAL.isTBLTItem(i)))
 								.findFirst()
 								.ifPresent(p -> {
 									Utility.getSpherePositions(p.getLocation(), 3).stream()
@@ -67,16 +67,14 @@ public enum TBLTPortal {
 										.filter(block -> block.getState() instanceof Chest)
 										.flatMap(block -> Stream.of(((Chest) block.getState()).getInventory().getContents())
 											.filter(i -> i != null)
-											.filter(i -> i.getItemMeta().getDisplayName().equalsIgnoreCase(warp.getItemMeta().getDisplayName()))//ItemStack.isSimilar cannot be used for lore
-											.filter(i -> i.getType() == warp.getType())//ItemStack.isSimilar cannot be used for lore
+											.filter(i -> TBLTItem.WARP_CRYSTAL.isTBLTItem(i))
 										)
 										.filter(i -> i.getItemMeta().getLore() != null)
-										.map(i -> i.getItemMeta().getLore())
-										.filter(i -> 0 < i.size())
-										.map(i -> i.get(0))
+										.filter(i -> 0 < i.getItemMeta().getLore().size())
+										.map(i -> i.getItemMeta().getLore().get(0))
 										.map(name -> new TBLTArenaMap().findUnique(name))
 										.forEach(to -> to.ifPresent(to2 -> players.stream().forEach(p2 -> ((TBLTArena) to2).startSpawn(p2))));
-										//TODO initialize arena and players
+									a.load();//Initialize Arena
 								});
 							}
 						}

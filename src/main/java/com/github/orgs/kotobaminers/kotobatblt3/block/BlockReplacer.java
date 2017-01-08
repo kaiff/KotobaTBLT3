@@ -33,16 +33,19 @@ public class BlockReplacer extends BlockStorage {
 	}
 
 
-	public void replace(Player player, Block clicked) {
+	public boolean replace(Player player, Block clicked) {
+		boolean success = false;
 		if(clicked.getType() == target && player.getItemInHand().getType() == trigger) {
-			getBlocks().stream()
+			success = getBlocks().stream()
 				.filter(block -> block.getType() == target)
-				.forEach(block -> {
+				.map(block -> {
 					KotobaEffect.MAGIC_SMALL.playEffect(block.getLocation());
 					KotobaEffect.MAGIC_SMALL.playSound(block.getLocation());
-				});
-			load();
+					return true;
+				}).allMatch(b -> b == true);
+			if(success) load();
 		}
+		return success;
 	}
 
 

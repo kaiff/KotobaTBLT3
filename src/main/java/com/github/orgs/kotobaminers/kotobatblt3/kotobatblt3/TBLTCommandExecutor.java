@@ -15,9 +15,11 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BookMeta;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import com.github.orgs.kotobaminers.develop.TBLTTest;
 import com.github.orgs.kotobaminers.kotobaapi.kotobaapi.CommandEnumInterface;
@@ -34,7 +36,7 @@ import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArena;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaMap;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTPortal;
 import com.github.orgs.kotobaminers.kotobatblt3.game.Game.TBLTGameMode;
-import com.github.orgs.kotobaminers.kotobatblt3.game.TBLTJob.TBLTJobEnum;
+import com.github.orgs.kotobaminers.kotobatblt3.game.TBLTJob;
 import com.github.orgs.kotobaminers.kotobatblt3.gui.IconCreatorUtility;
 import com.github.orgs.kotobaminers.kotobatblt3.gui.TBLTGUI;
 import com.github.orgs.kotobaminers.kotobatblt3.gui.TBLTIconListGUI;
@@ -70,8 +72,6 @@ public class TBLTCommandExecutor implements CommandExecutor {
 		TEST(Arrays.asList(Arrays.asList("test")), "", "Command Test", PermissionEnum.OP) {
 			@Override
 			public boolean perform(Player player , String[] args) {
-				Arrow projectile = player.launchProjectile(Arrow.class);
-				projectile.setBounce(true);
 				return true;
 			}
 		},
@@ -247,7 +247,7 @@ public class TBLTCommandExecutor implements CommandExecutor {
 			public boolean perform(Player player, String[] args) {
 				List<String> options = takeOptions(args);
 				if(0 < options.size()) {
-					Optional<TBLTJobEnum> job = TBLTJobEnum.find(options.get(0));
+					Optional<TBLTJob> job = TBLTJob.find(options.get(0));
 						if(job.isPresent()) {
 							job.ifPresent(j -> j.become(player));
 							return true;
@@ -256,7 +256,7 @@ public class TBLTCommandExecutor implements CommandExecutor {
 						}
 				} else {
 					player.getInventory().clear();
-					TBLTGUI.SELECT_JOB.create(TBLTJobEnum.getAllJobs().stream().map(j -> j.getIcon()).collect(Collectors.toList()))
+					TBLTGUI.SELECT_JOB.create(TBLTJob.getAllJobs().stream().map(j -> j.getIcon()).collect(Collectors.toList()))
 					.ifPresent(gui -> player.openInventory(gui));
 					return true;
 				}
@@ -359,6 +359,37 @@ public class TBLTCommandExecutor implements CommandExecutor {
 				.map(arena -> {
 					arena.removeNearestCheckPoint(player.getLocation());
 					arena.save();
+					return true;
+				}).orElse(false);
+		}
+	},
+
+	ARENA_SET_PREDICTION_HERE(Arrays.asList(Arrays.asList("arena", "a"), Arrays.asList("setpredictionhere", "sph")), "", "Set prediction with book and quill", PermissionEnum.OP) {
+		@Override
+		public boolean perform(Player player , String[] args) {
+			ItemStack item = player.getItemInHand();
+			if(item.getItemMeta() instanceof ItemMeta) {
+				return new TBLTArenaMap().findUnique(player.getLocation())
+					.map(a -> {
+						((TBLTArena) a).setPredictionItem((BookMeta) item.getItemMeta());
+						a.save();
+						return true;
+					}).orElse(false);
+			}
+			return false;
+		}
+	},
+
+	ARENA_GET_PREDICTION_HERE(Arrays.asList(Arrays.asList("arena", "a"), Arrays.asList("getpredictionhere", "gph")), "", "Get prediction with book and quill", PermissionEnum.OP) {
+		@Override
+		public boolean perform(Player player , String[] args) {
+			return new TBLTArenaMap().findUnique(player.getLocation())
+				.map(a -> ((TBLTArena) a).getPredictionWrittenBook())
+				.map(i -> {
+					BookMeta meta = (BookMeta) i.getItemMeta();
+					ItemStack book = new ItemStack(Material.BOOK_AND_QUILL);
+					book.setItemMeta(meta);
+					player.getInventory().addItem(book);
 					return true;
 				}).orElse(false);
 		}

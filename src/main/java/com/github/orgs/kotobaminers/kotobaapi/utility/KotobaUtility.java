@@ -74,9 +74,18 @@ public class KotobaUtility {
 
 	public static List<String> toStringListFromBookMeta(BookMeta bookMeta) {
 		return bookMeta.getPages().stream()
-			.flatMap(page -> Stream.of(page.split("\n"))
+			.flatMap(page -> Stream.of(page.split("\n")).map(line -> ChatColor.stripColor(line)))
+			.collect(Collectors.toList());
+	}
+
+	public static List<String> toStringListFromBookMeta(BookMeta bookMeta, int page) {
+		if(bookMeta.getPageCount() <= page) {
+			return Stream.of(bookMeta.getPage(page).split("\n"))
 				.map(line -> ChatColor.stripColor(line))
-			).collect(Collectors.toList());
+				.collect(Collectors.toList());
+		}
+		return new ArrayList<>();
+
 	}
 
 	public static ItemStack createPlayerSkull(String owner) {

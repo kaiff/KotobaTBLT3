@@ -104,6 +104,7 @@ public class ClickAbilityListener implements Listener {
 			TBLTPotion.find(event).eventSplash(event);
 		}
 	}
+
 	@EventHandler
 	public void onProjectileHit(ProjectileHitEvent event) {
 		Location location = event.getEntity().getLocation();

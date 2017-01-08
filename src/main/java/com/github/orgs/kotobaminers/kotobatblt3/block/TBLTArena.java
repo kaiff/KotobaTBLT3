@@ -13,19 +13,22 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Chest;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BookMeta;
 
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaEffect;
+import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStack;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaTitle;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaTitle.TitleOption;
 import com.github.orgs.kotobaminers.kotobaapi.worldeditor.BlockStorage;
 import com.github.orgs.kotobaminers.kotobatblt3.ability.ClickBlockChestAbility;
-import com.github.orgs.kotobaminers.kotobatblt3.game.TBLTJob.TBLTJobEnum;
+import com.github.orgs.kotobaminers.kotobatblt3.game.TBLTJob;
 import com.github.orgs.kotobaminers.kotobatblt3.kotobatblt3.Setting;
 import com.github.orgs.kotobaminers.kotobatblt3.resource.ResourceHolder;
 import com.github.orgs.kotobaminers.kotobatblt3.resource.TBLTResource;
@@ -38,11 +41,13 @@ public class TBLTArena extends BlockStorage implements ResourceHolder {
 
 	private static final File DIRECTORY = new File(Setting.getPlugin().getDataFolder().getAbsolutePath() + "/Arena/");
 	private static final String CHECK_POINT = "CheckPoint";
+	private static final String PREDICTION = "Prediction";
 
 	private Map<TBLTResource, Integer> resources = new TreeMap<>();
 	private List<Location> checkPoints = new ArrayList<>();
 	private Location currentPoint = null;
 	private Set<RepeatingEffect> repeatingEffects = new HashSet<>();
+	private ItemStack predictionItem = KotobaItemStack.create(Material.BOOK_AND_QUILL, (short) 0, 1, "Prediction", new ArrayList<String>());
 
 
 	protected TBLTArena(String name) {
@@ -56,7 +61,7 @@ public class TBLTArena extends BlockStorage implements ResourceHolder {
 
 
 	private void start(Player player, Location location) {
-		TBLTJobEnum.initializeInventory(player);
+		TBLTJob.initializeInventory(player);
 		player.teleport(location);
 		KotobaEffect.ENDER_SIGNAL.playEffect(location);
 		KotobaEffect.ENDER_SIGNAL.playSound(location);
@@ -65,6 +70,10 @@ public class TBLTArena extends BlockStorage implements ResourceHolder {
 	}
 
 	public void startSpawn(Player player) {
+		//Initialize Arena
+		load();
+
+		//Start Player
 		start(player, getSpawn());
 	}
 
@@ -95,6 +104,7 @@ public class TBLTArena extends BlockStorage implements ResourceHolder {
 		Stream.iterate(0, i -> i + 1)
 			.limit(checkPoints.size())
 			.forEach(i -> config.set(CHECK_POINT + "." + i, checkPoints.get(i)));
+		config.set(PREDICTION, predictionItem);
 	}
 
 	@Override
@@ -106,6 +116,11 @@ public class TBLTArena extends BlockStorage implements ResourceHolder {
 				.collect(Collectors.toList());
 			this.checkPoints = points;
 		}
+
+		if(config.isItemStack(PREDICTION)) {
+			setPredictionItem((BookMeta) ((ItemStack) config.get(PREDICTION)).getItemMeta());
+		}
+
 	}
 
 	@Override
@@ -171,6 +186,16 @@ public class TBLTArena extends BlockStorage implements ResourceHolder {
 		return this.repeatingEffects.stream()
 			.filter(e -> e.getBlockLocation().distance(blockLocation) == 0)
 			.collect(Collectors.toList());
+	}
+
+	public ItemStack getPredictionWrittenBook() {
+		return predictionItem;
+	}
+
+	public void setPredictionItem(BookMeta bookMeta) {
+		ItemStack item = new ItemStack(Material.WRITTEN_BOOK);
+		item.setItemMeta(bookMeta);
+		this.predictionItem = item;
 	}
 
 

@@ -14,7 +14,7 @@ import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaEffect;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStack;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaSound;
 import com.github.orgs.kotobaminers.kotobatblt3.game.TBLTData;
-import com.github.orgs.kotobaminers.kotobatblt3.game.TBLTJob.TBLTJobEnum;
+import com.github.orgs.kotobaminers.kotobatblt3.game.TBLTJob;
 
 public enum TBLTGUI implements ChestGUI {
 	RESOURCES("Resources", ChestSize.MINIMUM) {
@@ -97,7 +97,7 @@ public enum TBLTGUI implements ChestGUI {
 			if(event.getWhoClicked() instanceof Player) {
 				Player player = (Player) event.getWhoClicked();
 				player.closeInventory();
-				Stream.of(TBLTJobEnum.values())
+				Stream.of(TBLTJob.values())
 					.filter(job -> job.isSameIcon(event.getCurrentItem()))
 					.findFirst()
 					.ifPresent(job -> {

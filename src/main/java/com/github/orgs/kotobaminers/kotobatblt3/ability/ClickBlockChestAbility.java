@@ -97,48 +97,6 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface {
 		}
 	},
 
-	PREDICTION(
-		Material.ENCHANTED_BOOK,
-		(short) 0,
-		"Prediction",
-		null,
-		Arrays.asList(Action.RIGHT_CLICK_BLOCK),
-		0,
-		FindType.UNDER_CHEST,
-		KotobaEffect.MAGIC_SMALL,
-		KotobaEffect.MAGIC_SMALL
-	) {
-		@Override
-		public boolean performAbility(PlayerInteractEvent event) {
-			Block block = event.getClickedBlock();
-			List<ItemStack> options = findOptions(block.getLocation());
-
-			List<ItemStack> informations = options.stream()
-				.filter(i -> i.getType() == Material.BOOK_AND_QUILL)
-				.map(i -> (BookMeta) i.getItemMeta())
-				.map(meta -> KotobaUtility.toStringListFromBookMeta(meta))
-				.map(lore -> {
-					ItemStack item = createItem(1);
-					ItemMeta itemMeta = item.getItemMeta();
-					itemMeta.setLore(lore);
-					item.setItemMeta(itemMeta);
-					return item;
-				})
-				.collect(Collectors.toList());
-
-			informations.addAll(options);
-			Player player = event.getPlayer();
-			if(0 < informations.size()) {
-				TBLTGUI.INVESTIGATE.create(informations)
-					.ifPresent(inventory -> {
-						player.openInventory(inventory);
-					});
-				return true;
-			}
-			return false;
-		}
-	},
-
 	FIND_SPELL(
 		Material.ENCHANTED_BOOK,
 		(short) 0,

@@ -38,7 +38,6 @@ import com.github.orgs.kotobaminers.kotobatblt3.utility.Utility;
 
 public enum ProjectileAbility implements ProjectileAbilityInterface {
 
-
 	BLAST_ARROW(
 		EntityType.ARROW,
 		Material.ARROW,
@@ -55,49 +54,8 @@ public enum ProjectileAbility implements ProjectileAbilityInterface {
 		public void onHit(ProjectileHitEvent event) {
 			Projectile projectile = event.getEntity();
 			Location location = projectile.getLocation();
-			projectile.getWorld().playEffect(location, Effect.valueOf("EXPLOSION_LARGE"), 0);
-			projectile.getWorld().playSound(location, Sound.EXPLODE, 1, 1);
-			Location center = projectile.getWorld().getBlockAt(location).getLocation();
-			List<Material> materials = Stream.of(EditableBlock.values())
-					.filter(e -> e.getResistance() <= 1)
-					.map(b -> b.getMaterial())
-					.collect(Collectors.toList());
-			Utility.getSpherePositions(center, 3)
-			.stream()
-			.map(l -> l.getWorld().getBlockAt(l))
-			.filter(b -> materials.contains(b.getType()))
-			.filter(b -> new TBLTArenaMap().isInAny(b.getLocation()))
-			.forEach(b -> b.setType(Material.AIR));
-			projectile.remove();
-		}
-		@Override
-		public boolean perform(PlayerInteractEvent event) {
-			Projectile projectile = launchProjectile(event.getPlayer());
-			projectile.setVelocity(projectile.getVelocity().clone().add(new Vector(0,0.3,0)));
-			playPathEffect(projectile, Effect.valueOf("LAVA_POP"), 5);
-			projectile.getWorld().playSound(projectile.getLocation(), Sound.WITHER_SHOOT, 1, 1);
-			return true;
-		}
-	},
-
-	MAGIC_ARROW(
-		EntityType.ARROW,
-		Material.ARROW,
-		(short) 0,
-		"Magic Arrow",
-		null,
-		Arrays.asList(Action.RIGHT_CLICK_AIR, Action.RIGHT_CLICK_BLOCK),
-		0,
-		2d,
-		new HashMap<TBLTResource, Integer>() {{
-		}}
-			) {
-		@Override
-		public void onHit(ProjectileHitEvent event) {
-			Projectile projectile = event.getEntity();
-			Location location = projectile.getLocation();
-			projectile.getWorld().playEffect(location, Effect.valueOf("EXPLOSION_LARGE"), 0);
-			projectile.getWorld().playSound(location, Sound.EXPLODE, 1, 1);
+			KotobaEffect.MAGIC_MIDIUM.playEffect(location);
+			KotobaEffect.MAGIC_MIDIUM.playSound(location);
 			Location center = projectile.getWorld().getBlockAt(location).getLocation();
 			List<Material> materials = Stream.of(EditableBlock.values())
 					.filter(e -> e.getResistance() <= 1)
@@ -121,11 +79,54 @@ public enum ProjectileAbility implements ProjectileAbilityInterface {
 		}
 	},
 
-	ICE_ARROW(
+	MAGNETIC_ARROW(
 		EntityType.ARROW,
 		Material.ARROW,
 		(short) 0,
-		"Ice Arrow",
+		"Magnetic Arrow",
+		null,
+		Arrays.asList(Action.RIGHT_CLICK_AIR, Action.RIGHT_CLICK_BLOCK),
+		0,
+		2d,
+		new HashMap<TBLTResource, Integer>() {{
+		}}
+	) {
+		@Override
+		public void onHit(ProjectileHitEvent event) {
+			Projectile projectile = event.getEntity();
+			Location location = projectile.getLocation();
+			KotobaEffect.MAGIC_MIDIUM.playEffect(location);
+			KotobaEffect.MAGIC_MIDIUM.playSound(location);
+			if(projectile.getShooter() instanceof Player) {
+				Player shooter = (Player) projectile.getShooter();
+				Bukkit.getOnlinePlayers().stream()
+					.filter(p -> p.getUniqueId() != shooter.getUniqueId())
+					.filter(p -> ((Entity) p).isOnGround())
+					.filter(p -> p.getLocation().distance(projectile.getLocation()) < 3)
+					.forEach(p -> {
+						p.setVelocity(shooter.getLocation().subtract(p.getLocation()).toVector().normalize().multiply(new Vector(2,0,2)).add(new Vector(0,0.5,0)));
+						Utility.playJumpEffect(p);
+					});
+				Bukkit.getOnlinePlayers().stream()
+					.forEach(p -> System.out.println(p.getName() + p.getLocation().distance(projectile.getLocation())));
+			}
+			projectile.remove();
+		}
+		@Override
+		public boolean perform(PlayerInteractEvent event) {
+			Projectile projectile = launchProjectile(event.getPlayer());
+			projectile.setVelocity(projectile.getVelocity().clone().add(new Vector(0,0.3,0)));
+			playPathEffect(projectile, Effect.valueOf("SLIME"), 5);
+			projectile.getWorld().playSound(projectile.getLocation(), Sound.WITHER_SHOOT, 1, 1);
+			return true;
+		}
+	},
+
+	FROST_ARROW(
+		EntityType.ARROW,
+		Material.ARROW,
+		(short) 0,
+		"Frost Arrow",
 		null,
 		Arrays.asList(Action.RIGHT_CLICK_AIR, Action.RIGHT_CLICK_BLOCK),
 		0,

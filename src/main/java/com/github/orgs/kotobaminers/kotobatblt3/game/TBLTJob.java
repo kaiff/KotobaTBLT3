@@ -19,36 +19,10 @@ import com.github.orgs.kotobaminers.kotobatblt3.ability.ClickBlockAbility;
 import com.github.orgs.kotobaminers.kotobatblt3.ability.ClickBlockAbilityInterface;
 import com.github.orgs.kotobaminers.kotobatblt3.ability.ClickBlockChestAbility;
 
-public class TBLTJob {
-	private interface TBLTJobInterface {
-
-
-		ItemStack getIcon();
-
-		void become(Player player);
-
-		void setInventory(Player player);
-
-
-		default boolean isSameIcon(ItemStack itemStack) {
-			ItemStack icon = getIcon();
-			ItemMeta iconMeta = icon.getItemMeta();
-			ItemMeta itemMeta = itemStack.getItemMeta();
-			if(
-				icon.getType().equals(itemStack.getType()) &&
-				icon.getDurability() == itemStack.getDurability() &&
-				iconMeta.getDisplayName().equalsIgnoreCase(itemMeta.getDisplayName())
-			) {
-				return true;
-			}
-			return false;
-		}
-	}
-
-	public enum TBLTJobEnum implements TBLTJobInterface {
+	public enum TBLTJob {
 		MAGICIAN(
 			new LinkedHashMap<ClickBlockAbilityInterface, Integer>() {{
-				put(ClickBlockChestAbility.PREDICTION, 1);
+				put(ClickBlockAbility.PREDICTION, 1);
 				put(ClickBlockAbility.CLAIRVOYANCE, 1);
 				put(ClickBlockAbility.SYPHON_MANA, 10);
 				put(ClickBlockChestAbility.OPEN_PORTAL, 1);
@@ -82,14 +56,14 @@ public class TBLTJob {
 		private boolean actual;
 		private ItemStack icon;
 
-		private TBLTJobEnum(Map<ClickBlockAbilityInterface, Integer> abilities, boolean actual, ItemStack icon) {
+		private TBLTJob(Map<ClickBlockAbilityInterface, Integer> abilities, boolean actual, ItemStack icon) {
 			this.abilities = abilities;
 			this.actual = actual;
 			this.icon = icon;
 		}
 
-		public static Optional<TBLTJobEnum> find(String name) {
-			return Stream.of(TBLTJobEnum.values())
+		public static Optional<TBLTJob> find(String name) {
+			return Stream.of(TBLTJob.values())
 				.filter(job -> job.name().equalsIgnoreCase(name))
 				.findAny();
 		}
@@ -98,48 +72,44 @@ public class TBLTJob {
 			return abilities;
 		}
 
-
-		@Override
 		public void setInventory(Player player) {
 			player.getInventory().clear();
 			abilities.entrySet().stream().forEach(entry ->player.getInventory().addItem(entry.getKey().createItem(entry.getValue())));
 		}
 
-		@Override
 		public ItemStack getIcon() {
 			return icon;
 		}
 
-		@Override
 		public void become(Player player) {
 			player.setGameMode(GameMode.ADVENTURE);
 			setInventory(player);
 		}
 
-		public static List<TBLTJobEnum> getActualJobs() {
-			return Stream.of(TBLTJobEnum.values())
+		public static List<TBLTJob> getActualJobs() {
+			return Stream.of(TBLTJob.values())
 				.filter(j -> j.actual)
 				.collect(Collectors.toList());
 		}
-		public static List<TBLTJobEnum> getNoneJobs() {
-			return Stream.of(TBLTJobEnum.values())
+		public static List<TBLTJob> getNoneJobs() {
+			return Stream.of(TBLTJob.values())
 				.filter(j -> !j.actual)
 				.collect(Collectors.toList());
 		}
 
-		public static List<TBLTJobEnum> getAllJobs() {
-			List<TBLTJobEnum> jobs = new ArrayList<>();
-			jobs.addAll(TBLTJobEnum.getActualJobs());
-			jobs.addAll(TBLTJobEnum.getNoneJobs());
+		public static List<TBLTJob> getAllJobs() {
+			List<TBLTJob> jobs = new ArrayList<>();
+			jobs.addAll(TBLTJob.getActualJobs());
+			jobs.addAll(TBLTJob.getNoneJobs());
 			return jobs;
 		}
 
-		public static Optional<TBLTJobEnum> find(Player player) {
+		public static Optional<TBLTJob> find(Player player) {
 			List<ItemStack> items = Stream.of(player.getInventory().getContents())
 				.filter(item -> item != null)
 				.filter(item -> item.getType() != Material.AIR)
 				.collect(Collectors.toList());
-			return Stream.of(TBLTJobEnum.values())
+			return Stream.of(TBLTJob.values())
 				.filter(job ->
 					job.getAbilities().keySet().stream()
 						.map(ability ->
@@ -148,14 +118,25 @@ public class TBLTJob {
 		}
 
 		public static void initializeInventory(Player player) {
-			Optional<TBLTJobEnum> find = find(player);
+			Optional<TBLTJob> find = find(player);
 			player.getInventory().clear();
 			find.ifPresent(job -> job.become(player));
 		}
 
+		public boolean isSameIcon(ItemStack itemStack) {
+			ItemStack icon = getIcon();
+			ItemMeta iconMeta = icon.getItemMeta();
+			ItemMeta itemMeta = itemStack.getItemMeta();
+			if(
+				icon.getType().equals(itemStack.getType()) &&
+				icon.getDurability() == itemStack.getDurability() &&
+				iconMeta.getDisplayName().equalsIgnoreCase(itemMeta.getDisplayName())
+			) {
+				return true;
+			}
+			return false;
+		}
+
 
 	}
-
-
-}
 

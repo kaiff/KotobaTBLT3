@@ -149,6 +149,7 @@ public enum ClickEntityAbility implements ClickEntityAbilityInterface {
 				return true;
 			}
 	},
+
 	THROW_AWAY_1(
 			Material.FEATHER,
 			(short) 0,

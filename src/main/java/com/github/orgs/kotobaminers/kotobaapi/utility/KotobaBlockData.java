@@ -26,8 +26,7 @@ public class KotobaBlockData {
 	@SuppressWarnings("deprecation")
 	public void placeBlock() {
 		Block block = location.getBlock();
-		block.setType(material);
-		block.setData((byte) data);
+		block.setTypeIdAndData(material.getId(), (byte) data, false);
 	}
 
 	public Location getLocation() {
