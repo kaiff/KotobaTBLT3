@@ -7,10 +7,10 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaSound;
 
-public class TBLTGUIListener implements Listener {
+public class TBLTPlayerGUIListener implements Listener {
 	@EventHandler
 	void onInventoryClick(InventoryClickEvent event) {
-		TBLTGUI.find(event.getInventory())
+		TBLTPlayerGUI.find(event.getInventory())
 			.ifPresent(e -> {
 				event.setCancelled(true);
 				KotobaSound.CLICK.play(((Player) event.getWhoClicked()).getLocation());

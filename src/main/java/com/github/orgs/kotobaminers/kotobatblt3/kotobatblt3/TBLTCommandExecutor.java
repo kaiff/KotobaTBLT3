@@ -35,11 +35,15 @@ import com.github.orgs.kotobaminers.kotobatblt3.block.BlockReplacerMap;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArena;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaMap;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTPortal;
+import com.github.orgs.kotobaminers.kotobatblt3.database.PlayerData;
+import com.github.orgs.kotobaminers.kotobatblt3.database.PlayerDatabase;
+import com.github.orgs.kotobaminers.kotobatblt3.database.SentenceDatabase;
+import com.github.orgs.kotobaminers.kotobatblt3.database.TBLTConversationEditor;
 import com.github.orgs.kotobaminers.kotobatblt3.game.Game.TBLTGameMode;
 import com.github.orgs.kotobaminers.kotobatblt3.game.TBLTJob;
 import com.github.orgs.kotobaminers.kotobatblt3.gui.IconCreatorUtility;
-import com.github.orgs.kotobaminers.kotobatblt3.gui.TBLTGUI;
 import com.github.orgs.kotobaminers.kotobatblt3.gui.TBLTIconListGUI;
+import com.github.orgs.kotobaminers.kotobatblt3.gui.TBLTPlayerGUI;
 import com.github.orgs.kotobaminers.kotobatblt3.resource.TBLTResource;
 
 public class TBLTCommandExecutor implements CommandExecutor {
@@ -131,97 +135,27 @@ public class TBLTCommandExecutor implements CommandExecutor {
 			}
 		},
 
-		RESOURCE_HERE(Arrays.asList(Arrays.asList("resourcehere")), "", "Get Resources for arena", PermissionEnum.OP) {
+		EDIT_ENGLISH(Arrays.asList(Arrays.asList("edit", "e"), Arrays.asList("english", "e")), "", "Edit English", PermissionEnum.OP) {
 			@Override
 			public boolean perform(Player player , String[] args) {
+				PlayerData data = new PlayerDatabase().getOrDefault(player.getUniqueId());
 				List<String> options = takeOptions(args);
-				Optional<TBLTArena> arena = new TBLTArenaMap().findUnique(player.getLocation())
-						.map(storage -> (TBLTArena) storage);
-				if(0 < options.size()) {
-					arena.ifPresent(a -> Stream.of(TBLTResource.values()).forEach(resource -> a.setResources(resource, Integer.parseInt(options.get(0)))));
+				if(1 < options.size()) {
+					String line = String.join(" ", options);
+					new SentenceDatabase().findSentencesByNPCId(data.getNPC())
+						.ifPresent(sentences -> sentences.stream().findFirst()
+							.map(s -> TBLTConversationEditor.empty().getConversationEditorOrDefault(s.getConversation(), player.getUniqueId(), 0))
+								.ifPresent(e -> {
+									e.getSelectedSentence().ifPresent(s -> s.editEnglish(line));
+									e.updateConversation();
+								})
+						);
+					return true;
 				}
-				arena.ifPresent(a -> player.openInventory(a.getResourceInventory()));
-				return true;
+				return false;
 			}
 		},
 
-//		REPLACER_CREATE(Arrays.asList(Arrays.asList("replacer"), Arrays.asList("create", "c")), "<Replacer>", "Create Replacer", PermissionEnum.OP) {
-//			@Override
-//			public boolean perform(Player player , String[] args) {
-//				List<String> options = takeOptions(args);
-//				if(0 < options.size()) {
-//					BlockReplacer replacer = BlockReplacer.create(options.get(0));
-//					replacer.create(player, replacer.getName());
-//					replacer.setSpawn(player.getLocation());
-//					replacer.save();
-//					BlockReplacer.addReplacer(replacer);
-//					return true;
-//				}
-//				return false;
-//			}
-//		},
-//
-//		REPLACER_SETTRIGGER(Arrays.asList(Arrays.asList("replacer"), Arrays.asList("settrigger", "st")), "<Replacer>", "", PermissionEnum.OP) {
-//			@Override
-//			public boolean perform(Player player , String[] args) {
-//				Block block = player.getTargetBlock((Set<Material>) null, 10);
-//				if(block.getType().equals(Material.AIR)) {
-//					player.sendMessage("No block");
-//					return true;
-//				}
-//				Optional<BlockReplacer> replacer = BlockReplacer.getReplacers().stream()
-//					.filter(r -> r.isIn(block.getLocation()))
-//					.findAny();
-//				if(replacer.isPresent()) {
-//					Material material = player.getItemInHand().getType();
-//					if(BlockReplacer.isTrigger(material)) {
-//						replacer.get().setTrigger(material);
-//					}
-//					if(BlockReplacer.isBlock(block.getType())) {
-//						replacer.get().setBlock(block.getType());
-//					}
-//					TBLTGUI.BLOCK_REPLACER.create(replacer.get().getGUIIcons())
-//						.ifPresent(inventory -> player.openInventory(inventory));
-//				} else {
-//					player.sendMessage("Replacer Not Found");
-//				}
-//				return true;
-//			}
-//		},
-//
-//		REPLACER_SAVE(Arrays.asList(Arrays.asList("replacer"), Arrays.asList("save", "s")), "<Replacer>", "Save Arena", PermissionEnum.OP) {
-//			@Override
-//			public boolean perform(Player player , String[] args) {
-//				List<String> options = takeOptions(args);
-//				if(0 < options.size()) {
-//					return BlockReplacer.getReplacers().stream()
-//						.filter(replacer -> replacer.getName().equalsIgnoreCase(options.get(0)))
-//						.findAny()
-//						.map(replacer -> {
-//							replacer.save();
-//							replacer.saveOptions();
-//							return true;
-//						}).orElse(false);
-//				}
-//				return false;
-//			}
-//		},
-//
-//		REPLACER_RELOAD(Arrays.asList(Arrays.asList("replacer"), Arrays.asList("reload")), "<Replacer>", "Reload Replacer", PermissionEnum.OP) {
-//			@Override
-//			public boolean perform(Player player , String[] args) {
-//				List<String> options = takeOptions(args);
-//				if(0 < options.size()) {
-//					return BlockReplacer.findUnique(options.get(0))
-//						.map(replacer -> {
-//							TBLTArena.findUnique(replacer.getCenter())
-//								.map(arena -> arena.getBlocks());
-//							return true;
-//						}).orElse(false);
-//				}
-//				return false;
-//			}
-//		},
 
 		GAME_START(Arrays.asList(Arrays.asList("game", "g"), Arrays.asList("start", "s")), "<GameMode>", "Start Game Mode", PermissionEnum.OP) {
 			@Override
@@ -256,7 +190,7 @@ public class TBLTCommandExecutor implements CommandExecutor {
 						}
 				} else {
 					player.getInventory().clear();
-					TBLTGUI.SELECT_JOB.create(TBLTJob.getAllJobs().stream().map(j -> j.getIcon()).collect(Collectors.toList()))
+					TBLTPlayerGUI.SELECT_JOB.create(TBLTJob.getAllJobs().stream().map(j -> j.getIcon()).collect(Collectors.toList()))
 					.ifPresent(gui -> player.openInventory(gui));
 					return true;
 				}
@@ -310,152 +244,166 @@ public class TBLTCommandExecutor implements CommandExecutor {
 					arena.delete();
 					return true;
 				}).orElse(false);
-		}
-	},
-
-	ARENA_RESIZE_HERE(Arrays.asList(Arrays.asList("arena", "a"), Arrays.asList("resizehere")), "", "Resize arena", PermissionEnum.OP) {
-		@Override
-		public boolean perform(Player player , String[] args) {
-			return new TBLTArenaMap().findUnique(player.getLocation())
-					.map(arena -> (TBLTArena) arena)
-					.map(arena -> {
-						arena.resize(player);
-						arena.save();
-						return true;
-					}).orElse(false);
-		}
-	},
-
-	ARENA_SETSPAWN_HERE(Arrays.asList(Arrays.asList("arena", "a"), Arrays.asList("setspawnhere", "ssh")), "", "Set arena spawn", PermissionEnum.OP) {
-		@Override
-		public boolean perform(Player player , String[] args) {
-			return new TBLTArenaMap().findUnique(player.getLocation())
-					.map(arena -> {
-						arena.setSpawn(player.getLocation());
-						arena.save();
-						return true;
-					}).orElse(false);
-		}
-	},
-
-	ARENA_CHECK_POINT_HERE(Arrays.asList(Arrays.asList("arena", "a"), Arrays.asList("checkpointhere", "cph")), "", "Add check point", PermissionEnum.OP) {
-		@Override
-		public boolean perform(Player player , String[] args) {
-			return new TBLTArenaMap().findUnique(player.getLocation())
-				.map(arena -> (TBLTArena) arena)
-				.map(arena -> {
-					arena.addCheckPoint(player.getLocation());
-					arena.save();
-					return true;
-				}).orElse(false);
-		}
-	},
-
-	ARENA_CHECK_POINT_REMOVE_HERE(Arrays.asList(Arrays.asList("arena", "a"), Arrays.asList("checkpointremovehere", "cprh")), "", "Remove nearest check point", PermissionEnum.OP) {
-		@Override
-		public boolean perform(Player player , String[] args) {
-			return new TBLTArenaMap().findUnique(player.getLocation())
-				.map(arena -> (TBLTArena) arena)
-				.map(arena -> {
-					arena.removeNearestCheckPoint(player.getLocation());
-					arena.save();
-					return true;
-				}).orElse(false);
-		}
-	},
-
-	ARENA_SET_PREDICTION_HERE(Arrays.asList(Arrays.asList("arena", "a"), Arrays.asList("setpredictionhere", "sph")), "", "Set prediction with book and quill", PermissionEnum.OP) {
-		@Override
-		public boolean perform(Player player , String[] args) {
-			ItemStack item = player.getItemInHand();
-			if(item.getItemMeta() instanceof ItemMeta) {
-				return new TBLTArenaMap().findUnique(player.getLocation())
-					.map(a -> {
-						((TBLTArena) a).setPredictionItem((BookMeta) item.getItemMeta());
-						a.save();
-						return true;
-					}).orElse(false);
 			}
-			return false;
-		}
-	},
+		},
 
-	ARENA_GET_PREDICTION_HERE(Arrays.asList(Arrays.asList("arena", "a"), Arrays.asList("getpredictionhere", "gph")), "", "Get prediction with book and quill", PermissionEnum.OP) {
-		@Override
-		public boolean perform(Player player , String[] args) {
-			return new TBLTArenaMap().findUnique(player.getLocation())
-				.map(a -> ((TBLTArena) a).getPredictionWrittenBook())
-				.map(i -> {
-					BookMeta meta = (BookMeta) i.getItemMeta();
-					ItemStack book = new ItemStack(Material.BOOK_AND_QUILL);
-					book.setItemMeta(meta);
-					player.getInventory().addItem(book);
-					return true;
-				}).orElse(false);
-		}
-	},
+		ARENA_RESIZE_HERE(Arrays.asList(Arrays.asList("arena", "a"), Arrays.asList("resizehere")), "", "Resize arena", PermissionEnum.OP) {
+			@Override
+			public boolean perform(Player player , String[] args) {
+				return new TBLTArenaMap().findUnique(player.getLocation())
+						.map(arena -> (TBLTArena) arena)
+						.map(arena -> {
+							arena.resize(player);
+							arena.save();
+							return true;
+						}).orElse(false);
+			}
+		},
 
-	ARENA_LIST(Arrays.asList(Arrays.asList("arena", "a"), Arrays.asList("list", "l")), "", "List arenas", PermissionEnum.OP) {
-		@Override
-		public boolean perform(Player player , String[] args) {
-			player.openInventory(TBLTIconListGUI.ARENA.createInventory(1));
-			return true;
-		}
-	},
+		ARENA_SETSPAWN_HERE(Arrays.asList(Arrays.asList("arena", "a"), Arrays.asList("setspawnhere", "ssh")), "", "Set arena spawn", PermissionEnum.OP) {
+			@Override
+			public boolean perform(Player player , String[] args) {
+				return new TBLTArenaMap().findUnique(player.getLocation())
+						.map(arena -> {
+							arena.setSpawn(player.getLocation());
+							arena.save();
+							return true;
+						}).orElse(false);
+			}
+		},
 
-	ARENA_HERE(Arrays.asList(Arrays.asList("arena", "a"), Arrays.asList("here", "h")), "", "Arena where you are", PermissionEnum.OP) {
-		@Override
-		public boolean perform(Player player , String[] args) {
-			return new TBLTArenaMap().findUnique(player.getLocation())
-				.map(arena -> {
-					TBLTGUI.ARENA.create(IconCreatorUtility.getIcons((TBLTArena) arena)).ifPresent(player::openInventory);;
-					return true;
-				}).orElse(false);
-		}
-	},
+		ARENA_CHECK_POINT_HERE(Arrays.asList(Arrays.asList("arena", "a"), Arrays.asList("checkpointhere", "cph")), "", "Add check point", PermissionEnum.OP) {
+			@Override
+			public boolean perform(Player player , String[] args) {
+				return new TBLTArenaMap().findUnique(player.getLocation())
+						.map(arena -> (TBLTArena) arena)
+						.map(arena -> {
+							arena.addCheckPoint(player.getLocation());
+							arena.save();
+							return true;
+						}).orElse(false);
+			}
+		},
 
+		ARENA_CHECK_POINT_REMOVE_HERE(Arrays.asList(Arrays.asList("arena", "a"), Arrays.asList("checkpointremovehere", "cprh")), "", "Remove nearest check point", PermissionEnum.OP) {
+			@Override
+			public boolean perform(Player player , String[] args) {
+				return new TBLTArenaMap().findUnique(player.getLocation())
+						.map(arena -> (TBLTArena) arena)
+						.map(arena -> {
+							arena.removeNearestCheckPoint(player.getLocation());
+							arena.save();
+							return true;
+						}).orElse(false);
+			}
+		},
 
-	REPLACER_CREATE(Arrays.asList(Arrays.asList("replacer", "r"), Arrays.asList("create", "c")), "<Arena>", "Create Arena", PermissionEnum.OP) {
-		@Override
-		public boolean perform(Player player, String[] args) {
-			List<String> options = takeOptions(args);
-			if(0 < options.size()) {
-				BlockReplacer replacer = BlockReplacer.create(options.get(0), player);
-				replacer.setSpawn(player.getLocation());
-				new BlockReplacerMap().put(replacer);
-				replacer.save();
+		ARENA_SET_PREDICTION_HERE(Arrays.asList(Arrays.asList("arena", "a"), Arrays.asList("setpredictionhere", "sph")), "", "Set prediction with book and quill", PermissionEnum.OP) {
+			@Override
+			public boolean perform(Player player , String[] args) {
+				ItemStack item = player.getItemInHand();
+				if(item.getItemMeta() instanceof ItemMeta) {
+					return new TBLTArenaMap().findUnique(player.getLocation())
+							.map(a -> {
+								((TBLTArena) a).setPredictionItem((BookMeta) item.getItemMeta());
+								a.save();
+								return true;
+							}).orElse(false);
+				}
+				return false;
+			}
+		},
+
+		ARENA_GET_PREDICTION_HERE(Arrays.asList(Arrays.asList("arena", "a"), Arrays.asList("getpredictionhere", "gph")), "", "Get prediction with book and quill", PermissionEnum.OP) {
+			@Override
+			public boolean perform(Player player , String[] args) {
+				return new TBLTArenaMap().findUnique(player.getLocation())
+						.map(a -> ((TBLTArena) a).getPredictionWrittenBook())
+						.map(i -> {
+							BookMeta meta = (BookMeta) i.getItemMeta();
+							ItemStack book = new ItemStack(Material.BOOK_AND_QUILL);
+							book.setItemMeta(meta);
+							player.getInventory().addItem(book);
+							return true;
+						}).orElse(false);
+			}
+		},
+
+		ARENA_RESOURCE_HERE(Arrays.asList(Arrays.asList("arena", "a"), Arrays.asList("resourcehere")), "", "Get Resources for arena", PermissionEnum.OP) {
+			@Override
+			public boolean perform(Player player , String[] args) {
+				List<String> options = takeOptions(args);
+				Optional<TBLTArena> arena = new TBLTArenaMap().findUnique(player.getLocation())
+						.map(storage -> (TBLTArena) storage);
+				if(0 < options.size()) {
+					arena.ifPresent(a -> Stream.of(TBLTResource.values()).forEach(resource -> a.setResources(resource, Integer.parseInt(options.get(0)))));
+				}
+				arena.ifPresent(a -> player.openInventory(a.getResourceInventory()));
 				return true;
 			}
-			return false;
-		}
-	},
+		},
 
-	REPLACER_UPDATE_HERE(Arrays.asList(Arrays.asList("replacer", "r"), Arrays.asList("updatehere", "uh")), "", "Update where you are", PermissionEnum.OP) {
-		@Override
-		public boolean perform(Player player, String[] args) {
-			return new BlockReplacerMap().findUnique(player.getLocation())
-				.map(replacer -> {
+		ARENA_LIST(Arrays.asList(Arrays.asList("arena", "a"), Arrays.asList("list", "l")), "", "List arenas", PermissionEnum.OP) {
+			@Override
+			public boolean perform(Player player , String[] args) {
+				player.openInventory(TBLTIconListGUI.ARENA.createInventory(1));
+				return true;
+			}
+		},
+
+		ARENA_HERE(Arrays.asList(Arrays.asList("arena", "a"), Arrays.asList("here", "h")), "", "Arena where you are", PermissionEnum.OP) {
+			@Override
+			public boolean perform(Player player , String[] args) {
+				return new TBLTArenaMap().findUnique(player.getLocation())
+						.map(arena -> {
+							TBLTPlayerGUI.ARENA.create(IconCreatorUtility.getIcons((TBLTArena) arena)).ifPresent(player::openInventory);;
+							return true;
+						}).orElse(false);
+			}
+		},
+
+
+		REPLACER_CREATE(Arrays.asList(Arrays.asList("replacer", "r"), Arrays.asList("create", "c")), "<Arena>", "Create Arena", PermissionEnum.OP) {
+			@Override
+			public boolean perform(Player player, String[] args) {
+				List<String> options = takeOptions(args);
+				if(0 < options.size()) {
+					BlockReplacer replacer = BlockReplacer.create(options.get(0), player);
+					replacer.setSpawn(player.getLocation());
+					new BlockReplacerMap().put(replacer);
 					replacer.save();
 					return true;
-				}).orElse(false);
-		}
-	},
+				}
+				return false;
+			}
+		},
 
-	REPLACER_AFTER_HERE(Arrays.asList(Arrays.asList("replacer", "r"), Arrays.asList("afterhere", "ah")), "", "Replace as after where you are", PermissionEnum.OP) {
-		@Override
-		public boolean perform(Player player, String[] args) {
-			return new BlockReplacerMap().findUnique(player.getLocation())
-				.map(replacer -> {
-					replacer.load();
-					return true;
-				}).orElse(false);
-		}
-	},
+		REPLACER_UPDATE_HERE(Arrays.asList(Arrays.asList("replacer", "r"), Arrays.asList("updatehere", "uh")), "", "Update where you are", PermissionEnum.OP) {
+			@Override
+			public boolean perform(Player player, String[] args) {
+				return new BlockReplacerMap().findUnique(player.getLocation())
+						.map(replacer -> {
+							replacer.save();
+							return true;
+						}).orElse(false);
+			}
+		},
 
-	REPLACER_BEFORE_HERE(Arrays.asList(Arrays.asList("replacer", "r"), Arrays.asList("beforehere", "bh")), "", "Replace as before where you are", PermissionEnum.OP) {
-		@Override
-		public boolean perform(Player player, String[] args) {
-			return false;//TODO not implemented yet
+		REPLACER_AFTER_HERE(Arrays.asList(Arrays.asList("replacer", "r"), Arrays.asList("afterhere", "ah")), "", "Replace as after where you are", PermissionEnum.OP) {
+			@Override
+			public boolean perform(Player player, String[] args) {
+				return new BlockReplacerMap().findUnique(player.getLocation())
+						.map(replacer -> {
+							replacer.load();
+							return true;
+						}).orElse(false);
+			}
+		},
+
+		REPLACER_BEFORE_HERE(Arrays.asList(Arrays.asList("replacer", "r"), Arrays.asList("beforehere", "bh")), "", "Replace as before where you are", PermissionEnum.OP) {
+			@Override
+			public boolean perform(Player player, String[] args) {
+				return false;//TODO not implemented yet
 //			return new DevReplacerMap().findUnique(player.getLocation())
 //				.map(replacer -> {
 //					Location center = replacer.getCenter();
@@ -468,63 +416,63 @@ public class TBLTCommandExecutor implements CommandExecutor {
 //						});
 //					return true;
 //				}).orElse(false);
-		}
-	},
+			}
+		},
 
-	REPLACER_REMOVE_HERE(Arrays.asList(Arrays.asList("replacer", "r"), Arrays.asList("removehere")), "", "Remove arena where you are", PermissionEnum.OP) {
-		@Override
-		public boolean perform(Player player, String[] args) {
-			BlockReplacerMap replacers = new BlockReplacerMap();
-			return replacers.findUnique(player.getLocation())
-					.map(replacer -> {
-						replacers.remove(replacer);
-						replacer.delete();
-						return true;
-					}).orElse(false);
-		}
-	},
+		REPLACER_REMOVE_HERE(Arrays.asList(Arrays.asList("replacer", "r"), Arrays.asList("removehere")), "", "Remove arena where you are", PermissionEnum.OP) {
+			@Override
+			public boolean perform(Player player, String[] args) {
+				BlockReplacerMap replacers = new BlockReplacerMap();
+				return replacers.findUnique(player.getLocation())
+						.map(replacer -> {
+							replacers.remove(replacer);
+							replacer.delete();
+							return true;
+						}).orElse(false);
+			}
+		},
 
-	REPLACER_SETTRIGGER(Arrays.asList(Arrays.asList("replacer", "r"), Arrays.asList("settrigger", "st")), "", "Set trigger and target", PermissionEnum.OP) {
-		@Override
-		public boolean perform(Player player , String[] args) {
-			Block block = player.getTargetBlock((Set<Material>) null, 10);
-			if(block.getType().equals(Material.AIR)) {
-				player.sendMessage("No block");
+		REPLACER_SETTRIGGER(Arrays.asList(Arrays.asList("replacer", "r"), Arrays.asList("settrigger", "st")), "", "Set trigger and target", PermissionEnum.OP) {
+			@Override
+			public boolean perform(Player player , String[] args) {
+				Block block = player.getTargetBlock((Set<Material>) null, 10);
+				if(block.getType().equals(Material.AIR)) {
+					player.sendMessage("No block");
+					return true;
+				}
+
+				return new BlockReplacerMap().findUnique(block.getLocation())
+						.map(replacer -> {
+							BlockReplacer r = (BlockReplacer) replacer;
+							Material trigger = player.getItemInHand().getType();
+							Material target = block.getType();
+							r.setTriggers(trigger, target);
+							r.save();
+							TBLTPlayerGUI.BLOCK_REPLACER.create(IconCreatorUtility.getIcons(r))
+							.ifPresent(inventory -> player.openInventory(inventory));
+							return true;
+						}).orElse(false);
+			}
+		},
+
+		REPLACER_LIST(Arrays.asList(Arrays.asList("replacer", "r"), Arrays.asList("list", "l")), "", "List replacers", PermissionEnum.OP) {
+			@Override
+			public boolean perform(Player player , String[] args) {
+				player.openInventory(TBLTIconListGUI.BLOCK_REPLACER.createInventory(1));
 				return true;
 			}
+		},
 
-			return new BlockReplacerMap().findUnique(block.getLocation())
-				.map(replacer -> {
-					BlockReplacer r = (BlockReplacer) replacer;
-					Material trigger = player.getItemInHand().getType();
-					Material target = block.getType();
-					r.setTriggers(trigger, target);
-					r.save();
-					TBLTGUI.BLOCK_REPLACER.create(IconCreatorUtility.getIcons(r))
-						.ifPresent(inventory -> player.openInventory(inventory));
-					return true;
-				}).orElse(false);
-		}
-	},
-
-	REPLACER_LIST(Arrays.asList(Arrays.asList("replacer", "r"), Arrays.asList("list", "l")), "", "List replacers", PermissionEnum.OP) {
-		@Override
-		public boolean perform(Player player , String[] args) {
-			player.openInventory(TBLTIconListGUI.BLOCK_REPLACER.createInventory(1));
-			return true;
-		}
-	},
-
-	REPLACER_HERE(Arrays.asList(Arrays.asList("replacer", "r"), Arrays.asList("here", "h")), "", "Replacer where you are", PermissionEnum.OP) {
-		@Override
-		public boolean perform(Player player , String[] args) {
-			return new BlockReplacerMap().findUnique(player.getLocation())
-				.map(arena -> {
-					TBLTGUI.BLOCK_REPLACER.create(IconCreatorUtility.getIcons((BlockReplacer) arena)).ifPresent(player::openInventory);;
-					return true;
-				}).orElse(false);
-		}
-	},
+		REPLACER_HERE(Arrays.asList(Arrays.asList("replacer", "r"), Arrays.asList("here", "h")), "", "Replacer where you are", PermissionEnum.OP) {
+			@Override
+			public boolean perform(Player player , String[] args) {
+				return new BlockReplacerMap().findUnique(player.getLocation())
+						.map(arena -> {
+							TBLTPlayerGUI.BLOCK_REPLACER.create(IconCreatorUtility.getIcons((BlockReplacer) arena)).ifPresent(player::openInventory);;
+							return true;
+						}).orElse(false);
+			}
+		},
 //		ARENA_JOIN(Arrays.asList(Arrays.asList("arena", "a"), Arrays.asList("join", "j")), "<Arena>", "Join Arena", PermissionEnum.PLAYER) {
 //			@Override
 //			public boolean perform(Player player , String[] args) {

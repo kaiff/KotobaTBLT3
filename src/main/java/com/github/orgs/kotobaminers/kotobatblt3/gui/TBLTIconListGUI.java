@@ -45,7 +45,7 @@ public enum TBLTIconListGUI implements IconListGUI {
 		private void onIconClickEvent(InventoryClickEvent event) {
 			String name = event.getCurrentItem().getItemMeta().getDisplayName();
 			new TBLTArenaMap().findUnique(name)
-				.flatMap(arena -> TBLTGUI.ARENA.create(IconCreatorUtility.getIcons((TBLTArena) arena)))
+				.flatMap(arena -> TBLTPlayerGUI.ARENA.create(IconCreatorUtility.getIcons((TBLTArena) arena)))
 				.ifPresent(i -> event.getWhoClicked().openInventory(i));
 		}
 	},
@@ -71,7 +71,7 @@ public enum TBLTIconListGUI implements IconListGUI {
 		public void onIconClickEvent(InventoryClickEvent event) {
 			String name = event.getCurrentItem().getItemMeta().getDisplayName();
 			new BlockReplacerMap().findUnique(name)
-				.flatMap(arena -> TBLTGUI.BLOCK_REPLACER.create(IconCreatorUtility.getIcons((BlockReplacer) arena)))
+				.flatMap(arena -> TBLTPlayerGUI.BLOCK_REPLACER.create(IconCreatorUtility.getIcons((BlockReplacer) arena)))
 				.ifPresent(i -> event.getWhoClicked().openInventory(i));
 		}
 	},

@@ -29,7 +29,7 @@ import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStack;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaUtility;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArena;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaMap;
-import com.github.orgs.kotobaminers.kotobatblt3.gui.TBLTGUI;
+import com.github.orgs.kotobaminers.kotobatblt3.gui.TBLTPlayerGUI;
 import com.github.orgs.kotobaminers.kotobatblt3.kotobatblt3.Setting;
 import com.github.orgs.kotobaminers.kotobatblt3.resource.ResourceHolder;
 import com.github.orgs.kotobaminers.kotobatblt3.resource.TBLTResource;
@@ -269,7 +269,7 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 				List<ItemStack> icons = Stream.of(chest.getInventory().getContents())
 					.filter(i -> i != null)
 					.collect(Collectors.toList());
-				event.getPlayer().openInventory(TBLTGUI.CLAIRVOYANCE.create(icons).get());
+				event.getPlayer().openInventory(TBLTPlayerGUI.CLAIRVOYANCE.create(icons).get());
 				return true;
 			}
 			return false;
@@ -355,7 +355,7 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 				.filter(e -> e instanceof Player)
 				.map(e -> (Player) e)
 				.filter(e -> new TBLTArenaMap().isInAny(e.getLocation()))
-//				.filter(e -> e.isSneaking())TODO
+				.filter(e -> e.isSneaking())
 				.findAny()
 				.map(e -> {
 					Location userLocation = e.getLocation();

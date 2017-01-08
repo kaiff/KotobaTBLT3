@@ -16,27 +16,36 @@ import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaSound;
 import com.github.orgs.kotobaminers.kotobatblt3.game.TBLTData;
 import com.github.orgs.kotobaminers.kotobatblt3.game.TBLTJob;
 
-public enum TBLTGUI implements ChestGUI {
+public enum TBLTPlayerGUI implements ChestGUI {
+
+
 	RESOURCES("Resources", ChestSize.MINIMUM) {
 		@Override
 		public void onInventoryClick(InventoryClickEvent event) {
 		}
 	},
+
+
 	INVESTIGATE("Investigating...", ChestSize.MINIMUM) {
 		@Override
 		public void onInventoryClick(InventoryClickEvent event) {
 		}
 	},
+
+
 	PREDICTION("Prediction...", ChestSize.MINIMUM) {
 		@Override
 		public void onInventoryClick(InventoryClickEvent event) {
 		}
 	},
+
+
 	CLAIRVOYANCE("Clairvoyance...", ChestSize.MINIMUM) {
 		@Override
 		public void onInventoryClick(InventoryClickEvent event) {
 		}
 	},
+
 
 	/**
 	 * @author fukus
@@ -78,6 +87,7 @@ public enum TBLTGUI implements ChestGUI {
 			}
 		}
 	},
+
 	ARENA("Arena", ChestSize.MINIMUM) {
 		@Override
 		public void onInventoryClick(InventoryClickEvent event) {
@@ -112,7 +122,7 @@ public enum TBLTGUI implements ChestGUI {
 	private String title;
 	private ChestSize chestSize;
 
-	private TBLTGUI(String title, ChestSize chestSize) {
+	private TBLTPlayerGUI(String title, ChestSize chestSize) {
 		this.title = title;
 		this.chestSize = chestSize;
 	}
@@ -126,8 +136,8 @@ public enum TBLTGUI implements ChestGUI {
 		return chestSize;
 	}
 
-	public static Optional<TBLTGUI> find(Inventory inventory) {
-		return Stream.of(TBLTGUI.values())
+	public static Optional<TBLTPlayerGUI> find(Inventory inventory) {
+		return Stream.of(TBLTPlayerGUI.values())
 			.filter(e -> e.getTitle().equalsIgnoreCase(inventory.getTitle()))
 			.findFirst();
 	}

@@ -7,10 +7,17 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
 
+import com.github.orgs.kotobaminers.kotobaapi.database.DatabaseManager;
+import com.github.orgs.kotobaminers.kotobaapi.database.KotobaSQLData;
 import com.github.orgs.kotobaminers.kotobaapi.sentence.Sentence.Expression;
 import com.github.orgs.kotobaminers.kotobatblt3.kotobatblt3.TBLTCommandExecutor.PermissionEnum;
 
-public class PlayerData {
+public class PlayerData implements KotobaSQLData {
+
+
+	private static final DatabaseManager DATABASE = new PlayerDatabase();
+
+
 	private UUID uuid = null;
 	private int npc = 0;
 	private int sentence = 0;
@@ -21,13 +28,16 @@ public class PlayerData {
 	private boolean english = true;
 	private boolean kanji = false;
 
+
 	private PlayerData() {
 	}
+
 	public static PlayerData create(final Consumer<PlayerData> builder) {
 		PlayerData data = new PlayerData();
 		builder.accept(data);
 		return data;
 	}
+
 	public static PlayerData initial(UUID uuid) {
 		PlayerData data = new PlayerData();
 		data.uuid = uuid;
@@ -71,6 +81,18 @@ public class PlayerData {
 		return this;
 	}
 
+
+	@Override
+	public void update() {
+		((PlayerDatabase) DATABASE).update(this);
+	}
+
+	@Override
+	public DatabaseManager getDatabaseManager() {
+		return DATABASE;
+	}
+
+
 	public UUID getUuid() {
 		return uuid;
 	}
@@ -112,6 +134,7 @@ public class PlayerData {
 		return kanji;
 	}
 
+
 	public enum EditMode {
 		KANJI,
 		ENGLISH,
@@ -120,4 +143,7 @@ public class PlayerData {
 		NONE,
 		;
 	}
+
+
 }
+

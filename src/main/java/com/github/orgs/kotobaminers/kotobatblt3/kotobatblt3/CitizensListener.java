@@ -1,50 +1,67 @@
 package com.github.orgs.kotobaminers.kotobatblt3.kotobatblt3;
 
+import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
+import java.util.stream.Stream;
 
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.Inventory;
 
-import com.github.orgs.kotobaminers.kotobaapi.sentence.Holograms;
-import com.github.orgs.kotobaminers.kotobaapi.sentence.HologramsManager;
 import com.github.orgs.kotobaminers.kotobaapi.sentence.Sentence;
-import com.github.orgs.kotobaminers.kotobaapi.sentence.Sentence.Expression;
-import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaSound;
-import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaUtility;
-import com.github.orgs.kotobaminers.kotobatblt3.database.PlayerData;
+import com.github.orgs.kotobaminers.kotobaapi.userinterface.ConversationGUI;
+import com.github.orgs.kotobaminers.kotobaapi.userinterface.ConversationGUIIcon;
 import com.github.orgs.kotobaminers.kotobatblt3.database.PlayerDatabase;
 import com.github.orgs.kotobaminers.kotobatblt3.database.SentenceDatabase;
-import com.github.orgs.kotobaminers.kotobatblt3.utility.NPCManager;
-import com.github.orgs.kotobaminers.kotobatblt3.utility.Utility;
+import com.github.orgs.kotobaminers.kotobatblt3.database.TBLTSentenceHolograms;
 
+import net.citizensnpcs.api.event.NPCLeftClickEvent;
 import net.citizensnpcs.api.event.NPCRightClickEvent;
 import net.citizensnpcs.api.npc.NPC;
 
 public class CitizensListener implements Listener {
+
+
 	@EventHandler
 	public void onRightClickNPC(NPCRightClickEvent event) {
 		Player player = event.getClicker();
-
 		NPC npc = event.getNPC();
-		PlayerDatabase playerDatabase = new PlayerDatabase();
-		PlayerData data = playerDatabase.getOrDefault(player.getUniqueId()).npc(npc.getId());
-		SentenceDatabase sentenceDatabase = new SentenceDatabase();
-		List<Expression> expressions = data.getExpressions();
+		new PlayerDatabase().getOrDefault(event.getClicker().getUniqueId()).npc(npc.getId()).update();
 
-		playerDatabase.updateDisplay(data, npc.getId())
-			.ifPresent(d ->sentenceDatabase.find(d.getDisplay())
-			.ifPresent(s ->NPCManager.findNPC(s.getNPC()).map(n -> n.getStoredLocation())
-				.ifPresent(loc -> {
-					List<String> lines = s.getLines(expressions);
-					sentenceDatabase.findSentencesByConversation(s.getConversation())
-						.ifPresent(sentences -> lines.add(0, Utility.patternProgress("◇", "◆", sentences.size(), sentences.stream().map(Sentence::getId).collect(Collectors.toList()).indexOf(s.getId()), ChatColor.GREEN)));
-					HologramsManager.updateHologram(Setting.getPlugin(), Holograms.create(loc), s.getConversation(), lines, 20 * 10);
-					KotobaUtility.lookAt(player, loc.add(0, -1, 0));
-					KotobaSound.ATTENTION.play(player.getLocation());
-				})));
+		new TBLTSentenceHolograms(npc.getStoredLocation()).display(npc, player);
+
 	}
 
+	@EventHandler
+	public void onLeftClickNPC(NPCLeftClickEvent event) {
+		Player player = event.getClicker();
+		NPC npc = event.getNPC();
+		new PlayerDatabase().getOrDefault(event.getClicker().getUniqueId()).npc(npc.getId()).update();
+
+		Optional<List<Sentence>> optional = new SentenceDatabase().findSentencesByNPCId(npc.getId());
+		if(optional.isPresent()) {
+			player.openInventory(new ConversationGUI().create(optional.get(), false));
+		} else {
+			new ConversationGUI().create(Arrays.asList(ConversationGUIIcon.CREATE.createItemStack()))
+				.ifPresent(inv -> player.openInventory(inv));
+		}
+	}
+
+	@EventHandler
+	public void onInventoryClick(InventoryClickEvent event) {
+		if(!event.getWhoClicked().isOp()) return;
+		Inventory inventory = event.getInventory();
+		if(new ConversationGUI().isChestGUI(inventory.getTitle())) {
+			Stream.of(ConversationGUIIcon.values())
+				.filter(e -> e.isIcon(event.getCurrentItem()))
+				.forEach(e -> e.performClicked(event));
+			event.setCancelled(true);
+		}
+	}
+
+
 }
+

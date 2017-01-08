@@ -127,8 +127,7 @@ public class PlayerDatabase extends DatabaseManager {
 
 	public synchronized Optional<PlayerData> updateDisplay(PlayerData data, int npc) {
 		List<Sentence> sentences = new SentenceDatabase().findSentencesByNPCId(npc)
-			.orElse(new ArrayList<Sentence>()).stream()
-			.collect(Collectors.toList());
+			.orElse(new ArrayList<Sentence>());
 
 		List<Integer> ids = sentences.stream()
 			.map(s -> s.getId())

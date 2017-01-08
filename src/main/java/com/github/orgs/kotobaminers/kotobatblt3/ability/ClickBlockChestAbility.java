@@ -27,7 +27,7 @@ import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArena;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaMap;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTPortal;
 import com.github.orgs.kotobaminers.kotobatblt3.game.TBLTData;
-import com.github.orgs.kotobaminers.kotobatblt3.gui.TBLTGUI;
+import com.github.orgs.kotobaminers.kotobatblt3.gui.TBLTPlayerGUI;
 import com.github.orgs.kotobaminers.kotobatblt3.resource.TBLTResource;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.RepeatingEffect;
 
@@ -87,7 +87,7 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface {
 			informations.addAll(options);
 			Player player = event.getPlayer();
 			if(0 < informations.size()) {
-				TBLTGUI.INVESTIGATE.create(informations)
+				TBLTPlayerGUI.INVESTIGATE.create(informations)
 					.ifPresent(inventory -> {
 						player.openInventory(inventory);
 					});
@@ -110,7 +110,7 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface {
 	) {
 		@Override
 		public boolean performAbility(PlayerInteractEvent event) {
-			TBLTGUI.ITEM_EXCHANGER.create(findOptions(event.getClickedBlock().getLocation()))
+			TBLTPlayerGUI.ITEM_EXCHANGER.create(findOptions(event.getClickedBlock().getLocation()))
 				.ifPresent(inventory -> {
 					TBLTData.getOrDefault(event.getPlayer().getUniqueId()).target(event.getClickedBlock());
 					event.getPlayer().openInventory(inventory);
@@ -132,7 +132,7 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface {
 	) {
 		@Override
 		public boolean performAbility(PlayerInteractEvent event) {
-			TBLTGUI.ITEM_EXCHANGER.create(findOptions(event.getClickedBlock().getLocation()))
+			TBLTPlayerGUI.ITEM_EXCHANGER.create(findOptions(event.getClickedBlock().getLocation()))
 				.ifPresent(inventory -> {
 					TBLTData.getOrDefault(event.getPlayer().getUniqueId()).target(event.getClickedBlock());
 					event.getPlayer().openInventory(inventory);

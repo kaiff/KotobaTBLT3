@@ -21,9 +21,6 @@ import com.github.orgs.kotobaminers.kotobatblt3.kotobatblt3.Setting;
 
 public class SentenceDatabase extends DatabaseManager {
 
-	public SentenceDatabase() {
-		super();
-	}
 
 	private static String database;
 	private static String user;
@@ -31,7 +28,8 @@ public class SentenceDatabase extends DatabaseManager {
 	private static YamlConfiguration config = YamlConfiguration.loadConfiguration(new File(Setting.getPlugin().getDataFolder().getAbsoluteFile() + "/Config/Database.yml"));
 	private static String sentenceTable;
 
-	public synchronized void update(Sentence sentence) {
+
+	protected synchronized void update(Sentence sentence) {
 		String update = "";
 		PreparedStatement prepared = null;
 		Connection connection = null;
@@ -51,6 +49,7 @@ public class SentenceDatabase extends DatabaseManager {
 					prepared.setString(6, sentence.getLines(Arrays.asList(Expression.KANJI)).get(0).replace("'", "''"));
 					prepared.setString(7, sentence.getLines(Arrays.asList(Expression.ENGLISH)).get(0).replace("'", "''"));
 					prepared.setString(8, sentence.getOwner().map(UUID::toString).orElse(""));
+					prepared.executeUpdate();
 				} else {
 					update = "INSERT INTO " + sentenceTable + " "
 						+ "(id, npc, conversation, ordering, task, keyBool, japanese, english, owner) "
@@ -91,6 +90,27 @@ public class SentenceDatabase extends DatabaseManager {
 	}
 
 
+	public synchronized void deleteConversation(int conversation) {
+		String delete = "DELETE FROM " + sentenceTable + " WHERE conversation = ?;";
+		Connection connection = null;
+		PreparedStatement ps = null;
+
+		try {
+			connection = openConnection();
+			ps = connection.prepareStatement(delete);
+			ps.setInt(1, conversation);
+			ps.executeUpdate();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			closeStatement(ps);
+			closeConnection(connection);
+		}
+
+	}
+
+
 	public synchronized Optional<Sentence> find(int id) {
  		Optional<Sentence> sentence = Optional.empty();
 		String select = "SELECT * FROM " + sentenceTable + " WHERE id = '" + id + "' LIMIT 1;";
@@ -103,7 +123,7 @@ public class SentenceDatabase extends DatabaseManager {
 			statement = connection.createStatement();
 			result = statement.executeQuery(select);
 			if(result.next()) {
-				sentence = Optional.ofNullable(Sentence.create(result));
+				sentence = Optional.ofNullable(new TBLTSentence().create(result));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -161,7 +181,7 @@ public class SentenceDatabase extends DatabaseManager {
 			if(result.next()) {
 				result.previous();
 				while(result.next()) {
-					list.add(Sentence.create(result));
+					list.add(new TBLTSentence().create(result));
 				}
 			}
 		} catch (SQLException e) {
@@ -178,18 +198,43 @@ public class SentenceDatabase extends DatabaseManager {
 		}
 	}
 
+	public synchronized int getMaxConversation() {
+		String sql = "SELECT MAX(conversation) as maxConversation FROM tblt_sentence;";
+		Connection connection = null;
+		Statement statement = null;
+		ResultSet result = null;
+
+		try {
+			connection = openConnection();
+			statement = connection.createStatement();
+			result = statement.executeQuery(sql);
+			if(result.next()) {
+				return result.getInt("maxConversation");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			closeStatement(statement);
+			closeConnection(connection);
+		}
+		return 1;
+	}
+
 	@Override
 	public String getDatabase() {
 		return database;
 	}
+
 	@Override
 	public String getUser() {
 		return user;
 	}
+
 	@Override
 	public String getPass() {
 		return pass;
 	}
+
 	@Override
 	public void loadConfig() {
 		SentenceDatabase.database = config.getString("DATABASE");
@@ -197,4 +242,7 @@ public class SentenceDatabase extends DatabaseManager {
 		SentenceDatabase.pass = config.getString("PASS");
 		SentenceDatabase.sentenceTable = config.getString("SENTENCE_TABLE");
 	}
+
+
 }
+

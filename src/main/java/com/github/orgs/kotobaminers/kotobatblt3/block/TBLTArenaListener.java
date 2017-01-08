@@ -31,7 +31,7 @@ import org.bukkit.potion.Potion;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaEffect;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStack;
 import com.github.orgs.kotobaminers.kotobatblt3.ability.ProjectileAbility;
-import com.github.orgs.kotobaminers.kotobatblt3.gui.TBLTGUI;
+import com.github.orgs.kotobaminers.kotobatblt3.gui.TBLTPlayerGUI;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.Utility;
 
 public class TBLTArenaListener implements Listener {
@@ -151,7 +151,7 @@ public class TBLTArenaListener implements Listener {
 		if(event.getPlayer() instanceof Player) {
 			Player player = (Player) event.getPlayer();
 			if(Utility.isTBLTPlayer(player)) {
-				if(!TBLTGUI.find(event.getInventory()).isPresent()) {
+				if(!TBLTPlayerGUI.find(event.getInventory()).isPresent()) {
 					event.setCancelled(true);
 				}
 			}
@@ -163,7 +163,7 @@ public class TBLTArenaListener implements Listener {
 		if(event.getWhoClicked() instanceof Player) {
 			Player player = (Player) event.getWhoClicked();
 			if(Utility.isTBLTPlayer(player)) {
-				if(!TBLTGUI.find(event.getInventory()).isPresent()) {
+				if(!TBLTPlayerGUI.find(event.getInventory()).isPresent()) {
 					event.getWhoClicked().closeInventory();
 					event.setCancelled(true);
 				}

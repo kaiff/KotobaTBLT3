@@ -1,6 +1,6 @@
 package com.github.orgs.kotobaminers.kotobatblt3.kotobatblt3;
 
-import com.github.orgs.kotobaminers.kotobaapi.sentence.HologramsManager;
+import com.github.orgs.kotobaminers.kotobaapi.sentence.Holograms;
 import com.github.orgs.kotobaminers.kotobatblt3.block.BlockReplacerMap;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaMap;
 import com.github.orgs.kotobaminers.kotobatblt3.database.PlayerDatabase;
@@ -18,7 +18,7 @@ public class Setting {
 		new PlayerDatabase().loadConfig();
 		new SentenceDatabase().loadConfig();
 
-		HologramsManager.removeAllHologram(plugin);
+		Holograms.removeAllHologram(plugin);
 
 	}
 

@@ -28,10 +28,14 @@ public interface ChestGUI {
 		abstract int getSize(int iconSize);
 	}
 
+
 	String getTitle();
 	ChestSize getChestSize();
 
+
 	void onInventoryClick(InventoryClickEvent event);
+
+
 	default Optional<Inventory> create(List<ItemStack> icons) {
 		Inventory inventory = Bukkit.createInventory(null, getChestSize().getSize(icons.size()), getTitle());
 		Stream.iterate(0, i -> i + 1)
@@ -39,4 +43,11 @@ public interface ChestGUI {
 			.forEach(i -> inventory.setItem(i, icons.get(i)));
 		return Optional.ofNullable(inventory);
 	}
+
+
+	default boolean isChestGUI(String title) {
+		return getTitle().equalsIgnoreCase(title);
+	}
+
+
 }

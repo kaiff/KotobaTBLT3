@@ -23,7 +23,6 @@ import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaYamlConfiguration;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.selections.Selection;
 
-//TODO: torch cannot be set correctry
 public abstract class BlockStorage extends KotobaYamlConfiguration {
 	private enum Path {
 		NAME("NAME"),
