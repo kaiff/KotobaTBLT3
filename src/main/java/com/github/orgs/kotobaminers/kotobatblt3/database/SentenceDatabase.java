@@ -137,7 +137,7 @@ public class SentenceDatabase extends DatabaseManager {
 		return sentence;
 	}
 
-	public synchronized Optional<List<Sentence>> findSentencesByNPCId(int npc) {
+	public synchronized List<Sentence> findSentencesByNPCId(int npc) {
 		Connection connection = null;
 		Statement statement = null;
 		ResultSet result = null;
@@ -152,7 +152,7 @@ public class SentenceDatabase extends DatabaseManager {
 
 			if(result.next()) {
 				int conversation = result.getInt("conversation");
-				list = findSentencesByConversation(conversation).orElse(list);
+				list = getSentencesByConversation(conversation);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -162,13 +162,13 @@ public class SentenceDatabase extends DatabaseManager {
 			closeConnection(connection);
 		}
 		if(0 < list.size()) {
-			return Optional.ofNullable(list);
+			return list;
 		} else {
-			return Optional.empty();
+			return new ArrayList<>();
 		}
 	}
 
-	public synchronized Optional<List<Sentence>> findSentencesByConversation(int conversation) {
+	public synchronized List<Sentence> getSentencesByConversation(int conversation) {
 		List<Sentence> list = new ArrayList<>();
 		Connection connection = null;
 		Statement statement = null;
@@ -194,9 +194,9 @@ public class SentenceDatabase extends DatabaseManager {
 			closeConnection(connection);
 		}
 		if(0 < list.size()) {
-			return Optional.ofNullable(list);
+			return list;
 		} else {
-			return Optional.empty();
+			return new ArrayList<>();
 		}
 	}
 

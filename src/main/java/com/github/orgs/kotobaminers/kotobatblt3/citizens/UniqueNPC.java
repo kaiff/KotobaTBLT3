@@ -19,6 +19,7 @@ import com.github.orgs.kotobaminers.kotobaapi.citizens.UniqueNPCInterface;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaEffect;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStack;
 import com.github.orgs.kotobaminers.kotobatblt3.database.SentenceDatabase;
+import com.github.orgs.kotobaminers.kotobatblt3.database.TBLTNPCHolograms;
 
 import net.citizensnpcs.api.npc.NPC;
 import net.citizensnpcs.trait.LookClose;
@@ -101,6 +102,7 @@ public enum UniqueNPC implements UniqueNPCInterface {
 			.forEach(npc -> {
 				npc.despawn();
 				playDespawnEffect(npc.getStoredLocation());
+				new TBLTNPCHolograms().removeNear(npc.getStoredLocation());
 			});
 	}
 

@@ -5,7 +5,6 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -126,8 +125,7 @@ public class PlayerDatabase extends DatabaseManager {
 	}
 
 	public synchronized Optional<PlayerData> updateDisplay(PlayerData data, int npc) {
-		List<Sentence> sentences = new SentenceDatabase().findSentencesByNPCId(npc)
-			.orElse(new ArrayList<Sentence>());
+		List<Sentence> sentences = new SentenceDatabase().findSentencesByNPCId(npc);
 
 		List<Integer> ids = sentences.stream()
 			.map(s -> s.getId())

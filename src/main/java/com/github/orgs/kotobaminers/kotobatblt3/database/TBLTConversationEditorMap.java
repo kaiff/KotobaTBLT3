@@ -1,6 +1,5 @@
 package com.github.orgs.kotobaminers.kotobatblt3.database;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -31,8 +30,7 @@ public class TBLTConversationEditorMap extends ConversationEditorMap {
 				return editor;
 			}
 		}
-		List<Sentence> list = new SentenceDatabase().findSentencesByConversation(conversation)
-			.orElse(new ArrayList<>());
+		List<Sentence> list = new SentenceDatabase().getSentencesByConversation(conversation);
 		editor = new TBLTConversationEditor(list, author);
 		getMap().put(conversation,  editor);
 		return editor;

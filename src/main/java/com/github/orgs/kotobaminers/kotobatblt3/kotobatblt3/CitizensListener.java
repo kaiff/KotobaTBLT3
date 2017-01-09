@@ -2,11 +2,8 @@ package com.github.orgs.kotobaminers.kotobatblt3.kotobatblt3;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.bukkit.Location;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -14,12 +11,10 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.util.Vector;
 
 import com.github.orgs.kotobaminers.kotobaapi.sentence.ConversationGUI;
 import com.github.orgs.kotobaminers.kotobaapi.sentence.ConversationGUIIcon;
 import com.github.orgs.kotobaminers.kotobaapi.sentence.Sentence;
-import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaSound;
 import com.github.orgs.kotobaminers.kotobatblt3.database.PlayerDatabase;
 import com.github.orgs.kotobaminers.kotobatblt3.database.SentenceDatabase;
 import com.github.orgs.kotobaminers.kotobatblt3.database.TBLTNPCHolograms;
@@ -37,15 +32,6 @@ public class CitizensListener implements Listener {
 		NPC npc = event.getNPC();
 		new PlayerDatabase().getOrDefault(event.getClicker().getUniqueId()).npc(npc.getId()).update();
 		new TBLTNPCHolograms().display(npc, player);
-
-		Location lookAt = npc.getStoredLocation();
-		if(npc.getEntity() instanceof LivingEntity) {
-			lookAt = ((LivingEntity) npc.getEntity()).getEyeLocation();
-		}
-		Vector vector = lookAt.subtract(player.getEyeLocation()).toVector();
-		player.teleport(player.getLocation().setDirection(vector));
-		KotobaSound.ATTENTION.play(npc.getStoredLocation());
-
 	}
 
 
@@ -55,9 +41,9 @@ public class CitizensListener implements Listener {
 		NPC npc = event.getNPC();
 		new PlayerDatabase().getOrDefault(event.getClicker().getUniqueId()).npc(npc.getId()).update();
 
-		Optional<List<Sentence>> optional = new SentenceDatabase().findSentencesByNPCId(npc.getId());
-		if(optional.isPresent()) {
-			player.openInventory(new ConversationGUI().create(optional.get(), false));
+		List<Sentence> sentences = new SentenceDatabase().findSentencesByNPCId(npc.getId());
+		if(0 < sentences.size()) {
+			player.openInventory(new ConversationGUI().create(sentences, false));
 		} else {
 			new TBLTNPCHolograms().removeNear(npc.getStoredLocation());
 			ItemStack icon = ConversationGUIIcon.CREATE.createItemStack();
@@ -68,6 +54,7 @@ public class CitizensListener implements Listener {
 				.ifPresent(inv -> player.openInventory(inv));
 		}
 	}
+
 
 	@EventHandler
 	public void onInventoryClick(InventoryClickEvent event) {

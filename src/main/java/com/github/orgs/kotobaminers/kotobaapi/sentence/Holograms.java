@@ -15,7 +15,7 @@ public abstract class Holograms {
 
 	private static final double SPACE = 0.25;
 	private static final int DUPLICATE =  3;
-
+	private static final double ARMOR_STAND_HEIGHT = 1.5;
 
 	public boolean display(List<String> lines, Location base) {
 		Collections.reverse(lines);
@@ -23,7 +23,7 @@ public abstract class Holograms {
 			removeNear(base);
 			Stream.iterate(0, i -> i + 1)
 				.limit(lines.size())
-				.forEach(i -> updateArmorStand(lines.get(i), base.clone().add(0, SPACE * i, 0)));
+				.forEach(i -> updateArmorStand(lines.get(i), base.clone().add(0, SPACE * i - ARMOR_STAND_HEIGHT, 0)));
 			return true;
 		}
 		return false;

@@ -17,7 +17,9 @@ import org.bukkit.SkullType;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Firework;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
@@ -96,6 +98,15 @@ public class KotobaUtility {
 		skull.setItemMeta(itemMeta);
 		return skull;
 	}
+
+	public static Location getBase(Entity entity) {
+		if(entity instanceof LivingEntity) {
+			LivingEntity le = (LivingEntity) entity;
+			return le.getEyeLocation();
+		}
+		return entity.getLocation();
+	}
+
 
 	public static void lookAt(Player player, Location lookat) {
 		//Clone the loc to prevent applied changes to the input loc
