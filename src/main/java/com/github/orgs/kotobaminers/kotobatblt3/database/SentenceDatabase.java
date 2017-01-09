@@ -8,8 +8,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -198,7 +200,7 @@ public class SentenceDatabase extends DatabaseManager {
 		}
 	}
 
-	public synchronized int getMaxConversation() {
+	public synchronized Optional<Integer> getMaxConversation() {
 		String sql = "SELECT MAX(conversation) as maxConversation FROM tblt_sentence;";
 		Connection connection = null;
 		Statement statement = null;
@@ -209,15 +211,69 @@ public class SentenceDatabase extends DatabaseManager {
 			statement = connection.createStatement();
 			result = statement.executeQuery(sql);
 			if(result.next()) {
-				return result.getInt("maxConversation");
+				return Optional.ofNullable(result.getInt("maxConversation"));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
+			closeResultSet(result);
 			closeStatement(statement);
 			closeConnection(connection);
 		}
-		return 1;
+		return Optional.empty();
+	}
+
+	public synchronized Optional<Integer> findConversation(int npc) {
+		String find = "SELECT conversation FROM " + sentenceTable + " WHERE npc = ?;";
+		Connection connection = null;
+		PreparedStatement ps = null;
+		ResultSet result = null;
+
+		try {
+			connection = openConnection();
+			ps = connection.prepareStatement(find);
+			ps.setInt(1, npc);
+			result = ps.executeQuery();
+			if(result.next()) {
+				return Optional.ofNullable(result.getInt("conversation"));
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			closeResultSet(result);
+			closeStatement(ps);
+			closeConnection(connection);
+		}
+		return Optional.empty();
+	}
+
+	public synchronized Set<Integer> getNPCIds() {
+		String find = "SELECT npc FROM " + sentenceTable + ";";
+		Connection connection = null;
+		Statement statement = null;
+		ResultSet result = null;
+
+		Set<Integer> ids = new HashSet<Integer>();
+		try {
+			connection = openConnection();
+			statement = connection.createStatement();
+			result = statement.executeQuery(find);
+			while(result.next()) {
+				ids.add(result.getInt("npc"));
+			}
+			if(result.next()) {
+				return ids;
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			closeResultSet(result);
+			closeStatement(statement);
+			closeConnection(connection);
+		}
+		return ids;
 	}
 
 	@Override

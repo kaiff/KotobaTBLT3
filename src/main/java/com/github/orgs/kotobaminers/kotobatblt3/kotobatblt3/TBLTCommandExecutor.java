@@ -22,8 +22,10 @@ import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.github.orgs.kotobaminers.develop.TBLTTest;
+import com.github.orgs.kotobaminers.kotobaapi.citizens.CitizensManager;
 import com.github.orgs.kotobaminers.kotobaapi.kotobaapi.CommandEnumInterface;
 import com.github.orgs.kotobaminers.kotobaapi.kotobaapi.PermissionEnumInterface;
+import com.github.orgs.kotobaminers.kotobaapi.sentence.Holograms;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaUtility;
 import com.github.orgs.kotobaminers.kotobatblt3.ability.ClickBlockAbility;
 import com.github.orgs.kotobaminers.kotobatblt3.ability.ClickBlockChestAbility;
@@ -35,10 +37,11 @@ import com.github.orgs.kotobaminers.kotobatblt3.block.BlockReplacerMap;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArena;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaMap;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTPortal;
+import com.github.orgs.kotobaminers.kotobatblt3.citizens.UniqueNPC;
 import com.github.orgs.kotobaminers.kotobatblt3.database.PlayerData;
 import com.github.orgs.kotobaminers.kotobatblt3.database.PlayerDatabase;
 import com.github.orgs.kotobaminers.kotobatblt3.database.SentenceDatabase;
-import com.github.orgs.kotobaminers.kotobatblt3.database.TBLTConversationEditor;
+import com.github.orgs.kotobaminers.kotobatblt3.database.TBLTConversationEditorMap;
 import com.github.orgs.kotobaminers.kotobatblt3.game.Game.TBLTGameMode;
 import com.github.orgs.kotobaminers.kotobatblt3.game.TBLTJob;
 import com.github.orgs.kotobaminers.kotobatblt3.gui.IconCreatorUtility;
@@ -72,10 +75,11 @@ public class TBLTCommandExecutor implements CommandExecutor {
 		;
 	}
 
-	protected enum PlayerCommand implements CommandEnumInterface {
+	public enum PlayerCommand implements CommandEnumInterface {
 		TEST(Arrays.asList(Arrays.asList("test")), "", "Command Test", PermissionEnum.OP) {
 			@Override
 			public boolean perform(Player player , String[] args) {
+				Holograms.removeAllHologram(Setting.getPlugin());
 				return true;
 			}
 		},
@@ -135,27 +139,122 @@ public class TBLTCommandExecutor implements CommandExecutor {
 			}
 		},
 
+		HOLOGRAM_REMOVE(Arrays.asList(Arrays.asList("hologram"), Arrays.asList("remove")), "", "Remove All Holograms", PermissionEnum.OP) {
+			@Override
+			public boolean perform(Player player , String[] args) {
+				Holograms.removeAllHologram(Setting.getPlugin());
+				return true;
+			}
+		},
+
+		UNIQUENPC_SPAWN(Arrays.asList(Arrays.asList("uniquenpc", "un"), Arrays.asList("spawn", "s")), "", "Spawn All Unique NPCs", PermissionEnum.OP) {
+			@Override
+			public boolean perform(Player player , String[] args) {
+				Stream.of(UniqueNPC.values())
+					.forEach(u -> u.getNPCs().stream().forEach(npc -> {
+						npc.spawn(npc.getStoredLocation());
+						u.become(npc);
+					}));
+				return true;
+			}
+		},
+
+		UNIQUENPC_DESPAWN(Arrays.asList(Arrays.asList("uniquenpc", "un"), Arrays.asList("despawn", "d")), "", "Despawn All Unique NPCs", PermissionEnum.OP) {
+			@Override
+			public boolean perform(Player player , String[] args) {
+				Stream.of(UniqueNPC.values())
+					.forEach(u -> u.getNPCs().stream().forEach(npc -> npc.despawn()));
+				return true;
+			}
+		},
+
 		EDIT_ENGLISH(Arrays.asList(Arrays.asList("edit", "e"), Arrays.asList("english", "e")), "", "Edit English", PermissionEnum.OP) {
 			@Override
 			public boolean perform(Player player , String[] args) {
 				PlayerData data = new PlayerDatabase().getOrDefault(player.getUniqueId());
 				List<String> options = takeOptions(args);
-				if(1 < options.size()) {
+				if(0 < options.size()) {
 					String line = String.join(" ", options);
-					new SentenceDatabase().findSentencesByNPCId(data.getNPC())
-						.ifPresent(sentences -> sentences.stream().findFirst()
-							.map(s -> TBLTConversationEditor.empty().getConversationEditorOrDefault(s.getConversation(), player.getUniqueId(), 0))
-								.ifPresent(e -> {
-									e.getSelectedSentence().ifPresent(s -> s.editEnglish(line));
-									e.updateConversation();
-								})
-						);
+					new SentenceDatabase().findConversation(data.getNPC())
+						.ifPresent(conversation -> new TBLTConversationEditorMap().registerConversationEditorOrDefault(conversation, player.getUniqueId()).editEnglish(line));
 					return true;
 				}
 				return false;
 			}
 		},
 
+		EDIT_NPC(Arrays.asList(Arrays.asList("edit", "e"), Arrays.asList("npc", "n")), "", "Change NPC by ID", PermissionEnum.OP) {
+			@Override
+			public boolean perform(Player player , String[] args) {
+				PlayerData data = new PlayerDatabase().getOrDefault(player.getUniqueId());
+				List<String> options = takeOptions(args);
+				if(0 < options.size()) {
+					try {
+						int npc = Integer.parseInt(options.get(0));
+						CitizensManager.findNPC(npc)
+							.ifPresent(n -> new SentenceDatabase().findConversation(data.getNPC())
+								.ifPresent(conversation -> new TBLTConversationEditorMap().registerConversationEditorOrDefault(conversation, player.getUniqueId()).editNPC(n.getId())));
+					} catch(NumberFormatException e) {
+						e.printStackTrace();
+					}
+					return true;
+				}
+				return false;
+			}
+		},
+
+		EDIT_REMOVE(Arrays.asList(Arrays.asList("edit", "e"), Arrays.asList("remove", "r")), "", "Remove sentence", PermissionEnum.OP) {
+			@Override
+			public boolean perform(Player player , String[] args) {
+				PlayerData data = new PlayerDatabase().getOrDefault(player.getUniqueId());
+				new SentenceDatabase().findConversation(data.getNPC())
+					.ifPresent(conversation -> new TBLTConversationEditorMap().registerConversationEditorOrDefault(conversation, player.getUniqueId()).removeSentence());
+				return true;
+			}
+		},
+
+		EDIT_PREPEND(Arrays.asList(Arrays.asList("edit", "e"), Arrays.asList("prepend", "p")), "", "Prepend sentence", PermissionEnum.OP) {
+			@Override
+			public boolean perform(Player player , String[] args) {
+				PlayerData data = new PlayerDatabase().getOrDefault(player.getUniqueId());
+				new SentenceDatabase().findConversation(data.getNPC())
+					.ifPresent(conversation -> new TBLTConversationEditorMap().registerConversationEditorOrDefault(conversation, player.getUniqueId()).prependEmpty());
+				return true;
+			}
+		},
+
+		EDIT_APPEND(Arrays.asList(Arrays.asList("edit", "e"), Arrays.asList("append", "a")), "", "Append sentence", PermissionEnum.OP) {
+			@Override
+			public boolean perform(Player player , String[] args) {
+				PlayerData data = new PlayerDatabase().getOrDefault(player.getUniqueId());
+				new SentenceDatabase().findConversation(data.getNPC())
+					.ifPresent(conversation -> new TBLTConversationEditorMap().registerConversationEditorOrDefault(conversation, player.getUniqueId()).appendEmpty());
+				return true;
+			}
+		},
+
+		EDIT_SERVANT(Arrays.asList(Arrays.asList("edit", "e"), Arrays.asList("servant", "s")), "<" + String.join(",", Stream.of(UniqueNPC.values()).map(UniqueNPC::name).collect(Collectors.toList())) +">", "Change as servant", PermissionEnum.OP) {
+			@Override
+			public boolean perform(Player player , String[] args) {
+				PlayerData data = new PlayerDatabase().getOrDefault(player.getUniqueId());
+				List<String> options = takeOptions(args);
+				if(0 < options.size()) {
+					Stream.of(UniqueNPC.values())
+						.filter(u -> u.name().equalsIgnoreCase(options.get(0)))
+						.findAny()
+						.ifPresent(u ->
+							CitizensManager.findNPC(data.getNPC())
+								.ifPresent(npc -> {
+									u.become(npc);
+									player.getInventory().addItem(u.createKey(npc.getId()));
+								})
+						);
+
+					;
+				}
+				return true;
+			}
+		},
 
 		GAME_START(Arrays.asList(Arrays.asList("game", "g"), Arrays.asList("start", "s")), "<GameMode>", "Start Game Mode", PermissionEnum.OP) {
 			@Override

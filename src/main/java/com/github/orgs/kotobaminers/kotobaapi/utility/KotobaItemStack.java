@@ -2,12 +2,15 @@ package com.github.orgs.kotobaminers.kotobaapi.utility;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+
+import net.md_5.bungee.api.ChatColor;
 
 public class KotobaItemStack extends ItemStack {
 	private enum MaterialConverter {
@@ -54,6 +57,7 @@ public class KotobaItemStack extends ItemStack {
 		}
 		return null;
 	}
+
 	public static ItemStack create(ItemStack itemStack) {
 		ItemStack kotobaItem = new KotobaItemStack(MaterialConverter.toItemMaterial(itemStack.getType()), itemStack.getAmount(), itemStack.getDurability());
 		ItemMeta itemMeta = itemStack.getItemMeta();
@@ -73,4 +77,15 @@ public class KotobaItemStack extends ItemStack {
 			item.setAmount(item.getAmount() - amount);
 		}
 	}
+
+	public static ItemStack setColoredLore(ItemStack itemStack, ChatColor color, List<String> lore) {
+		lore = lore.stream()
+			.map(s -> "" + ChatColor.RESET + color + s)
+			.collect(Collectors.toList());
+		ItemMeta meta = itemStack.getItemMeta();
+		meta.setLore(lore);
+		itemStack.setItemMeta(meta);
+		return itemStack;
+	}
+
 }

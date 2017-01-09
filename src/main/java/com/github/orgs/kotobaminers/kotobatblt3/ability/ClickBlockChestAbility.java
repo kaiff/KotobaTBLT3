@@ -26,6 +26,7 @@ import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaUtility;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArena;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaMap;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTPortal;
+import com.github.orgs.kotobaminers.kotobatblt3.citizens.UniqueNPC;
 import com.github.orgs.kotobaminers.kotobatblt3.game.TBLTData;
 import com.github.orgs.kotobaminers.kotobatblt3.gui.TBLTPlayerGUI;
 import com.github.orgs.kotobaminers.kotobatblt3.resource.TBLTResource;
@@ -140,6 +141,68 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface {
 			return true;
 		}
 	},
+
+	SUMMON_SERVANT_1(
+		Material.REDSTONE_TORCH_ON,
+		(short) 0,
+		"Summon a servant",
+		null,
+		Arrays.asList(Action.RIGHT_CLICK_BLOCK),
+		0,
+		FindType.UNDER_CHEST,
+		KotobaEffect.TWINCLE_MIDIUM,
+		KotobaEffect.TWINCLE_MIDIUM
+	) {
+		@Override
+		public boolean performAbility(PlayerInteractEvent event) {
+			Block block = event.getClickedBlock();
+			UniqueNPC unique = UniqueNPC.CAT;
+			boolean success = findOptions(block.getLocation()).stream()
+				.map(item -> unique.findNPCByKey(item))
+				.filter(npc -> npc.isPresent())
+				.map(Optional::get)
+				.map(a -> {
+					unique.despawnAll();
+					unique.spawn(a.getId());
+					return true;
+				}).collect(Collectors.toList()).contains(true);
+			return success;
+		}
+
+
+	},
+
+
+	SUMMON_SERVANT_2(
+		Material.SLIME_BALL,
+		(short) 0,
+		"Summon a servant",
+		null,
+		Arrays.asList(Action.RIGHT_CLICK_BLOCK),
+		0,
+		FindType.UNDER_CHEST,
+		KotobaEffect.TWINCLE_MIDIUM,
+		KotobaEffect.TWINCLE_MIDIUM
+	) {
+		@Override
+		public boolean performAbility(PlayerInteractEvent event) {
+			Block block = event.getClickedBlock();
+			UniqueNPC unique = UniqueNPC.SLIME;
+			boolean success = findOptions(block.getLocation()).stream()
+					.map(item -> unique.findNPCByKey(item))
+					.filter(npc -> npc.isPresent())
+					.map(Optional::get)
+					.map(a -> {
+						unique.despawnAll();
+						unique.spawn(a.getId());
+						return true;
+					}).collect(Collectors.toList()).contains(true);
+			return success;
+		}
+
+
+	},
+
 	;
 
 

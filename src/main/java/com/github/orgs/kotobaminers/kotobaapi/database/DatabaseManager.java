@@ -7,10 +7,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public abstract class DatabaseManager {
-	
+
 	protected DatabaseManager() {
 	}
-	
+
 	public abstract String getDatabase();
 	public abstract String getUser();
 	public abstract String getPass();
@@ -25,7 +25,7 @@ public abstract class DatabaseManager {
 		return null;
 	}
 
-	public synchronized void closeConnection(Connection connection) {
+	protected synchronized void closeConnection(Connection connection) {
 		try {
 			if(connection != null && !connection.isClosed()) {
 				connection.close();
@@ -34,8 +34,8 @@ public abstract class DatabaseManager {
 			e.printStackTrace();
 		}
 	}
-	
-	public synchronized void closeStatement(Statement statement) {
+
+	protected synchronized void closeStatement(Statement statement) {
 		try {
 			if(statement != null && !statement.isClosed()) {
 				statement.close();
@@ -44,8 +44,8 @@ public abstract class DatabaseManager {
 			e.printStackTrace();
 		}
 	}
-	
-	public synchronized void closeResultSet(ResultSet result) {
+
+	protected synchronized void closeResultSet(ResultSet result) {
 		try {
 			if(result != null && !result.isClosed()) {
 				result.close();
