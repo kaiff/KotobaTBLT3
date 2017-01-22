@@ -38,11 +38,11 @@ import com.github.orgs.kotobaminers.kotobatblt3.utility.Utility;
 
 public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 
-	CRUSH_CRYSTAL(
+	CRYSTAL_CRUSHER(
 		Material.DIAMOND_PICKAXE,
 		(short) 0,
-		"Crush crystal",
-		null,
+		"Crystal Crusher",
+		Arrays.asList("This special item is used to gather the essence from crystals."),
 		Arrays.asList(Action.RIGHT_CLICK_BLOCK),
 		0,
 		new HashMap<TBLTResource, Integer>() {{
@@ -51,20 +51,20 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 		@Override
 		public boolean perform(PlayerInteractEvent event) {
 			Location location = event.getClickedBlock().getLocation();
-			boolean success = Utility.getSpherePositions(location, 3).stream()
+			List<Location> locations = Utility.getSpherePositions(location, 3).stream()
 				.filter(loc -> loc.getBlock().getType() == Material.EMERALD_BLOCK)
-				.map(loc -> {
+				.collect(Collectors.toList());
+			if(0 < locations.size()) {
+				locations.forEach(loc -> {
 					KotobaEffect.MAGIC_MIDIUM.playEffect(loc);
 					KotobaEffect.BREAK_BLOCK_MIDIUM.playEffect(loc);
 					loc.getBlock().setType(Material.AIR);
 					KotobaItemStack.consume(event.getPlayer().getInventory(), event.getPlayer().getInventory().getItemInHand(), 64);
-					event.getPlayer().getInventory().addItem(TBLTItem.WARP_CRYSTAL.createItem(1));
-					return true;
-				}).findAny().orElse(false);
-			if(success) {
+					event.getPlayer().getInventory().addItem(TBLTItem.PORTAL_CRYSTAL.createItem(1));
+				});
 				KotobaEffect.MAGIC_MIDIUM.playSound(location);
 			}
-			return success;
+			return false;
 		}
 	},
 
@@ -99,23 +99,52 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 		@Override
 		public boolean perform(PlayerInteractEvent event) {
 			Block block = event.getClickedBlock();
+
 			return new TBLTArenaMap().findUnique(event.getPlayer().getLocation())
-				.map(a ->
-					TBLTResourceBlock.find(block.getType())
-						.map(r -> {
-							((ResourceHolder) a).addResources(r);
-							r.siphon(block);
-							KotobaEffect.dropItemEffect(r.createResource(), block.getLocation().add(0, 1, 0));
+				.map(a -> {
+					if(block.getState() instanceof Chest) {
+						Chest chest = (Chest) block.getState();
+						List<Boolean> founds = Stream.of(chest.getInventory().getContents())
+						.filter(i -> i != null)
+						.filter(i -> i.getType() != Material.AIR)
+						.map(i ->
+							TBLTResourceBlock.find(i.getType())
+								.map(r -> {
+									Stream.iterate(0, j -> j)
+										.limit(i.getAmount())
+										.forEach(j -> {
+											((ResourceHolder) a).addResources(r);
+											KotobaEffect.dropItemEffect(r.createResource(), block.getLocation().add(0, 1, 0));
+										});
+									return true;
+							}).orElse(false)
+						).filter(r -> r == true)
+						.collect(Collectors.toList());
+
+						if(founds.contains(true)) {
+							chest.getInventory().clear();
+							TBLTResourceBlock.siphon(block);
 							return true;
-						}).orElse(false)
-				).orElse(false);
+						}
+						return false;
+
+					} else {
+						return  TBLTResourceBlock.find(block.getType())
+							.map(r -> {
+								((ResourceHolder) a).addResources(r);
+								TBLTResourceBlock.siphon(block);
+								KotobaEffect.dropItemEffect(r.createResource(), block.getLocation().add(0, 1, 0));
+								return true;
+							}).orElse(false);
+					}
+				}).orElse(false);
 		}
 	},
 
 	EXTRACT_MANA(
 		Material.GOLD_PICKAXE,
 		(short) 0,
-		"Extract Mana",
+		"Mana Extracter",
 		null,
 		Arrays.asList(Action.RIGHT_CLICK_BLOCK),
 		1,
@@ -130,7 +159,7 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 					TBLTResourceBlock.find(block.getType())
 						.map(r -> {
 							((ResourceHolder) a).addResources(r);
-							r.extract(block);
+							TBLTResourceBlock.extract(block);
 							KotobaEffect.dropItemEffect(r.createResource(), block.getLocation().add(0, 1, 0));
 							return true;
 						}).orElse(false)
@@ -141,8 +170,8 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 	PREDICTION(
 		Material.ENCHANTED_BOOK,
 		(short) 0,
-		"Write a prediction",
-		null,
+		"Prediction",
+		Arrays.asList("Are you stuck?", "Use prediction to get a useful hint about what to do next."),
 		Arrays.asList(Action.RIGHT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR),
 		0,
 		new HashMap<TBLTResource, Integer>() {{
@@ -193,7 +222,7 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 		Material.IRON_HOE,
 		(short) 0,
 		"Lock picking",
-		Arrays.asList("Open a chest once"),
+		Arrays.asList("With this tool you can pick any lock.", "Use the lock pick on locked chest to instantly receive the contents."),
 		Arrays.asList(Action.RIGHT_CLICK_BLOCK),
 		0,
 		new HashMap<TBLTResource, Integer>() {{
@@ -222,8 +251,8 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 	REWIND_TIME(
 		Material.WATCH,
 		(short) 0,
-		"Rewind time",
-		null,
+		"Rewind Time",
+		Arrays.asList("You can go back in time to the last checkpoint with this item."),
 		Arrays.asList(Action.RIGHT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR),
 		0,
 		new HashMap<TBLTResource, Integer>() {{
@@ -243,7 +272,7 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 						TBLTArena a = (TBLTArena) arena;
 						a.load();
 						a.initializeResources();
-						players.forEach(p -> a.startCurrent((Player) p));
+						players.forEach(p -> a.continueFromCurrent((Player) p));
 					}
 				});
 			return true;
@@ -254,7 +283,7 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 		Material.GLASS,
 		(short) 0,
 		"Clairvoyance",
-		null,
+		Arrays.asList("You can see the contents of locked chests with this skill."),
 		Arrays.asList(Action.RIGHT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR),
 		0,
 		new HashMap<TBLTResource, Integer>() {{

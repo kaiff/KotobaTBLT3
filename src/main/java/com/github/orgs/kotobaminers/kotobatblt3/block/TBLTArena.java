@@ -12,6 +12,8 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -22,12 +24,16 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
+import com.github.orgs.kotobaminers.kotobaapi.block.KotobaBlockData;
+import com.github.orgs.kotobaminers.kotobaapi.block.KotobaBlockStorage;
+import com.github.orgs.kotobaminers.kotobaapi.sentence.Holograms;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaEffect;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStack;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaTitle;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaTitle.TitleOption;
-import com.github.orgs.kotobaminers.kotobaapi.worldeditor.BlockStorage;
+import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaUtility;
 import com.github.orgs.kotobaminers.kotobatblt3.ability.ClickBlockChestAbility;
+import com.github.orgs.kotobaminers.kotobatblt3.citizens.UniqueNPC;
 import com.github.orgs.kotobaminers.kotobatblt3.game.TBLTJob;
 import com.github.orgs.kotobaminers.kotobatblt3.kotobatblt3.Setting;
 import com.github.orgs.kotobaminers.kotobatblt3.resource.ResourceHolder;
@@ -36,14 +42,15 @@ import com.github.orgs.kotobaminers.kotobatblt3.utility.RepeatingEffect;
 
 import net.md_5.bungee.api.ChatColor;
 
-public class TBLTArena extends BlockStorage implements ResourceHolder {
+public class TBLTArena extends KotobaBlockStorage implements ResourceHolder {
 
 
 	private static final File DIRECTORY = new File(Setting.getPlugin().getDataFolder().getAbsolutePath() + "/Arena/");
 	private static final String CHECK_POINT = "CheckPoint";
 	private static final String PREDICTION = "Prediction";
 
-	private Map<TBLTResource, Integer> resources = new TreeMap<>();
+
+	private Map<TBLTResource, Integer> resources = getInitialResources();
 	private List<Location> checkPoints = new ArrayList<>();
 	private Location currentPoint = null;
 	private Set<RepeatingEffect> repeatingEffects = new HashSet<>();
@@ -59,6 +66,13 @@ public class TBLTArena extends BlockStorage implements ResourceHolder {
 		return (TBLTArena) (new TBLTArena(name)).setData(name, player);
 	}
 
+	public static Map<TBLTResource, Integer> getInitialResources() {
+		Map<TBLTResource, Integer> initialResources = new TreeMap<TBLTResource, Integer>();
+		Stream.of(TBLTResource.values())
+			.forEach(r -> initialResources.put(r, 0));
+		return initialResources;
+	}
+
 
 	private void start(Player player, Location location) {
 		TBLTJob.initializeInventory(player);
@@ -69,15 +83,14 @@ public class TBLTArena extends BlockStorage implements ResourceHolder {
 		KotobaTitle.displayTitle(player, getName(), ChatColor.RED, Arrays.asList(TitleOption.BOLD, TitleOption.ITALIC));
 	}
 
-	public void startSpawn(Player player) {
-		//Initialize Arena
-		load();
 
-		//Start Player
+	public void startSpawn(Player player) {
+		currentPoint = null;//The current Check point is not initialized by restarting
+		initialize();
 		start(player, getSpawn());
 	}
 
-	public void startCurrent(Player player) {
+	public void continueFromCurrent(Player player) {
 		start(player, getCurrentPoint());
 	}
 
@@ -93,7 +106,8 @@ public class TBLTArena extends BlockStorage implements ResourceHolder {
 
 	public void removeNearestCheckPoint(Location location) {
 		Optional<Location> nearest = findNearestCheckPoint(location);
-		List<Location> points = nearest.map(loc -> checkPoints.stream().filter(point -> 0 != point.distance(loc)).collect(Collectors.toList()))
+		List<Location> points = nearest.map(loc -> checkPoints.stream()
+			.filter(point -> 0 != point.distance(loc)).collect(Collectors.toList()))
 			.orElse(checkPoints);
 		this.checkPoints = points;
 	}
@@ -101,9 +115,11 @@ public class TBLTArena extends BlockStorage implements ResourceHolder {
 
 	@Override
 	protected void saveOptions(YamlConfiguration config) {
-		Stream.iterate(0, i -> i + 1)
-			.limit(checkPoints.size())
-			.forEach(i -> config.set(CHECK_POINT + "." + i, checkPoints.get(i)));
+		if(checkPoints != null) {
+			Stream.iterate(0, i -> i + 1)
+				.limit(checkPoints.size())
+				.forEach(i -> config.set(CHECK_POINT + "." + i, checkPoints.get(i)));
+		}
 		config.set(PREDICTION, predictionItem);
 	}
 
@@ -124,8 +140,24 @@ public class TBLTArena extends BlockStorage implements ResourceHolder {
 	}
 
 	@Override
+	protected void initialize() {
+		this.resources = getInitialResources();
+		new BlockReplacerMap().getReplacers(this).forEach(r -> r.setBefore());
+		Holograms.removeHolograms(Setting.getPlugin(), this);
+		initializeUniqueNPCs();
+	}
+	@Override
 	protected void loadFromWorld() {
 		initializeRepeatingEffects();
+	}
+
+	private void initializeUniqueNPCs() {
+		Stream.of(UniqueNPC.values())
+			.forEach(u ->
+				u.getNPCs().stream()
+					.filter(n -> isIn(n.getStoredLocation()))
+					.forEach(n -> u.despawn(n.getId()))
+		);
 	}
 
 	private void initializeRepeatingEffects() {
@@ -152,7 +184,7 @@ public class TBLTArena extends BlockStorage implements ResourceHolder {
 	}
 
 	@Override
-	public BlockStorage create(String name) {
+	public KotobaBlockStorage create(String name) {
 		return new TBLTArena(name);
 	}
 
@@ -184,7 +216,7 @@ public class TBLTArena extends BlockStorage implements ResourceHolder {
 
 	public List<RepeatingEffect> findRepeatingEffects(Location blockLocation) {
 		return this.repeatingEffects.stream()
-			.filter(e -> e.getBlockLocation().distance(blockLocation) == 0)
+			.filter(e -> e.getBlockLocation().clone().distance(blockLocation.clone()) == 0)
 			.collect(Collectors.toList());
 	}
 
@@ -196,6 +228,61 @@ public class TBLTArena extends BlockStorage implements ResourceHolder {
 		ItemStack item = new ItemStack(Material.WRITTEN_BOOK);
 		item.setItemMeta(bookMeta);
 		this.predictionItem = item;
+	}
+
+
+	private void replaceFloor(Material bottom, Material second) {
+		KotobaUtility.getBlocks(getWorld(), getXMax(), getYMin(), getZMax(), getXMin(), getYMin(), getZMin())
+			.stream()
+			.map(block -> new KotobaBlockData(block.getLocation(), bottom, 0))
+			.forEach(data -> data.placeBlock());
+		KotobaUtility.getBlocks(getWorld(), getXMax(), getYMin() + 1, getZMax(), getXMin(), getYMin() + 1, getZMin())
+			.stream()
+			.map(block -> new KotobaBlockData(block.getLocation(), second, 0))
+			.forEach(data -> data.placeBlock());
+		}
+
+	private void replaceCeiling(Material material) {
+		KotobaUtility.getBlocks(getWorld(), getXMax(), getYMax(), getZMax(), getXMin(), getYMax(), getZMin())
+			.stream()
+			.map(block -> new KotobaBlockData(block.getLocation(), material, 0))
+			.forEach(data -> data.placeBlock());
+	}
+
+	private void replaceWalls(Material material) {
+		Arrays.asList(
+			KotobaUtility.getBlocks(getWorld(), getXMin(), getYMax(), getZMax(), getXMin(), getYMin(), getZMin()),
+			KotobaUtility.getBlocks(getWorld(), getXMax(), getYMax(), getZMax(), getXMax(), getYMin(), getZMin()),
+			KotobaUtility.getBlocks(getWorld(), getXMax(), getYMax(), getZMin(), getXMin(), getYMin(), getZMin()),
+			KotobaUtility.getBlocks(getWorld(), getXMax(), getYMax(), getZMax(), getXMin(), getYMin(), getZMax())
+		).stream()
+			.flatMap(blocks -> blocks.stream())
+			.map(block -> new KotobaBlockData(block.getLocation(), material, 0))
+			.forEach(data -> data.placeBlock());
+		}
+
+
+	private void replaceCorners(Material material) {
+		Location min = new Location(getWorld(), getXMin(), getYMin(), getZMin());
+		Location max = new Location(getWorld(), getXMax(), getYMax(), getZMax());
+		new KotobaBlockData(min, material, 0).placeBlock();
+		new KotobaBlockData(max, material, 0).placeBlock();
+	}
+
+
+	public void placeWallsFloorCorner(Material material) {
+		replaceFloor(Material.REDSTONE_ORE, Material.WATER);
+		replaceCeiling(material);
+		replaceWalls(material);
+		replaceCorners(Material.SEA_LANTERN);
+	}
+
+
+	public List<Player> getTBLTPlayers() {
+		return Bukkit.getServer().getOnlinePlayers().stream()
+			.filter(p -> p.getGameMode() == GameMode.ADVENTURE)
+			.filter(p -> isIn(p.getLocation()))
+			.collect(Collectors.toList());
 	}
 
 

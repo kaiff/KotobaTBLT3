@@ -6,6 +6,7 @@ import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Snowball;
 import org.bukkit.event.EventHandler;
@@ -28,8 +29,11 @@ public class ClickAbilityListener implements Listener {
 		Player player = event.getPlayer();
 		Block block = event.getClickedBlock();
 
-		if(player.getItemInHand().getType() == Material.AIR) return;
 		if(!Utility.isTBLTPlayer(player)) return;
+		if(!((Entity) player).isOnGround()) {
+			KotobaSound.SHEAR.play(player.getLocation());
+			return;
+		}
 
 		List<ClickBlockAbilityInterface> abilities = new ArrayList<>();
 		ClickBlockChestAbility.find(event).stream()
@@ -52,7 +56,6 @@ public class ClickAbilityListener implements Listener {
 							KotobaSound.SHEAR.play(player.getLocation());
 							return;
 						}
-
 						boolean successed = false;
 						successed = ability.perform(event);//Perform ability here
 						if(successed) {
@@ -70,8 +73,11 @@ public class ClickAbilityListener implements Listener {
 	public void onPlayerInteractEntityEvent(PlayerInteractEntityEvent event) {
 		Player player = event.getPlayer();
 		ItemStack itemStack = player.getItemInHand();
+
 		if(itemStack.getType() == Material.AIR) return;
+		if(!((Entity) player).isOnGround()) return;
 		if(!Utility.isTBLTPlayer(player)) return;
+
 		ClickEntityAbility.find(event.getPlayer().getItemInHand())
 			.ifPresent(ability -> {
 				event.setCancelled(true);

@@ -22,9 +22,11 @@ public enum TBLTResourceBlock {
 	MAGIC_ORE(Material.EMERALD_ORE, TBLTResource.MAGIC_MANA, 1),
 	;
 
+
 	private Material material;
 	private TBLTResource resource;
 	private int amount;
+
 
 	private TBLTResourceBlock(Material material, TBLTResource resource, int amount) {
 		this.material = material;
@@ -32,18 +34,22 @@ public enum TBLTResourceBlock {
 		this.amount = amount;
 	}
 
-	public void siphon(Block block) {
+
+	public static void siphon(Block block) {
 		block.setType(Material.OBSIDIAN);
 		Location location = block.getLocation().clone().add(0.5, 0.5, 0.5);
 		KotobaEffect.MAGIC_MIDIUM.playEffect(location);
 		KotobaEffect.MAGIC_MIDIUM.playSound(location);
 	}
-	public void extract(Block block) {
+
+	public static void extract(Block block) {
 		block.setType(Material.AIR);
 		Location location = block.getLocation().clone().add(0.5, 0.5, 0.5);
 		KotobaEffect.BREAK_BLOCK_MIDIUM.playEffect(location);
 		KotobaEffect.BREAK_BLOCK_MIDIUM.playSound(location);
 	}
+
+
 	public ItemStack createResource() {
 		return resource.create(amount);
 	}

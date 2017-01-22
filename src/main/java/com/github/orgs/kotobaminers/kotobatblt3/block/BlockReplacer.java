@@ -7,18 +7,20 @@ import org.bukkit.block.Block;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
+import com.github.orgs.kotobaminers.kotobaapi.block.KotobaBlockStorage;
+import com.github.orgs.kotobaminers.kotobaapi.block.KotobaYamlConfiguration;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaEffect;
-import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaYamlConfiguration;
-import com.github.orgs.kotobaminers.kotobaapi.worldeditor.BlockStorage;
 import com.github.orgs.kotobaminers.kotobatblt3.kotobatblt3.Setting;
 
-public class BlockReplacer extends BlockStorage {
+public class BlockReplacer extends KotobaBlockStorage {
 
 
 	private static final File DIRECTORY = new File(Setting.getPlugin().getDataFolder().getAbsolutePath() + "/BlockReplacer/");
 	private static final String TRIGGER = "TRIGGER";
 	private static final String TARGET = "TARGET";
 
+
+	private boolean isReplaced = false;
 	private Material trigger;
 	private Material target;
 
@@ -34,6 +36,7 @@ public class BlockReplacer extends BlockStorage {
 
 
 	public boolean replace(Player player, Block clicked) {
+		if(isReplaced) return false;
 		boolean success = false;
 		if(clicked.getType() == target && player.getItemInHand().getType() == trigger) {
 			success = getBlocks().stream()
@@ -43,9 +46,16 @@ public class BlockReplacer extends BlockStorage {
 					KotobaEffect.MAGIC_SMALL.playSound(block.getLocation());
 					return true;
 				}).allMatch(b -> b == true);
-			if(success) load();
+			if(success) {
+				load();
+				done();
+			}
 		}
 		return success;
+	}
+
+	private void done() {
+		this.isReplaced = true;
 	}
 
 
@@ -75,7 +85,7 @@ public class BlockReplacer extends BlockStorage {
 	}
 
 	@Override
-	public BlockStorage create(String name) {
+	public KotobaBlockStorage create(String name) {
 		return new BlockReplacer(name);
 	}
 
@@ -91,6 +101,16 @@ public class BlockReplacer extends BlockStorage {
 
 	public Material getTarget() {
 		return target;
+	}
+
+
+	@Override
+	protected void initialize() {
+		this.isReplaced = true;
+	}
+
+	protected void setBefore() {
+		this.isReplaced = false;
 	}
 
 

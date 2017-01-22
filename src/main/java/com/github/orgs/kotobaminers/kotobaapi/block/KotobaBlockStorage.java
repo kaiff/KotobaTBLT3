@@ -1,4 +1,4 @@
-package com.github.orgs.kotobaminers.kotobaapi.worldeditor;
+package com.github.orgs.kotobaminers.kotobaapi.block;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,13 +17,11 @@ import org.bukkit.block.Chest;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
-import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaBlockData;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaUtility;
-import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaYamlConfiguration;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.selections.Selection;
 
-public abstract class BlockStorage extends KotobaYamlConfiguration {
+public abstract class KotobaBlockStorage extends KotobaYamlConfiguration {
 	private enum Path {
 		NAME("NAME"),
 		WORLD("WORLD"),
@@ -41,12 +39,14 @@ public abstract class BlockStorage extends KotobaYamlConfiguration {
 	}
 
 
-	private static final List<Material> LIQUID = Arrays.asList(
+	private static final List<Material> SECOND = Arrays.asList(
 		Material.STATIONARY_WATER,
 		Material.WATER,
 		Material.STATIONARY_LAVA,
 		Material.LAVA,
-		Material.TORCH
+		Material.TORCH,
+		Material.REDSTONE_TORCH_OFF,
+		Material.REDSTONE_TORCH_ON
 	);
 
 
@@ -61,16 +61,16 @@ public abstract class BlockStorage extends KotobaYamlConfiguration {
 	private Integer zMin;
 
 
-	protected BlockStorage(String name) {
+	protected KotobaBlockStorage(String name) {
 		this.name = name;
 	}
 
 
-	public abstract BlockStorage create(String name);
+	public abstract KotobaBlockStorage create(String name);
 	protected abstract void saveOptions(YamlConfiguration config);
 	protected abstract void setOptions(YamlConfiguration config);
 
-	protected BlockStorage setData(String name, World world, Integer XMax, Integer YMax, Integer ZMax, Integer XMin, Integer YMin, Integer ZMin) {
+	protected KotobaBlockStorage setData(String name, World world, Integer XMax, Integer YMax, Integer ZMax, Integer XMin, Integer YMin, Integer ZMin) {
 		this.name = name;
 		this.world = world;
 		this.xMax = XMax;
@@ -82,7 +82,7 @@ public abstract class BlockStorage extends KotobaYamlConfiguration {
 		return this;
 	}
 
-	protected BlockStorage setData(String name, Player player) {
+	protected KotobaBlockStorage setData(String name, Player player) {
 		WorldEditPlugin worldEdit = (WorldEditPlugin) Bukkit.getServer().getPluginManager().getPlugin("WorldEdit");
 		if (worldEdit == null) {
 			player.sendMessage("WorldEdit Not Load");
@@ -101,7 +101,7 @@ public abstract class BlockStorage extends KotobaYamlConfiguration {
 		);
 	}
 
-	protected BlockStorage setDataFromConfig() {
+	protected KotobaBlockStorage setDataFromConfig() {
 		YamlConfiguration config = getConfiguration();
 		if(!config.contains(Path.WORLD.getPath())) return this;
 
@@ -130,7 +130,7 @@ public abstract class BlockStorage extends KotobaYamlConfiguration {
 	}
 
 
-	public List<BlockStorage> importAll() {
+	public List<KotobaBlockStorage> importAll() {
 		return Stream.of(getDirectory().listFiles())
 			.map(f -> f.getName().substring(0, f.getName().length()-".yml".length()))
 			.map(name -> create(name))
@@ -138,7 +138,7 @@ public abstract class BlockStorage extends KotobaYamlConfiguration {
 			.collect(Collectors.toList());
 	}
 
-	public BlockStorage resize(Player player) {
+	public KotobaBlockStorage resize(Player player) {
 		return setData(this.getName(), player);
 	}
 
@@ -185,28 +185,34 @@ public abstract class BlockStorage extends KotobaYamlConfiguration {
 	@Override
 	public void load() {
 		YamlConfiguration config = YamlConfiguration.loadConfiguration(getFileEvenCreate());
+		initialize();
 
 		List<KotobaBlockData> blocksData = KotobaYamlConfiguration.loadBlocksData(config, Path.BLOCKS.getPath(), Path.WORLD.getPath());
 
-		List<KotobaBlockData> liquid = blocksData.stream()
-			.filter(data -> LIQUID.contains(data.getMaterial()))
-			.collect(Collectors.toList());
-		List<KotobaBlockData> solid = blocksData.stream()
-				.filter(data -> !LIQUID.contains(data.getMaterial()))
+		List<KotobaBlockData> first = blocksData.stream()
+				.filter(data -> !SECOND.contains(data.getMaterial()))
 				.collect(Collectors.toList());
+		List<KotobaBlockData> second = blocksData.stream()
+				.filter(data -> SECOND.contains(data.getMaterial()))
+				.collect(Collectors.toList());
+
 
 		blocksData.stream()
 			.map(data -> data.getLocation().getBlock())
-			.filter(block -> LIQUID.contains(block.getType()))
+			.filter(block -> SECOND.contains(block.getType()))
 			.forEach(block -> block.setType(Material.AIR));
 
-		solid.forEach(KotobaBlockData::placeBlock);
-		liquid.forEach(KotobaBlockData::placeBlock);
+		first.forEach(KotobaBlockData::placeBlock);
+		second.forEach(KotobaBlockData::placeBlock);
 
 		KotobaYamlConfiguration.loadChests(config, Path.CHESTS.getPath(), Path.WORLD.getPath(), true);
+
 		loadFromWorld();
 	}
+
+
 	protected abstract void loadFromWorld();
+	protected abstract void initialize();
 
 
 	public List<Block> getBlocks() {
@@ -220,7 +226,7 @@ public abstract class BlockStorage extends KotobaYamlConfiguration {
 		return new Location(getWorld(), xCenter, yCenter, zCenter);
 	}
 
-	public boolean isOverlap(BlockStorage storage) {
+	public boolean isOverlap(KotobaBlockStorage storage) {
 		Integer xMax1 = this.getXMax();
 		Integer xMin1 = this.getXMin();
 		Integer xMax2 = storage.getXMax();

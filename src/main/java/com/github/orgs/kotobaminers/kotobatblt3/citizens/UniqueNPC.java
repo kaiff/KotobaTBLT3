@@ -8,17 +8,17 @@ import java.util.stream.Stream;
 import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Ocelot;
 import org.bukkit.entity.Ocelot.Type;
 import org.bukkit.entity.Slime;
 import org.bukkit.inventory.ItemStack;
 
-import com.github.orgs.kotobaminers.kotobaapi.citizens.CitizensManager;
+import com.github.orgs.kotobaminers.kotobaapi.citizens.KotobaCitizensManager;
 import com.github.orgs.kotobaminers.kotobaapi.citizens.UniqueNPCInterface;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaEffect;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStack;
-import com.github.orgs.kotobaminers.kotobatblt3.database.SentenceDatabase;
 import com.github.orgs.kotobaminers.kotobatblt3.database.TBLTNPCHolograms;
 
 import net.citizensnpcs.api.npc.NPC;
@@ -39,6 +39,17 @@ public enum UniqueNPC implements UniqueNPCInterface {
 				ocelot.setCatType(Type.BLACK_CAT);
 			}
 		}
+
+		@Override
+		public void playDespawnSound(Location location) {
+			location.getWorld().playSound(location, Sound.CAT_MEOW, 1, 1);
+		}
+
+		@Override
+		public void playSpawnSound(Location location) {
+			location.getWorld().playSound(location, Sound.CAT_MEOW, 1, 1);
+		}
+
 	},
 
 
@@ -53,6 +64,17 @@ public enum UniqueNPC implements UniqueNPCInterface {
 			lookClose.lookClose(true);
 			npc.addTrait(lookClose);
 		}
+
+		@Override
+		public void playDespawnSound(Location location) {
+			location.getWorld().playSound(location, Sound.SLIME_ATTACK, 1, 1);
+		}
+
+		@Override
+		public void playSpawnSound(Location location) {
+			location.getWorld().playSound(location, Sound.SLIME_ATTACK, 1, 1);
+		}
+
 	},
 
 	;
@@ -76,37 +98,36 @@ public enum UniqueNPC implements UniqueNPCInterface {
 	}
 
 	@Override
-	public void spawn(int id) {
-		Optional<NPC> optional = CitizensManager.findNPC(id);
+	public void spawn(int id, Location location) {
+		Optional<NPC> optional = KotobaCitizensManager.findNPC(id);
 		if(optional.isPresent()) {
 			NPC npc = optional.get();
 			if(npc.getEntity() != null) return;//#NPC.isSpawn() is not reliable for some reason
 
 			if(isThisNPC(npc)) {
-				npc.spawn(npc.getStoredLocation());
+				npc.spawn(location);
 				setStatus(npc);
 				playSpawnEffect(npc.getStoredLocation());
+				playSpawnSound(npc.getStoredLocation());
 			}
 		}
 		return;
 	}
 
 	@Override
-	public void despawnAll() {
-		new SentenceDatabase().getNPCIds().stream()
-			.map(id -> CitizensManager.findNPC(id))
-			.filter(optional -> optional.isPresent())
-			.map(optional -> optional.get())
+	public void despawn(int id) {
+		KotobaCitizensManager.findNPC(id)
 			.filter(npc -> npc.getEntity() != null)
 			.filter(npc -> isThisNPC(npc))
-			.forEach(npc -> {
+			.ifPresent(npc -> {
 				npc.despawn();
 				playDespawnEffect(npc.getStoredLocation());
+				playSpawnSound(npc.getStoredLocation());
 				new TBLTNPCHolograms().removeNear(npc.getStoredLocation());
 			});
 	}
 
-	@Override
+		@Override
 	public void playSpawnEffect(Location location) {
 		KotobaEffect.ENDER_SIGNAL.playEffect(location);
 		Stream.iterate(0, i -> i)
@@ -153,7 +174,7 @@ public enum UniqueNPC implements UniqueNPCInterface {
 					if(!name().equalsIgnoreCase(lore.get(0))) return Optional.empty();
 					try {
 						int id = Integer.parseInt(lore.get(1));
-						return CitizensManager.findNPC(id);
+						return KotobaCitizensManager.findNPC(id);
 					} catch(NumberFormatException e) {
 						e.printStackTrace();
 					}

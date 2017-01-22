@@ -1,5 +1,6 @@
 package com.github.orgs.kotobaminers.kotobatblt3.ability;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.Material;
@@ -7,24 +8,28 @@ import org.bukkit.inventory.ItemStack;
 
 public enum TBLTItem implements ItemAbilityInterface {
 
-	WARP_CRYSTAL(Material.NETHER_STAR, (short) 0, "Warp crystal", null) {
-		@Override
-		public boolean isTBLTItem(ItemStack item) {
-			if(item.getType() == this.material && item.getItemMeta().getDisplayName().equalsIgnoreCase(name)) {
-				return true;
-			}
-			return false;
-		}
+	PORTAL_CRYSTAL(
+		Material.NETHER_STAR,
+		(short) 0,
+		"Portal Crystal",
+		Arrays.asList("This special item is used to open the time travel portal to your next location.", "Click the portal to open it.")
+	) {
 	},
 
-	PREDICTION(Material.WRITTEN_BOOK, (short) 0, "A written prediction", null) {
-		@Override
-		public boolean isTBLTItem(ItemStack item) {
-			if(item.getType() == this.material && item.getItemMeta().getDisplayName().equalsIgnoreCase(name)) {
-				return true;
-			}
-			return false;
-		}
+	SINGLE_PORTAL(
+		Material.NETHER_STAR,
+		(short) 0,
+		"Single portal key",
+		null
+	) {
+	},
+
+	PREDICTION(
+		Material.WRITTEN_BOOK,
+		(short) 0,
+		"A written prediction",
+		null
+	) {
 	},
 	;
 
@@ -41,7 +46,12 @@ public enum TBLTItem implements ItemAbilityInterface {
 	}
 
 
-	public abstract boolean isTBLTItem(ItemStack item);
+	public boolean isTBLTItem(ItemStack item) {
+		if(item.getType() == this.material && item.getItemMeta().getDisplayName().equalsIgnoreCase(name)) {
+			return true;
+		}
+		return false;
+	}
 
 
 	@Override

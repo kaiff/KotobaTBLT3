@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -16,6 +17,7 @@ import org.bukkit.entity.Vehicle;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -36,6 +38,7 @@ import com.github.orgs.kotobaminers.kotobatblt3.utility.Utility;
 
 public class TBLTArenaListener implements Listener {
 
+
 	@EventHandler
 	public void onBlockReplacerPlayerInteract(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
@@ -49,6 +52,7 @@ public class TBLTArenaListener implements Listener {
 				});
 		}
 	}
+
 
 	@EventHandler
 	void onHitEnemy(EntityDamageByEntityEvent event) {
@@ -64,6 +68,7 @@ public class TBLTArenaListener implements Listener {
 			}
 		}
 	}
+
 
 	@EventHandler
 	void onEntityDamage(EntityDamageEvent event) {
@@ -88,9 +93,35 @@ public class TBLTArenaListener implements Listener {
 				event.setCancelled(true);
 				player.setHealth(20);
 				new TBLTArenaMap().findUnique(player.getLocation())
-				.ifPresent(arena -> ((TBLTArena) arena).startSpawn(player));
+					.map(arena -> (TBLTArena) arena)
+					.ifPresent(arena -> Bukkit.getOnlinePlayers().stream().filter(p -> arena.isIn(p.getLocation()) && p.getGameMode() == GameMode.ADVENTURE).forEach(p -> arena.continueFromCurrent(p)));
 			} else {
 				player.damage(damage);
+			}
+		}
+	}
+
+
+	@EventHandler
+	void onPlayerFallBottom(EntityChangeBlockEvent event) {
+		if(event.getEntity() instanceof Player) {
+			Player player = (Player) event.getEntity();
+
+			Block block = event.getBlock();
+			if(block.getType() == null) return;
+			if(block.getType() != Material.REDSTONE_ORE) return;
+			if(event.getTo() != Material.GLOWING_REDSTONE_ORE) return;
+
+			if(Utility.isTBLTPlayer(player)) {
+				new TBLTArenaMap().findUnique(block.getLocation())
+					.ifPresent(storage -> {
+						TBLTArena arena = (TBLTArena) storage;
+						if(arena.getYMin() == block.getLocation().getBlockY()) {
+							event.setCancelled(true);
+							arena.load();
+							arena.getTBLTPlayers().forEach(p -> arena.continueFromCurrent(p));
+						}
+					});
 			}
 		}
 	}
@@ -176,7 +207,7 @@ public class TBLTArenaListener implements Listener {
 	public void onPlayerPortalEvent(PlayerPortalEvent event) {
 		if(Utility.isTBLTPlayer(event.getPlayer())) {
 			event.setCancelled(true);
-			TBLTPortal.find(event)
+			new TBLTPortalManager().find(event.getFrom())
 				.forEach(portal -> portal.enterPortal(event));
 		}
 	}

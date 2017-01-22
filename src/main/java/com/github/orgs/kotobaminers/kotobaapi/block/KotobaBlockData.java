@@ -1,4 +1,4 @@
-package com.github.orgs.kotobaminers.kotobaapi.utility;
+package com.github.orgs.kotobaminers.kotobaapi.block;
 
 import org.bukkit.Location;
 import org.bukkit.Material;

@@ -20,12 +20,13 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
 
+import com.github.orgs.kotobaminers.kotobaapi.block.KotobaPortalInterface;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaEffect;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStack;
 import com.github.orgs.kotobaminers.kotobatblt3.ability.TBLTItem;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.Utility;
 
-public enum TBLTPortal {
+public enum ChestPortal implements KotobaPortalInterface {
 	ARENA_PORTAL(
 		KotobaItemStack.create(Material.EYE_OF_ENDER, (short) 0, 1, "Arena portal key", null),
 		new HashMap<Vector, Material>(){{
@@ -48,38 +49,40 @@ public enum TBLTPortal {
 			Location from = event.getFrom();
 			new TBLTArenaMap().findUnique(from)
 				.ifPresent(a -> {
-					List<Player> players = Bukkit.getOnlinePlayers().stream()
-							.filter(p -> Utility.isTBLTPlayer(p))
+					List<Player> inPortal = Bukkit.getOnlinePlayers().stream()
+						.filter(p -> p.getLocation().getBlock().getType() == Material.ENDER_PORTAL)
+						.filter(p -> Utility.isTBLTPlayer(p))
 						.collect(Collectors.toList());
-					if(1 < players.size()) {
-						if(players.stream().allMatch(p -> p.getWorld().getBlockAt(p.getLocation()).getType() == Material.ENDER_PORTAL)
-							&& players.stream().allMatch(p -> from.distance(p.getLocation()) < 4)
-						) {
-							players.stream()
+					List<Player> inArena = Bukkit.getOnlinePlayers().stream()
+							.filter(p -> Utility.isTBLTPlayer(p))
+							.collect(Collectors.toList());
+
+					if(isSinglePortal(from) || (1 < inPortal.size()) && inPortal.size() == inArena.size()) {
+						if(inPortal.stream().allMatch(p -> from.distance(p.getLocation()) < 4)) {
+							Optional<Player> crystalOwner = inPortal.stream()
 								.filter(p ->
 									Stream.of(p.getInventory().getContents())
 										.filter(i -> i != null)
-										.anyMatch(i -> TBLTItem.WARP_CRYSTAL.isTBLTItem(i)))
-								.findFirst()
-								.ifPresent(p -> {
-									Utility.getSpherePositions(p.getLocation(), 3).stream()
-										.map(loc -> loc.getBlock())
-										.filter(block -> block.getState() instanceof Chest)
-										.flatMap(block -> Stream.of(((Chest) block.getState()).getInventory().getContents())
-											.filter(i -> i != null)
-											.filter(i -> TBLTItem.WARP_CRYSTAL.isTBLTItem(i))
-										)
-										.filter(i -> i.getItemMeta().getLore() != null)
-										.filter(i -> 0 < i.getItemMeta().getLore().size())
-										.map(i -> i.getItemMeta().getLore().get(0))
-										.map(name -> new TBLTArenaMap().findUnique(name))
-										.forEach(to -> to.ifPresent(to2 -> players.stream().forEach(p2 -> ((TBLTArena) to2).startSpawn(p2))));
-									a.load();//Initialize Arena
-								});
+										.anyMatch(i -> TBLTItem.PORTAL_CRYSTAL.isTBLTItem(i)))
+								.findFirst();
+							if(crystalOwner.isPresent() || isSinglePortal(from)) {
+								List<Boolean> success = findChestsInRange(from).stream()
+									.flatMap(c -> Stream.of(c.getInventory().getContents()).filter(i -> i != null).filter(i -> TBLTItem.PORTAL_CRYSTAL.isTBLTItem(i)))
+									.filter(i -> i.getItemMeta().getLore() != null)
+									.filter(i -> 0 < i.getItemMeta().getLore().size())
+									.map(i -> i.getItemMeta().getLore().get(0))
+									.map(name -> new TBLTArenaMap().findUnique(name))
+									.map(to -> {
+										to.ifPresent(to2 -> inPortal.stream().forEach(p2 -> ((TBLTArena) to2).startSpawn(p2)));
+										return true;
+									}).collect(Collectors.toList());
+								if(success.contains(true)) {
+									a.load();
+								}
 							}
 						}
 					}
-				);
+				});
 			return true;
 		}
 	},
@@ -98,26 +101,45 @@ public enum TBLTPortal {
 			new TBLTArenaMap().findUnique(from)
 				.map(a -> (TBLTArena) a)
 				.ifPresent(a -> {
-					List<Player> players = Bukkit.getOnlinePlayers().stream()
+					List<Player> inArena = Bukkit.getOnlinePlayers().stream()
 						.filter(p -> Utility.isTBLTPlayer(p))
+						.filter(p -> a.isIn(p.getLocation()))
 						.collect(Collectors.toList());
-					if(1 < players.size()) {
-						if(players.stream().allMatch(p ->
-							p.getWorld().getBlockAt(p.getLocation()).getType() == Material.ENDER_PORTAL)) {
-							a.findNearestCheckPoint(from)
-								.ifPresent(check -> {
-									if(0 < a.getCurrentPoint().distance(check)) {
-										a.setCurrentPoint(check);
-										KotobaEffect.MAGIC_MIDIUM.playEffect(from);
-										KotobaEffect.MAGIC_MIDIUM.playSound(from);
-									}
-								});
-						}
+					List<Player> inPortal = inArena.stream()
+						.filter(p -> p.getLocation().getBlock().getType() == Material.ENDER_PORTAL)
+						.collect(Collectors.toList());
+
+					if(isSinglePortal(from) || (1 < inPortal.size()) && inPortal.size() == inArena.size()) {
+						a.findNearestCheckPoint(from)
+							.filter(check -> 0 < a.getCurrentPoint().distance(check))
+							.ifPresent(check -> {
+								KotobaEffect.MAGIC_MIDIUM.playEffect(from);
+								KotobaEffect.MAGIC_MIDIUM.playSound(from);
+
+								a.load();
+
+								a.setCurrentPoint(check);
+								inArena.forEach(p -> a.continueFromCurrent(p));
+
+							});
 					}
 				});
 			return true;
 		}
 	},
+
+	BOTTOM_PORTAL(
+		KotobaItemStack.create(Material.EYE_OF_ENDER, (short) 0, 1, "Arena portal key", null),
+		new HashMap<Vector, Material>(){{
+		}},
+		new Vector(0, -2, 0),
+		2
+	) {
+		@Override
+		public boolean enterPortal(PlayerPortalEvent event) {
+			return false;
+		}
+	}
 	;
 
 
@@ -127,39 +149,29 @@ public enum TBLTPortal {
 	private int chestRange;
 
 
-	private TBLTPortal(ItemStack key, Map<Vector, Material> pattern, Vector chestPosition, int chestRange) {
+	private ChestPortal(ItemStack key, Map<Vector, Material> pattern, Vector chestPosition, int chestRange) {
 		this.key = key;
 		this.pattern = pattern;
 		this.chestPosition = chestPosition;
 		this.chestRange = chestRange;
 	}
 
-	public static List<TBLTPortal> find(PlayerPortalEvent event) {
-		return Stream.of(TBLTPortal.values())
-			.flatMap(portal -> portal.findChestsInRange(event.getFrom()).stream()
-				.map(c -> find(c))
-				.filter(c -> c.isPresent())
-				.map(c -> c.get())
-			).collect(Collectors.toList());
+	@Override//TODO check
+	public boolean isThis(Location location) {
+		return findChestsInRange(location).stream()
+			.flatMap(chest -> Stream.of(chest.getInventory().getContents()))
+			.filter(i -> i != null)
+			.anyMatch(i -> isPortalKey(i));
 	}
 
-	public static Optional<TBLTPortal> find(List<ItemStack> items) {
-		return Stream.of(TBLTPortal.values())
-			.filter(portal -> {
-				ItemStack key = portal.createKey();
-				return items.stream().anyMatch(item -> item.getType() == key.getType() && item.getItemMeta().getDisplayName().equalsIgnoreCase(key.getItemMeta().getDisplayName()));
-			})
-			.findFirst();
+	private boolean isPortalKey(ItemStack itemStack) {
+		if(itemStack.getType() == key.getType() && itemStack.getItemMeta().getDisplayName().equalsIgnoreCase(key.getItemMeta().getDisplayName())) {
+			return true;
+		}
+		return false;
 	}
 
-	public static Optional<TBLTPortal> find(Chest chest) {
-		List<ItemStack> items = Stream.of(chest.getInventory().getContents())
-			.filter(item -> item != null)
-			.collect(Collectors.toList());
-		return find(items);
-	}
-
-	private List<Chest> findChestsInRange(Location location) {
+	protected List<Chest> findChestsInRange(Location location) {
 		return Utility.getSpherePositions(location.clone().add(chestPosition), chestRange).stream()
 			.map(loc -> loc.getBlock())
 			.filter(block -> block.getState() instanceof Chest)
@@ -168,11 +180,8 @@ public enum TBLTPortal {
 	}
 
 
-	public abstract boolean enterPortal(PlayerPortalEvent event);
-
-
 	public boolean openPortal(PlayerInteractEvent event) {
-		Location origin = event.getClickedBlock().getLocation();
+		Location origin = event.getClickedBlock().getLocation().clone();
 		pattern.entrySet().forEach(entry -> {
 			Location location = origin.clone().add(entry.getKey());
 			location.getBlock().setType(entry.getValue());
@@ -199,6 +208,16 @@ public enum TBLTPortal {
 		return pattern;
 	}
 
+	protected boolean isSinglePortal(Location location) {
+		long singleKeyNumber = findChestsInRange(location).stream()
+			.flatMap(c -> Stream.of(c.getInventory().getContents()).filter(i -> i != null).filter(i -> TBLTItem.SINGLE_PORTAL.isTBLTItem(i)))
+			.count();
+		if(0 < singleKeyNumber) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 
 }
 

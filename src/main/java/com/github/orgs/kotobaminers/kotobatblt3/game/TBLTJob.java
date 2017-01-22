@@ -22,27 +22,29 @@ import com.github.orgs.kotobaminers.kotobatblt3.ability.ClickBlockChestAbility;
 	public enum TBLTJob {
 		MAGICIAN(
 			new LinkedHashMap<ClickBlockAbilityInterface, Integer>() {{
-				put(ClickBlockAbility.PREDICTION, 1);
-				put(ClickBlockAbility.CLAIRVOYANCE, 1);
+				put(ClickBlockChestAbility.SUMMON_SERVANT_1, 1);
 				put(ClickBlockAbility.SYPHON_MANA, 10);
 				put(ClickBlockChestAbility.OPEN_PORTAL, 1);
-				put(ClickBlockChestAbility.FIND_SPELL, 1);
 				put(ClickBlockAbility.REWIND_TIME, 1);
+				put(ClickBlockAbility.CLAIRVOYANCE, 1);
+				put(ClickBlockAbility.PREDICTION, 1);
+				put(ClickBlockChestAbility.FIND_SPELL, 1);
 			}},
 			true,
 			KotobaItemStack.create(Material.EMERALD, (short) 0, 1 ,"Magician", null)
 		),
-		MAGIC_ENGINEER(
+		ENGINEER(
 			new LinkedHashMap<ClickBlockAbilityInterface, Integer>() {{
-				put(ClickBlockChestAbility.INVESTIGATE, 1);
-				put(ClickBlockAbility.LOCK_PICKING, 1);
+				put(ClickBlockChestAbility.SUMMON_SERVANT_2, 1);
 				put(ClickBlockAbility.EXTRACT_MANA, 5);
-				put(ClickBlockAbility.CRUSH_CRYSTAL, 1);
+				put(ClickBlockAbility.CRYSTAL_CRUSHER, 1);
+				put(ClickBlockChestAbility.INVESTIGATE, 1);
 				put(ClickBlockAbility.RESOURCES, 1);
+				put(ClickBlockAbility.LOCK_PICKING, 1);
 				put(ClickBlockChestAbility.FIND_TOOL, 1);
 			}},
 			true,
-			KotobaItemStack.create(Material.GOLD_PICKAXE, (short) 0, 1, "Magic Engineer", null)
+			KotobaItemStack.create(Material.GOLD_PICKAXE, (short) 0, 1, "Engineer", null)
 		),
 		RETURN_TO_DEFAULT(
 			new LinkedHashMap<ClickBlockAbilityInterface, Integer>() {{

@@ -33,7 +33,7 @@ public interface ResourceHolder {
 			.forEach(i -> {
 				if(consumption.containsKey(all.get(i))) {
 					if(consumption.get(all.get(i)) < 1) return;
-					ItemStack icon = KotobaItemStack.create(Material.WOOL, (short) 15, consumption.get(all.get(i)), "Consumption", Arrays.asList(all.get(i).create().getItemMeta().getDisplayName()));
+					ItemStack icon = KotobaItemStack.create(Material.WOOL, (short) 15, consumption.get(all.get(i)), "You need", Arrays.asList(all.get(i).getColoredName()));
 					inventory.setItem(i + offset, icon);
 				}
 			});

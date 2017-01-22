@@ -5,28 +5,36 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
-import com.github.orgs.kotobaminers.kotobaapi.worldeditor.BlockStorage;
-import com.github.orgs.kotobaminers.kotobaapi.worldeditor.BlockStorageMap;
+import com.github.orgs.kotobaminers.kotobaapi.block.KotobaBlockStorage;
+import com.github.orgs.kotobaminers.kotobaapi.block.KotobaBlockStorageMap;
 
-public class BlockReplacerMap  extends BlockStorageMap {
+public class BlockReplacerMap  extends KotobaBlockStorageMap {
 
 
-	private static Map<String, BlockStorage> replacers = new TreeMap<String, BlockStorage>();
+	private static Map<String, KotobaBlockStorage> replacers = new TreeMap<String, KotobaBlockStorage>();
+
+
+	public List<BlockReplacer> getReplacers(KotobaBlockStorage storage) {
+		return replacers.values().stream()
+			.filter(s -> storage.isIn(s.getCenter()))
+			.map(s -> (BlockReplacer) s)
+			.collect(Collectors.toList());
+	}
 
 
 	@Override
-	public Map<String, BlockStorage> getMap() {
+	public Map<String, KotobaBlockStorage> getMap() {
 		return replacers;
 	}
 
 	@Override
-	public List<BlockStorage> getStorages() {
+	public List<KotobaBlockStorage> getStorages() {
 		return getMap().values().stream().collect(Collectors.toList());
 	}
 
 	@Override
 	public void importAll() {
-		replacers = new TreeMap<String, BlockStorage>();//Initialize
+		replacers = new TreeMap<String, KotobaBlockStorage>();//Initialize
 		(new BlockReplacer("dummy")).importAll().stream()
 			.forEach(storage -> put(storage));
 		return;

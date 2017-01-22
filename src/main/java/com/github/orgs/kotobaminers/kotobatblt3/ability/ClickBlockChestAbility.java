@@ -8,11 +8,11 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
-import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
@@ -22,10 +22,12 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
 
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaEffect;
+import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStack;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaUtility;
+import com.github.orgs.kotobaminers.kotobatblt3.block.ChestPortal;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArena;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaMap;
-import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTPortal;
+import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTPortalManager;
 import com.github.orgs.kotobaminers.kotobatblt3.citizens.UniqueNPC;
 import com.github.orgs.kotobaminers.kotobatblt3.game.TBLTData;
 import com.github.orgs.kotobaminers.kotobatblt3.gui.TBLTPlayerGUI;
@@ -38,7 +40,7 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface {
 	OPEN_PORTAL(
 		Material.NETHER_STAR,
 		(short) 0,
-		"Open portal",
+		"Open Portal",
 		null,
 		Arrays.asList(Action.RIGHT_CLICK_BLOCK),
 		0,
@@ -50,17 +52,20 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface {
 		public boolean performAbility(PlayerInteractEvent event) {
 			Block block = event.getClickedBlock();
 			if(block.getType() == Material.ENDER_PORTAL) return false;
-			TBLTPortal.find(findOptions(block.getLocation()))
-				.ifPresent(portal -> portal.openPortal(event));
+			new TBLTPortalManager().find(block.getLocation().clone()).stream()
+				.filter(portal -> portal instanceof ChestPortal)
+				.map(portal -> (ChestPortal) portal)
+				.forEach(portal -> portal.openPortal(event));
 			return true;
 		}
 	},
+
 
 	INVESTIGATE(
 		Material.TRIPWIRE_HOOK,
 		(short) 0,
 		"Investigate",
-		null,
+		Arrays.asList("Use this skill on sparkling areas to get hints about the level.", "You can investigate things in more detail."),
 		Arrays.asList(Action.RIGHT_CLICK_BLOCK),
 		0,
 		FindType.UNDER_CHEST,
@@ -70,27 +75,28 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface {
 		@Override
 		public boolean performAbility(PlayerInteractEvent event) {
 			Block block = event.getClickedBlock();
-			List<ItemStack> options = findOptions(block.getLocation());
+			List<ItemStack> options = findOptions(block.getLocation()).stream()
+				.filter(i -> i.getType() != Material.BOOK_AND_QUILL)
+				.collect(Collectors.toList());
 
-			List<ItemStack> informations = options.stream()
+			List<ItemStack> informations = findOptions(block.getLocation()).stream()
 				.filter(i -> i.getType() == Material.BOOK_AND_QUILL)
 				.map(i -> (BookMeta) i.getItemMeta())
 				.map(meta -> KotobaUtility.toStringListFromBookMeta(meta))
 				.map(lore -> {
-					ItemStack item = createItem(1);
+					lore = 	lore.stream().flatMap(sentence -> KotobaUtility.splitSentence(sentence, ItemAbilityInterface.LORE_LENGTH).stream()).collect(Collectors.toList());
+					ItemStack item = KotobaItemStack.setColoredLore(createItem(1), ChatColor.RESET, lore);
 					ItemMeta itemMeta = item.getItemMeta();
-					itemMeta.setLore(lore);
 					item.setItemMeta(itemMeta);
 					return item;
 				})
 				.collect(Collectors.toList());
 
 			informations.addAll(options);
-			Player player = event.getPlayer();
 			if(0 < informations.size()) {
 				TBLTPlayerGUI.INVESTIGATE.create(informations)
 					.ifPresent(inventory -> {
-						player.openInventory(inventory);
+						event.getPlayer().openInventory(inventory);
 					});
 				return true;
 			}
@@ -120,6 +126,7 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface {
 		}
 	},
 
+
 	FIND_TOOL(
 		Material.ENCHANTED_BOOK,
 		(short) 0,
@@ -142,10 +149,11 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface {
 		}
 	},
 
+
 	SUMMON_SERVANT_1(
 		Material.REDSTONE_TORCH_ON,
 		(short) 0,
-		"Summon a servant",
+		"Summon Chiro",
 		null,
 		Arrays.asList(Action.RIGHT_CLICK_BLOCK),
 		0,
@@ -156,27 +164,30 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface {
 		@Override
 		public boolean performAbility(PlayerInteractEvent event) {
 			Block block = event.getClickedBlock();
-			UniqueNPC unique = UniqueNPC.CAT;
-			boolean success = findOptions(block.getLocation()).stream()
-				.map(item -> unique.findNPCByKey(item))
-				.filter(npc -> npc.isPresent())
-				.map(Optional::get)
-				.map(a -> {
-					unique.despawnAll();
-					unique.spawn(a.getId());
-					return true;
-				}).collect(Collectors.toList()).contains(true);
-			return success;
+			return new TBLTArenaMap().findUnique(block.getLocation())
+				.map(arena -> {
+					UniqueNPC unique = UniqueNPC.CAT;
+					boolean success = findOptions(block.getLocation()).stream()
+							.map(item -> unique.findNPCByKey(item))
+							.filter(npc -> npc.isPresent())
+							.map(Optional::get)
+							.map(npc -> {
+								unique.getNPCs().stream()
+									.filter(n -> arena.isIn(n.getStoredLocation()))
+									.forEach(n -> unique.despawn(n.getId()));
+								unique.spawn(npc.getId(), block.getLocation().clone().add(0.5,1.5,0.5));
+								return true;
+							}).collect(Collectors.toList()).contains(true);
+					return success;
+				}).orElse(false);
 		}
-
-
 	},
 
 
 	SUMMON_SERVANT_2(
 		Material.SLIME_BALL,
 		(short) 0,
-		"Summon a servant",
+		"Summon Sticky",
 		null,
 		Arrays.asList(Action.RIGHT_CLICK_BLOCK),
 		0,
@@ -187,20 +198,23 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface {
 		@Override
 		public boolean performAbility(PlayerInteractEvent event) {
 			Block block = event.getClickedBlock();
-			UniqueNPC unique = UniqueNPC.SLIME;
-			boolean success = findOptions(block.getLocation()).stream()
-					.map(item -> unique.findNPCByKey(item))
-					.filter(npc -> npc.isPresent())
-					.map(Optional::get)
-					.map(a -> {
-						unique.despawnAll();
-						unique.spawn(a.getId());
-						return true;
-					}).collect(Collectors.toList()).contains(true);
-			return success;
+			return new TBLTArenaMap().findUnique(block.getLocation())
+				.map(arena -> {
+					UniqueNPC unique = UniqueNPC.SLIME;
+					boolean success = findOptions(block.getLocation()).stream()
+							.map(item -> unique.findNPCByKey(item))
+							.filter(npc -> npc.isPresent())
+							.map(Optional::get)
+							.map(npc -> {
+								unique.getNPCs().stream()
+									.filter(n -> arena.isIn(n.getStoredLocation()))
+									.forEach(n -> unique.despawn(n.getId()));
+								unique.spawn(npc.getId(), block.getLocation().clone().add(0.5,1.5,0.5));
+								return true;
+							}).collect(Collectors.toList()).contains(true);
+					return success;
+				}).orElse(false);
 		}
-
-
 	},
 
 	;
@@ -266,7 +280,7 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface {
 
 
 	private static Optional<Chest> findChest(Location location) {
-		Block block = location.clone().add(POSITION_TO_BLOCK.multiply(-1)).getBlock();
+		Block block = location.clone().add(POSITION_TO_BLOCK.clone().multiply(-1)).getBlock();
 		if(block.getState() instanceof Chest) {
 			return Optional.ofNullable((Chest) block.getState());
 		}
@@ -275,14 +289,14 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface {
 
 
 	protected void clearContents(Location location) {
-		findChest(location)
+		findChest(location.clone())
 			.ifPresent(chest -> chest.getInventory().clear());
 	}
 
 
 	protected List<ItemStack> findOptions(Location location) {
 		ItemStack item = createItem(1);
-		return findChest(location)
+		return findChest(location.clone())
 			.map(chest -> {
 				Inventory inventory = chest.getInventory();
 				return Stream.iterate(0, i -> i + 1)
@@ -309,16 +323,16 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface {
 
 	@Override
 	public boolean perform(PlayerInteractEvent event) {
-		findEffects(event.getClickedBlock().getLocation()).forEach(e -> e.setRepeat(false));
+		findEffects(event.getClickedBlock().getLocation().clone()).forEach(e -> e.setRepeat(false));
 		return performAbility(event);
 	}
 
 	public abstract boolean performAbility(PlayerInteractEvent event);
 
 	private List<RepeatingEffect> findEffects(Location blockLocation) {
-		return new TBLTArenaMap().findUnique(blockLocation)
+		return new TBLTArenaMap().findUnique(blockLocation.clone())
 			.map(storage -> (TBLTArena) storage)
-			.map(arena -> arena.findRepeatingEffects(blockLocation))
+			.map(arena -> arena.findRepeatingEffects(blockLocation.clone()))
 			.orElse(new ArrayList<>());
 	}
 
@@ -350,7 +364,7 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface {
 	@Override
 	public Map<TBLTResource, Integer> getResourceConsumption(Block clicked) {
 		if(clicked == null) return null;
-		return TBLTResource.getResources(findOptions(clicked.getLocation()));
+		return TBLTResource.getResources(findOptions(clicked.getLocation().clone()));
 	}
 
 
@@ -361,7 +375,7 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface {
 			protected boolean canFind(PlayerInteractEvent event, ClickBlockChestAbility ability) {
 				if(event.getClickedBlock() == null) return false;
 				if(!event.getPlayer().getItemInHand().isSimilar(ability.createItem(1))) return false;
-				return 0 < ability.findOptions(event.getClickedBlock().getLocation()).size();
+				return 0 < ability.findOptions(event.getClickedBlock().getLocation().clone()).size();
 			}
 		},
 

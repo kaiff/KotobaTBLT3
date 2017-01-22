@@ -13,9 +13,9 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import com.github.orgs.kotobaminers.kotobaapi.block.KotobaBlockStorage;
 import com.github.orgs.kotobaminers.kotobaapi.userinterface.IconListGUI;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStack;
-import com.github.orgs.kotobaminers.kotobaapi.worldeditor.BlockStorage;
 import com.github.orgs.kotobaminers.kotobatblt3.block.BlockReplacer;
 import com.github.orgs.kotobaminers.kotobatblt3.block.BlockReplacerMap;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArena;
@@ -25,7 +25,7 @@ public enum TBLTIconListGUI implements IconListGUI {
 	ARENA("Arenas ") {
 		@Override
 		public List<ItemStack> getIcons() {
-			List<BlockStorage> arenas = new TBLTArenaMap().getStorages();
+			List<KotobaBlockStorage> arenas = new TBLTArenaMap().getStorages();
 			return Stream.iterate(0, i -> i + 1)
 				.limit(arenas.size())
 				.map(i -> KotobaItemStack.create(Material.GLASS, (short) 0, i + 1, arenas.get(i).getName(), null))
@@ -53,7 +53,7 @@ public enum TBLTIconListGUI implements IconListGUI {
 	BLOCK_REPLACER("Block Replacers ") {
 		@Override
 		public List<ItemStack> getIcons() {
-			List<BlockStorage> replacers = new BlockReplacerMap().getStorages();
+			List<KotobaBlockStorage> replacers = new BlockReplacerMap().getStorages();
 			return Stream.iterate(0, i -> i + 1)
 				.limit(replacers.size())
 				.map(i -> KotobaItemStack.create(Material.ANVIL, (short) 0, i + 1, replacers.get(i).getName(), null))

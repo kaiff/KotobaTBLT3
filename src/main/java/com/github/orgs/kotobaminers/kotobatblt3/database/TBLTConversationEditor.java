@@ -6,7 +6,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import com.github.orgs.kotobaminers.kotobaapi.citizens.CitizensManager;
+import com.github.orgs.kotobaminers.kotobaapi.citizens.KotobaCitizensManager;
 import com.github.orgs.kotobaminers.kotobaapi.sentence.ConversationEditor;
 import com.github.orgs.kotobaminers.kotobaapi.sentence.ConversationEditorMap;
 import com.github.orgs.kotobaminers.kotobaapi.sentence.Sentence;
@@ -48,7 +48,7 @@ public class TBLTConversationEditor extends ConversationEditor {
 
 	@Override
 	protected boolean canAddNPC(int npc) {
-		Optional<NPC> entity = CitizensManager.findNPC(npc);
+		Optional<NPC> entity = KotobaCitizensManager.findNPC(npc);
 		if(!entity.isPresent()) return false;
 		if(sentences.stream().map(Sentence::getNPC).collect(Collectors.toSet()).contains(npc)) return true;
 		if(entity.filter(e -> !new SentenceDatabase().getNPCIds().contains(e.getId())).isPresent()) return true;

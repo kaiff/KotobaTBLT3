@@ -20,10 +20,12 @@ public interface UniqueNPCInterface {
 
 
 	abstract void become(NPC npc);
-	abstract void despawnAll();
-	abstract void spawn(int id);
+	abstract void despawn(int id);
+	abstract void spawn(int id, Location location);
 	abstract void playDespawnEffect(Location location);
 	abstract void playSpawnEffect(Location location);
+	abstract void playDespawnSound(Location location);
+	abstract void playSpawnSound(Location location);
 	abstract ItemStack createKey(int id);
 	abstract Optional<NPC> findNPCByKey(ItemStack key);
 
@@ -48,7 +50,7 @@ public interface UniqueNPCInterface {
 
 	default List<NPC> getNPCs() {
 		return new SentenceDatabase().getNPCIds().stream()
-			.map(id -> CitizensManager.findNPC(id))
+			.map(id -> KotobaCitizensManager.findNPC(id))
 			.filter(Optional::isPresent)
 			.map(Optional::get)
 			.filter(this::isThisNPC)

@@ -8,9 +8,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
+import org.bukkit.block.Chest;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -22,7 +24,7 @@ import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.github.orgs.kotobaminers.develop.TBLTTest;
-import com.github.orgs.kotobaminers.kotobaapi.citizens.CitizensManager;
+import com.github.orgs.kotobaminers.kotobaapi.citizens.KotobaCitizensManager;
 import com.github.orgs.kotobaminers.kotobaapi.kotobaapi.CommandEnumInterface;
 import com.github.orgs.kotobaminers.kotobaapi.kotobaapi.PermissionEnumInterface;
 import com.github.orgs.kotobaminers.kotobaapi.sentence.Holograms;
@@ -34,9 +36,9 @@ import com.github.orgs.kotobaminers.kotobatblt3.ability.ProjectileAbility;
 import com.github.orgs.kotobaminers.kotobatblt3.ability.TBLTItem;
 import com.github.orgs.kotobaminers.kotobatblt3.block.BlockReplacer;
 import com.github.orgs.kotobaminers.kotobatblt3.block.BlockReplacerMap;
+import com.github.orgs.kotobaminers.kotobatblt3.block.ChestPortal;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArena;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaMap;
-import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTPortal;
 import com.github.orgs.kotobaminers.kotobatblt3.citizens.UniqueNPC;
 import com.github.orgs.kotobaminers.kotobatblt3.database.PlayerData;
 import com.github.orgs.kotobaminers.kotobatblt3.database.PlayerDatabase;
@@ -48,6 +50,7 @@ import com.github.orgs.kotobaminers.kotobatblt3.gui.IconCreatorUtility;
 import com.github.orgs.kotobaminers.kotobatblt3.gui.TBLTIconListGUI;
 import com.github.orgs.kotobaminers.kotobatblt3.gui.TBLTPlayerGUI;
 import com.github.orgs.kotobaminers.kotobatblt3.resource.TBLTResource;
+import com.github.orgs.kotobaminers.kotobatblt3.utility.Utility;
 
 public class TBLTCommandExecutor implements CommandExecutor {
 
@@ -79,10 +82,10 @@ public class TBLTCommandExecutor implements CommandExecutor {
 		TEST(Arrays.asList(Arrays.asList("test")), "", "Command Test", PermissionEnum.OP) {
 			@Override
 			public boolean perform(Player player , String[] args) {
-				Holograms.removeAllHologram(Setting.getPlugin());
 				return true;
 			}
 		},
+
 
 		TEST2(Arrays.asList(Arrays.asList("test2")), "", "Command Test", PermissionEnum.OP) {
 			@Override
@@ -90,6 +93,7 @@ public class TBLTCommandExecutor implements CommandExecutor {
 				return true;
 			}
 		},
+
 
 		RELOAD(Arrays.asList(Arrays.asList("reload")), "", "Reload Plugin", PermissionEnum.OP) {
 			@Override
@@ -99,6 +103,7 @@ public class TBLTCommandExecutor implements CommandExecutor {
 			}
 		},
 
+
 		ITEM(Arrays.asList(Arrays.asList("item")), "", "Get Items", PermissionEnum.OP) {
 			@Override
 			public boolean perform(Player player , String[] args) {
@@ -106,12 +111,29 @@ public class TBLTCommandExecutor implements CommandExecutor {
 				Stream.of(TBLTItem.values())
 					.map(item -> item.createItem(64))
 					.forEach(item -> inventory.addItem(item));
-				Stream.of(TBLTPortal.values())
+				Stream.of(ChestPortal.values())
 					.map(item -> item.createKey())
 					.forEach(item -> inventory.addItem(item));
 				return true;
 			}
 		},
+
+
+		CHEST(Arrays.asList(Arrays.asList("chest")), "", "Open the nearest chest", PermissionEnum.OP) {
+			@Override
+			public boolean perform(Player player , String[] args) {
+				Location location = player.getLocation();
+				Utility.getSpherePositions(player.getLocation(), 5).stream()
+					.map(l -> l.getBlock())
+					.filter(b -> b.getState() instanceof Chest)
+					.map(b -> b.getLocation())
+					.sorted((l1, l2) -> (int) (l1.distance(location) - l2.distance(location)))
+					.findFirst()
+					.ifPresent(l -> player.openInventory(((Chest) l.getBlock().getState()).getInventory()));
+				return true;
+			}
+		},
+
 
 		ABILITY(Arrays.asList(Arrays.asList("ability")), "", "Get Abilities", PermissionEnum.OP) {
 			@Override
@@ -129,23 +151,26 @@ public class TBLTCommandExecutor implements CommandExecutor {
 			}
 		},
 
+
 		RESOURCE(Arrays.asList(Arrays.asList("resource")), "", "Get Resources", PermissionEnum.OP) {
 			@Override
 			public boolean perform(Player player , String[] args) {
 				Inventory inventory = player.getInventory();
 				Stream.of(TBLTResource.values())
-				.forEach(r -> inventory.addItem(r.create(64)));
+					.forEach(r -> inventory.addItem(r.create(64)));
 				return true;
 			}
 		},
 
+
 		HOLOGRAM_REMOVE(Arrays.asList(Arrays.asList("hologram"), Arrays.asList("remove")), "", "Remove All Holograms", PermissionEnum.OP) {
 			@Override
 			public boolean perform(Player player , String[] args) {
-				Holograms.removeAllHologram(Setting.getPlugin());
+				Holograms.removeAllHolograms(Setting.getPlugin());
 				return true;
 			}
 		},
+
 
 		UNIQUENPC_SPAWN(Arrays.asList(Arrays.asList("uniquenpc", "un"), Arrays.asList("spawn", "s")), "", "Spawn All Unique NPCs", PermissionEnum.OP) {
 			@Override
@@ -159,6 +184,7 @@ public class TBLTCommandExecutor implements CommandExecutor {
 			}
 		},
 
+
 		UNIQUENPC_DESPAWN(Arrays.asList(Arrays.asList("uniquenpc", "un"), Arrays.asList("despawn", "d")), "", "Despawn All Unique NPCs", PermissionEnum.OP) {
 			@Override
 			public boolean perform(Player player , String[] args) {
@@ -167,6 +193,7 @@ public class TBLTCommandExecutor implements CommandExecutor {
 				return true;
 			}
 		},
+
 
 		EDIT_ENGLISH(Arrays.asList(Arrays.asList("edit", "e"), Arrays.asList("english", "e")), "", "Edit English", PermissionEnum.OP) {
 			@Override
@@ -183,6 +210,7 @@ public class TBLTCommandExecutor implements CommandExecutor {
 			}
 		},
 
+
 		EDIT_NPC(Arrays.asList(Arrays.asList("edit", "e"), Arrays.asList("npc", "n")), "", "Change NPC by ID", PermissionEnum.OP) {
 			@Override
 			public boolean perform(Player player , String[] args) {
@@ -191,7 +219,7 @@ public class TBLTCommandExecutor implements CommandExecutor {
 				if(0 < options.size()) {
 					try {
 						int npc = Integer.parseInt(options.get(0));
-						CitizensManager.findNPC(npc)
+						KotobaCitizensManager.findNPC(npc)
 							.ifPresent(n -> new SentenceDatabase().findConversation(data.getNPC())
 								.ifPresent(conversation -> new TBLTConversationEditorMap().registerConversationEditorOrDefault(conversation, player.getUniqueId()).editNPC(n.getId())));
 					} catch(NumberFormatException e) {
@@ -202,6 +230,7 @@ public class TBLTCommandExecutor implements CommandExecutor {
 				return false;
 			}
 		},
+
 
 		EDIT_REMOVE(Arrays.asList(Arrays.asList("edit", "e"), Arrays.asList("remove", "r")), "", "Remove sentence", PermissionEnum.OP) {
 			@Override
@@ -243,7 +272,7 @@ public class TBLTCommandExecutor implements CommandExecutor {
 						.filter(u -> u.name().equalsIgnoreCase(options.get(0)))
 						.findAny()
 						.ifPresent(u ->
-							CitizensManager.findNPC(data.getNPC())
+							KotobaCitizensManager.findNPC(data.getNPC())
 								.ifPresent(npc -> {
 									u.become(npc);
 									player.getInventory().addItem(u.createKey(npc.getId()));
@@ -255,6 +284,7 @@ public class TBLTCommandExecutor implements CommandExecutor {
 				return true;
 			}
 		},
+
 
 		GAME_START(Arrays.asList(Arrays.asList("game", "g"), Arrays.asList("start", "s")), "<GameMode>", "Start Game Mode", PermissionEnum.OP) {
 			@Override
@@ -274,6 +304,7 @@ public class TBLTCommandExecutor implements CommandExecutor {
 				return false;
 			}
 		},
+
 
 		JOB_SELECT(Arrays.asList(Arrays.asList("job", "j"), Arrays.asList("select", "s")), "", "Select Job", PermissionEnum.OP) {
 			@Override
@@ -295,6 +326,7 @@ public class TBLTCommandExecutor implements CommandExecutor {
 				}
 			}
 		},
+
 
 		ARENA_CREATE(Arrays.asList(Arrays.asList("arena", "a"), Arrays.asList("create", "c")), "<Arena>", "Create Arena", PermissionEnum.OP) {
 			@Override
@@ -359,15 +391,37 @@ public class TBLTCommandExecutor implements CommandExecutor {
 			}
 		},
 
+		ARENA_SET_WALLS(Arrays.asList(Arrays.asList("arena", "a"), Arrays.asList("setwallshere", "swh")), "", "Set Walls", PermissionEnum.OP) {
+			@Override
+			public boolean perform(Player player , String[] args) {
+				List<String> options = takeOptions(args);
+				if(0 < options.size()) {
+					return new TBLTArenaMap().findUnique(player.getLocation())
+						.map(arena -> (TBLTArena) arena)
+						.flatMap(arena -> {
+							String arg = options.get(0);
+							return Stream.of(Material.values())
+								.filter(m -> m.name().equalsIgnoreCase(arg))
+								.findFirst()
+								.map(m -> {
+									arena.placeWallsFloorCorner(m);
+									return true;
+								});
+						}).orElse(false);
+				}
+				return false;
+			}
+		},
+
 		ARENA_SETSPAWN_HERE(Arrays.asList(Arrays.asList("arena", "a"), Arrays.asList("setspawnhere", "ssh")), "", "Set arena spawn", PermissionEnum.OP) {
 			@Override
 			public boolean perform(Player player , String[] args) {
 				return new TBLTArenaMap().findUnique(player.getLocation())
-						.map(arena -> {
-							arena.setSpawn(player.getLocation());
-							arena.save();
-							return true;
-						}).orElse(false);
+					.map(arena -> {
+						arena.setSpawn(player.getLocation());
+						arena.save();
+						return true;
+					}).orElse(false);
 			}
 		},
 
@@ -442,6 +496,19 @@ public class TBLTCommandExecutor implements CommandExecutor {
 			}
 		},
 
+		ARENA_JOIN_HERE(Arrays.asList(Arrays.asList("arena", "a"), Arrays.asList("joinhere", "jh")), "", "Join arena where you are", PermissionEnum.OP) {
+			@Override
+			public boolean perform(Player player , String[] args) {
+				return new TBLTArenaMap().findUnique(player.getLocation())
+					.map(arena -> (TBLTArena) arena)
+					.map(arena -> {
+						arena.startSpawn(player);
+						arena.load();
+						return true;
+					}).orElse(false);
+			}
+		},
+
 		ARENA_LIST(Arrays.asList(Arrays.asList("arena", "a"), Arrays.asList("list", "l")), "", "List arenas", PermissionEnum.OP) {
 			@Override
 			public boolean perform(Player player , String[] args) {
@@ -454,10 +521,10 @@ public class TBLTCommandExecutor implements CommandExecutor {
 			@Override
 			public boolean perform(Player player , String[] args) {
 				return new TBLTArenaMap().findUnique(player.getLocation())
-						.map(arena -> {
-							TBLTPlayerGUI.ARENA.create(IconCreatorUtility.getIcons((TBLTArena) arena)).ifPresent(player::openInventory);;
-							return true;
-						}).orElse(false);
+					.map(arena -> {
+						TBLTPlayerGUI.ARENA.create(IconCreatorUtility.getIcons((TBLTArena) arena)).ifPresent(player::openInventory);;
+						return true;
+					}).orElse(false);
 			}
 		},
 

@@ -18,7 +18,7 @@ public class Setting {
 		new PlayerDatabase().loadConfig();
 		new SentenceDatabase().loadConfig();
 
-		Holograms.removeAllHologram(plugin);
+		Holograms.removeAllHolograms(plugin);
 
 	}
 

@@ -1,4 +1,4 @@
-package com.github.orgs.kotobaminers.kotobaapi.utility;
+package com.github.orgs.kotobaminers.kotobaapi.block;
 
 import java.io.File;
 import java.io.IOException;

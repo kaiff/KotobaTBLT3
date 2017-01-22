@@ -83,6 +83,7 @@ public enum TBLTResource {
 		itemStack.setItemMeta(itemMeta);
 		return itemStack;
 	}
+
 	public ItemStack create() {
 		return create(1);
 	}

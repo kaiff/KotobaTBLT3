@@ -25,7 +25,7 @@ public class RepeatingEffect {
 		periodicEffect.effect = effect;
 		periodicEffect.sound = sound;
 		periodicEffect.repeat = repeat;
-		periodicEffect.blockLocation = blockLocation;
+		periodicEffect.blockLocation = blockLocation.clone();
 		return periodicEffect;
 	}
 

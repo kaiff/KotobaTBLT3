@@ -23,7 +23,7 @@ public class IconCreatorUtility {
 		Location center = arena.getCenter();
 		ItemStack teleport = TBLTIcon.TELEPORT.createItemStack(Arrays.asList(arena.getWorld().getName(), String.valueOf(center.getBlockX()) + "," + String.valueOf(center.getBlockY()) + "," + String.valueOf(center.getBlockZ())));
 
-		ItemStack warp = TBLTItem.WARP_CRYSTAL.createItem(1);
+		ItemStack warp = TBLTItem.PORTAL_CRYSTAL.createItem(1);
 		ItemMeta warpMeta = warp.getItemMeta();
 		warpMeta.setLore(Arrays.asList(arena.getName()));
 		warp.setItemMeta(warpMeta);

@@ -9,17 +9,17 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.bukkit.ChatColor;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import com.github.orgs.kotobaminers.kotobaapi.citizens.CitizensManager;
+import com.github.orgs.kotobaminers.kotobaapi.citizens.KotobaCitizensManager;
 import com.github.orgs.kotobaminers.kotobaapi.sentence.Sentence.Expression;
 import com.github.orgs.kotobaminers.kotobaapi.userinterface.ChestGUI;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStack;
 
 import net.citizensnpcs.api.npc.NPC;
-import net.md_5.bungee.api.ChatColor;
 
 public class ConversationGUI implements ChestGUI {
 
@@ -49,7 +49,7 @@ public class ConversationGUI implements ChestGUI {
 
 	private List<ItemStack> toIcons(Sentence sentence) {
 		ConversationGUIIcon edit = ConversationGUIIcon.EDIT;
-		Optional<NPC> npc = CitizensManager.findNPC(sentence.getNPC());
+		Optional<NPC> npc = KotobaCitizensManager.findNPC(sentence.getNPC());
 		String name = npc.map(NPC::getName).orElse("N/A");
 		int id = npc.map(NPC::getId).orElse(-1);
 		String english = sentence.getLines(Arrays.asList(Expression.ENGLISH)).get(0);

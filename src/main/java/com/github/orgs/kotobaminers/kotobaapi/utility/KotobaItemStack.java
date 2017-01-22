@@ -5,12 +5,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import net.md_5.bungee.api.ChatColor;
 
 public class KotobaItemStack extends ItemStack {
 	private enum MaterialConverter {
@@ -79,13 +79,14 @@ public class KotobaItemStack extends ItemStack {
 	}
 
 	public static ItemStack setColoredLore(ItemStack itemStack, ChatColor color, List<String> lore) {
+		ItemStack clone = itemStack.clone();
 		lore = lore.stream()
 			.map(s -> "" + ChatColor.RESET + color + s)
 			.collect(Collectors.toList());
-		ItemMeta meta = itemStack.getItemMeta();
+		ItemMeta meta = clone.getItemMeta();
 		meta.setLore(lore);
-		itemStack.setItemMeta(meta);
-		return itemStack;
+		clone.setItemMeta(meta);
+		return clone;
 	}
 
 }

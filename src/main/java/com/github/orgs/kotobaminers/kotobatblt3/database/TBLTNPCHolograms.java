@@ -11,7 +11,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-import com.github.orgs.kotobaminers.kotobaapi.citizens.CitizensManager;
+import com.github.orgs.kotobaminers.kotobaapi.citizens.KotobaCitizensManager;
 import com.github.orgs.kotobaminers.kotobaapi.sentence.Holograms;
 import com.github.orgs.kotobaminers.kotobaapi.sentence.Sentence;
 import com.github.orgs.kotobaminers.kotobaapi.sentence.Sentence.Expression;
@@ -40,7 +40,7 @@ public class TBLTNPCHolograms extends Holograms {
 			.map(Sentence::getNPC)
 			.collect(Collectors.toSet())
 			.stream()
-			.forEach(id -> CitizensManager.findNPC(id).ifPresent(n -> new TBLTNPCHolograms().removeNear(KotobaUtility.getBase(n.getEntity())))
+			.forEach(id -> KotobaCitizensManager.findNPC(id).ifPresent(n -> new TBLTNPCHolograms().removeNear(KotobaUtility.getBase(n.getEntity())))
 		);
 	}
 
@@ -55,7 +55,7 @@ public class TBLTNPCHolograms extends Holograms {
 
 
 	private void playEffect(Player player, Sentence sentence) {
-		CitizensManager.findNPC(sentence.getNPC())
+		KotobaCitizensManager.findNPC(sentence.getNPC())
 			.ifPresent(npc -> {
 				Location lookAt = npc.getStoredLocation();
 				if(npc.getEntity() instanceof LivingEntity) {
@@ -73,7 +73,7 @@ public class TBLTNPCHolograms extends Holograms {
 			.map(sentence -> {
 				removeConversationHolograms(sentence.getConversation());
 
-				Location base = CitizensManager.findNPC(sentence.getNPC()).map(n -> KotobaUtility.getBase(n.getEntity())).orElse(null);
+				Location base = KotobaCitizensManager.findNPC(sentence.getNPC()).map(n -> KotobaUtility.getBase(n.getEntity())).orElse(null);
 				if(base == null) return false;
 
 				boolean success = new TBLTNPCHolograms().display(getLines(sentence), base);

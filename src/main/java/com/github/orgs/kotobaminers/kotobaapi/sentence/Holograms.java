@@ -10,6 +10,8 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.github.orgs.kotobaminers.kotobaapi.block.KotobaBlockStorage;
+
 public abstract class Holograms {
 
 
@@ -60,9 +62,13 @@ public abstract class Holograms {
 	}
 
 
-	public static void removeAllHologram(JavaPlugin plugin) {
+	public static void removeAllHolograms(JavaPlugin plugin) {
 		plugin.getServer().getWorlds().stream()
 			.forEach(world -> world.getEntities().stream().filter(Holograms::isHologramArmorStand).forEach(e -> e.remove()));
+	}
+	public static void removeHolograms(JavaPlugin plugin, KotobaBlockStorage storage) {
+		plugin.getServer().getWorlds().stream()
+			.forEach(world -> world.getEntities().stream().filter(Holograms::isHologramArmorStand).filter(e -> storage.isIn(e.getLocation())).forEach(e -> e.remove()));
 	}
 
 

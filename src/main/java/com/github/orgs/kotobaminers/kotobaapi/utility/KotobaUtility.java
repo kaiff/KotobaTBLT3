@@ -1,6 +1,7 @@
 package com.github.orgs.kotobaminers.kotobaapi.utility;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -36,6 +37,26 @@ import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.selections.Selection;
 
 public class KotobaUtility {
+	public static List<String> splitSentence(String sentence, int number) {
+		List<String> words = Arrays.asList(sentence.split(" "));
+		List<List<String>> groups = new ArrayList<>();
+		int count = 0;
+		List<String> group = new ArrayList<>();
+		for(int i = 0; i < words.size(); i++) {
+			count += words.get(i).length() + 1;
+			if(count <= number) {
+				group.add(words.get(i));
+			} else {
+				groups.add(group);
+				group = new ArrayList<>();
+				group.add(words.get(i));
+				count = words.get(i).length() + 1;
+			}
+		}
+		groups.add(group);
+		return groups.stream().filter(g -> 0 < g.size()).map(g -> String.join(" ", g)).collect(Collectors.toList());
+	}
+
 	public static void shootFirework(World world, Location location) {
 		Firework fw = world.spawn(location, Firework.class);
 		FireworkMeta fwm = fw.getFireworkMeta();
@@ -73,6 +94,7 @@ public class KotobaUtility {
 		int zMin = sel.getMinimumPoint().getBlockZ();
 		return getBlocks(world, xMax, yMax, zMax, xMin, yMin, zMin);
 	}
+
 
 	public static List<String> toStringListFromBookMeta(BookMeta bookMeta) {
 		return bookMeta.getPages().stream()

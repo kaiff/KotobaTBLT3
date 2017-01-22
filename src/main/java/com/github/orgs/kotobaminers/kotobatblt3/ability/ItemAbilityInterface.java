@@ -2,7 +2,9 @@ package com.github.orgs.kotobaminers.kotobatblt3.ability;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
@@ -10,6 +12,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStack;
+import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaUtility;
+
 
 public interface ItemAbilityInterface {
 	Material getMaterial();
@@ -18,17 +22,20 @@ public interface ItemAbilityInterface {
 	List<String> getLore();
 	int getConsumption();
 
-	List<ItemFlag> flags = Arrays.asList(ItemFlag.HIDE_ATTRIBUTES);
+	static final List<ItemFlag> FLAGS = Arrays.asList(ItemFlag.HIDE_ATTRIBUTES);
+	static final int LORE_LENGTH = 25;
 
 	default ItemStack createItem(int amount) {
 		ItemStack item = new ItemStack(getMaterial(), amount, getData());
-		ItemMeta meta = item.getItemMeta();
-		meta.setDisplayName(getName());
 		if(getLore() != null) {
-			meta.setLore(getLore());
+			List<String> splited = getLore().stream().flatMap(line -> KotobaUtility.splitSentence(line, LORE_LENGTH).stream()).collect(Collectors.toList());
+			item = KotobaItemStack.setColoredLore(item, ChatColor.RESET, splited);
 		}
 
-		flags.stream().forEach(flag -> meta.addItemFlags(flag));
+		ItemMeta meta = item.getItemMeta();
+		meta.setDisplayName(getName());
+
+		FLAGS.stream().forEach(flag -> meta.addItemFlags(flag));
 
 		item.setItemMeta(meta);
 		return item;
