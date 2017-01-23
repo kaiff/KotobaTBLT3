@@ -229,7 +229,7 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface {
 	private List<Action> triggers;
 	private int consume;
 	private FindType findType;
-	private int period = 10;
+	private int period = 5;
 	private KotobaEffect effect;
 	private KotobaEffect sound;
 

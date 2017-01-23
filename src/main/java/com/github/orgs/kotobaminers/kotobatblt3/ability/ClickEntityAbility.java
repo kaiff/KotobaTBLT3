@@ -86,7 +86,7 @@ public enum ClickEntityAbility implements ClickEntityAbilityInterface {
 		"Fire resistance",
 		Arrays.asList("give fire resistance for 1 min"),
 		new HashMap<TBLTResource, Integer>() {{
-			put(TBLTResource.FLAME_MANA, 1);
+			put(TBLTResource.MAGIC_MANA, 1);
 		}}
 	) {
 		@Override
@@ -109,7 +109,7 @@ public enum ClickEntityAbility implements ClickEntityAbilityInterface {
 		"Give a ride",
 		Arrays.asList("Summon a minecart when you touch with a player"),
 		new HashMap<TBLTResource, Integer>() {{
-			put(TBLTResource.METAL_MANA, 1);
+			put(TBLTResource.MAGIC_MANA, 1);
 		}}
 	) {
 		@Override

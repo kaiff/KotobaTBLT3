@@ -13,12 +13,12 @@ import org.bukkit.inventory.ItemStack;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaEffect;
 
 public enum TBLTResourceBlock {
-	LEAVES(Material.LEAVES, TBLTResource.LIFE_MANA, 1),
-	RED_ROSE(Material.RED_ROSE, TBLTResource.LIFE_MANA, 1),
-	WATER(Material.WATER, TBLTResource.WATER_MANA, 1),
-	STATIONARY_WATER(Material.STATIONARY_WATER, TBLTResource.WATER_MANA, 1),
-	IRON_ORE(Material.IRON_ORE, TBLTResource.METAL_MANA, 1),
-	TORCH(Material.TORCH, TBLTResource.FLAME_MANA, 1),
+	LEAVES(Material.LEAVES, TBLTResource.MAGIC_MANA, 1),
+	RED_ROSE(Material.RED_ROSE, TBLTResource.MAGIC_MANA, 1),
+	WATER(Material.WATER, TBLTResource.MAGIC_MANA, 1),
+	STATIONARY_WATER(Material.STATIONARY_WATER, TBLTResource.MAGIC_MANA, 1),
+	IRON_ORE(Material.IRON_ORE, TBLTResource.MAGIC_MANA, 1),
+	TORCH(Material.TORCH, TBLTResource.MAGIC_MANA, 1),
 	MAGIC_ORE(Material.EMERALD_ORE, TBLTResource.MAGIC_MANA, 1),
 	;
 

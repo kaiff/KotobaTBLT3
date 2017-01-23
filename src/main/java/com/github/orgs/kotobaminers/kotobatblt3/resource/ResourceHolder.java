@@ -13,6 +13,8 @@ import org.bukkit.inventory.ItemStack;
 
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStack;
 
+import net.md_5.bungee.api.ChatColor;
+
 public interface ResourceHolder {
 	Map<TBLTResource, Integer> getResources();
 
@@ -32,8 +34,9 @@ public interface ResourceHolder {
 			.limit(all.size())
 			.forEach(i -> {
 				if(consumption.containsKey(all.get(i))) {
-					if(consumption.get(all.get(i)) < 1) return;
-					ItemStack icon = KotobaItemStack.create(Material.WOOL, (short) 15, consumption.get(all.get(i)), "You need", Arrays.asList(all.get(i).getColoredName()));
+					int amount = consumption.get(all.get(i));
+					if(amount < 1) return;
+					ItemStack icon = KotobaItemStack.create(Material.WOOL, (short) 15, amount, "You need", Arrays.asList(" " + ChatColor.RESET + amount + " " + all.get(i).getColoredName()));
 					inventory.setItem(i + offset, icon);
 				}
 			});

@@ -20,45 +20,45 @@ public enum TBLTResource {
 		ChatColor.GREEN
 	),
 
-	LIFE_MANA(
-		Material.INK_SACK,
-		(short) 2,
-		"Life Mana",
-		null,
-		ChatColor.GREEN
-	),
-
-	METAL_MANA(
-		Material.IRON_INGOT,
-		(short) 0,
-		"Metal Mana",
-		null,
-		ChatColor.GRAY
-	),
-
-	WATER_MANA(
-		Material.INK_SACK,
-		(short) 4,
-		"Water Mana",
-		null,
-		ChatColor.AQUA
-	),
-
-	FLAME_MANA(
-		Material.BLAZE_POWDER,
-		(short) 0,
-		"Flame Mana",
-		null,
-		ChatColor.RED
-	),
-
-	ENDER_MANA(
-		Material.EYE_OF_ENDER,
-		(short) 0,
-		"Ender Mana",
-		null,
-		ChatColor.DARK_GRAY
-	),
+//	LIFE_MANA(
+//		Material.INK_SACK,
+//		(short) 2,
+//		"Life Mana",
+//		null,
+//		ChatColor.GREEN
+//	),
+//
+//	METAL_MANA(
+//		Material.IRON_INGOT,
+//		(short) 0,
+//		"Metal Mana",
+//		null,
+//		ChatColor.GRAY
+//	),
+//
+//	WATER_MANA(
+//		Material.INK_SACK,
+//		(short) 4,
+//		"Water Mana",
+//		null,
+//		ChatColor.AQUA
+//	),
+//
+//	FLAME_MANA(
+//		Material.BLAZE_POWDER,
+//		(short) 0,
+//		"Flame Mana",
+//		null,
+//		ChatColor.RED
+//	),
+//
+//	ENDER_MANA(
+//		Material.EYE_OF_ENDER,
+//		(short) 0,
+//		"Ender Mana",
+//		null,
+//		ChatColor.DARK_GRAY
+//	),
 	;
 
 	private Material material;

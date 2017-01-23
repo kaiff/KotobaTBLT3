@@ -30,10 +30,6 @@ public class ClickAbilityListener implements Listener {
 		Block block = event.getClickedBlock();
 
 		if(!Utility.isTBLTPlayer(player)) return;
-		if(!((Entity) player).isOnGround()) {
-			KotobaSound.SHEAR.play(player.getLocation());
-			return;
-		}
 
 		List<ClickBlockAbilityInterface> abilities = new ArrayList<>();
 		ClickBlockChestAbility.find(event).stream()
@@ -46,27 +42,41 @@ public class ClickAbilityListener implements Listener {
 
 		if(0 < abilities.size()) {
 			event.setCancelled(true);
+			if(canPerformLocation(player)) {
 			new TBLTArenaMap().findUnique(player.getLocation())
 				.ifPresent(storage -> abilities.stream().forEach(
 					ability -> {
-						if(!ability.isCorrectAction(event.getAction())) return;
-						TBLTArena arena = (TBLTArena) storage;
-						if(!arena.hasResources(ability.getResourceConsumption(block))) {
-							player.openInventory(arena.getResourceConsumptionInventory(ability.getResourceConsumption(block)));
-							KotobaSound.SHEAR.play(player.getLocation());
-							return;
-						}
-						boolean successed = false;
-						successed = ability.perform(event);//Perform ability here
-						if(successed) {
-							arena.consumeResources(ability.getResourceConsumption(block));
-							ability.consumeInHand(player);
-						} else {
-							KotobaSound.SHEAR.play(player.getLocation());
-							return;
+						if(ability.isCorrectAction(event.getAction())) {
+							TBLTArena arena = (TBLTArena) storage;
+							if(!arena.hasResources(ability.getResourceConsumption(block))) {
+								player.openInventory(arena.getResourceConsumptionInventory(ability.getResourceConsumption(block)));
+							} else {
+								boolean successed = false;
+								successed = ability.perform(event);//Perform ability here
+								if(successed) {
+									arena.consumeResources(ability.getResourceConsumption(block));
+									ability.consumeInHand(player);
+									return;
+								}
+							}
 						}
 					}));
+			}
+			//Case: Found any ability but perfomed
+			performFailureEffect(player.getLocation());
 		}
+	}
+
+	private boolean canPerformLocation(Player player) {
+		boolean onGround = ((Entity) player).isOnGround();
+		boolean atLadder = player.getLocation().getBlock().getType() == Material.LADDER;
+		if(onGround || atLadder) {
+			return true;
+		}
+		return false;
+	}
+	private void performFailureEffect(Location location) {
+		KotobaSound.SHEAR.play(location);
 	}
 
 	@EventHandler

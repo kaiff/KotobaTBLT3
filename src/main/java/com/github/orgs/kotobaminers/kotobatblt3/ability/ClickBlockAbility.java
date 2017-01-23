@@ -226,7 +226,7 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 		Arrays.asList(Action.RIGHT_CLICK_BLOCK),
 		0,
 		new HashMap<TBLTResource, Integer>() {{
-			put(TBLTResource.METAL_MANA, 1);
+			put(TBLTResource.MAGIC_MANA, 1);
 		}}
 	) {
 		@Override

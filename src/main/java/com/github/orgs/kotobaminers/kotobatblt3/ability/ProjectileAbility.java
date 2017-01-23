@@ -170,7 +170,7 @@ public enum ProjectileAbility implements ProjectileAbilityInterface {
 		0,
 		0.7d,
 		new HashMap<TBLTResource, Integer>() {{
-			put(TBLTResource.FLAME_MANA, 1);
+			put(TBLTResource.MAGIC_MANA, 1);
 		}}
 	) {
 		@Override
@@ -210,7 +210,7 @@ public enum ProjectileAbility implements ProjectileAbilityInterface {
 		1,
 		0.7d,
 		new HashMap<TBLTResource, Integer>() {{
-			put(TBLTResource.LIFE_MANA, 1);
+			put(TBLTResource.MAGIC_MANA, 1);
 		}}
 	){
 		@Override
@@ -244,7 +244,7 @@ public enum ProjectileAbility implements ProjectileAbilityInterface {
 		1,
 		0.7d,
 		new HashMap<TBLTResource, Integer>() {{
-			put(TBLTResource.LIFE_MANA, 1);
+			put(TBLTResource.MAGIC_MANA, 1);
 		}}
 	){
 		@Override
@@ -275,7 +275,7 @@ public enum ProjectileAbility implements ProjectileAbilityInterface {
 		1,
 		0.7d,
 		new HashMap<TBLTResource, Integer>() {{
-			put(TBLTResource.METAL_MANA, 1);
+			put(TBLTResource.MAGIC_MANA, 1);
 		}}
 	) {
 
@@ -320,7 +320,7 @@ public enum ProjectileAbility implements ProjectileAbilityInterface {
 		0,
 		0.7d,
 		new HashMap<TBLTResource, Integer>() {{
-			put(TBLTResource.LIFE_MANA, 1);
+			put(TBLTResource.MAGIC_MANA, 1);
 		}}
 	) {
 		@Override
@@ -365,7 +365,7 @@ public enum ProjectileAbility implements ProjectileAbilityInterface {
 		1,
 		0.7d,
 		new HashMap<TBLTResource, Integer>() {{
-			put(TBLTResource.METAL_MANA, 1);
+			put(TBLTResource.MAGIC_MANA, 1);
 		}}
 	) {
 		@Override

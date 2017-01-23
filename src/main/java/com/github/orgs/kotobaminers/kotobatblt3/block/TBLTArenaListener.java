@@ -20,6 +20,9 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -40,7 +43,7 @@ public class TBLTArenaListener implements Listener {
 
 
 	@EventHandler
-	public void onBlockReplacerPlayerInteract(PlayerInteractEvent event) {
+	void onBlockReplacerPlayerInteract(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
 		Block block = event.getClickedBlock();
 		if(block == null) return;
@@ -50,6 +53,18 @@ public class TBLTArenaListener implements Listener {
 					boolean success = ((BlockReplacer) replacer).replace(player, block);
 					if(success) KotobaItemStack.consume(player.getInventory(), player.getItemInHand(), 1);
 				});
+		}
+	}
+
+
+	@EventHandler
+	void onPlayerInteractBlock(PlayerInteractEvent event) {
+		Player player = event.getPlayer();
+		Block block = event.getClickedBlock();
+		if(block == null) return;
+		if(Utility.isTBLTPlayer(player)) {
+			InteractiveBlock.find(block)
+				.forEach(i -> i.interact(event));
 		}
 	}
 
@@ -97,6 +112,36 @@ public class TBLTArenaListener implements Listener {
 					.ifPresent(arena -> Bukkit.getOnlinePlayers().stream().filter(p -> arena.isIn(p.getLocation()) && p.getGameMode() == GameMode.ADVENTURE).forEach(p -> arena.continueFromCurrent(p)));
 			} else {
 				player.damage(damage);
+			}
+		}
+	}
+
+
+	@EventHandler
+	void onPlayerRegainHealth(EntityRegainHealthEvent event) {
+		if(event.getEntity() instanceof Player) {
+			Player player = (Player) event.getEntity();
+			if(!Utility.isTBLTPlayer(player)) return;
+
+			if(event.getRegainReason() == RegainReason.SATIATED) {
+				int rate = 5;
+				event.setCancelled(true);
+				double health = player.getHealth() + event.getAmount() * rate;
+				health = Math.min(health, player.getMaxHealth());
+				player.setHealth(health);
+			}
+		}
+	}
+
+
+	@EventHandler
+	void onPlayerChangeFoodLevel(FoodLevelChangeEvent event) {
+		if(event.getEntity() instanceof Player) {
+			Player player = (Player) event.getEntity();
+			if(Utility.isTBLTPlayer(player)) {
+				event.setCancelled(true);
+				player.setFoodLevel(20);
+				player.setSaturation(20);
 			}
 		}
 	}
