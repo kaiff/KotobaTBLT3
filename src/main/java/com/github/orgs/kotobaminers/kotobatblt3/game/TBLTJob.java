@@ -27,7 +27,7 @@ import com.github.orgs.kotobaminers.kotobatblt3.ability.ClickBlockChestAbility;
 				put(ClickBlockChestAbility.OPEN_PORTAL, 1);
 				put(ClickBlockAbility.REWIND_TIME, 1);
 				put(ClickBlockAbility.CLAIRVOYANCE, 1);
-				put(ClickBlockAbility.PREDICTION, 1);
+				put(ClickBlockChestAbility.SEE_MEMORY, 1);
 				put(ClickBlockChestAbility.FIND_SPELL, 1);
 			}},
 			true,

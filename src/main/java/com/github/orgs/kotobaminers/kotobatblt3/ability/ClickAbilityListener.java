@@ -2,6 +2,8 @@ package com.github.orgs.kotobaminers.kotobatblt3.ability;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -32,40 +34,52 @@ public class ClickAbilityListener implements Listener {
 		if(!Utility.isTBLTPlayer(player)) return;
 
 		List<ClickBlockAbilityInterface> abilities = new ArrayList<>();
+
 		ClickBlockChestAbility.find(event).stream()
 			.forEach(ability -> abilities.add(ability));
 
 		ClickBlockAbility.find(player.getItemInHand()).stream()
 			.forEach(ability -> abilities.add(ability));
+
 		ProjectileAbility.find(player.getItemInHand()).stream()
 			.forEach(ability -> abilities.add(ability));
+
 
 		if(0 < abilities.size()) {
 			event.setCancelled(true);
 			if(canPerformLocation(player)) {
-			new TBLTArenaMap().findUnique(player.getLocation())
-				.ifPresent(storage -> abilities.stream().forEach(
-					ability -> {
-						if(ability.isCorrectAction(event.getAction())) {
-							TBLTArena arena = (TBLTArena) storage;
-							if(!arena.hasResources(ability.getResourceConsumption(block))) {
-								player.openInventory(arena.getResourceConsumptionInventory(ability.getResourceConsumption(block)));
-							} else {
-								boolean successed = false;
-								successed = ability.perform(event);//Perform ability here
-								if(successed) {
-									arena.consumeResources(ability.getResourceConsumption(block));
-									ability.consumeInHand(player);
-									return;
+
+				Optional<List<Boolean>> founds = new TBLTArenaMap().findUnique(player.getLocation())
+					.map(storage -> abilities.stream().map(
+						ability -> {
+							boolean successed = false;
+							if(ability.isCorrectAction(event.getAction())) {
+								TBLTArena arena = (TBLTArena) storage;
+								if(!arena.hasResources(ability.getResourceConsumption(block))) {
+									player.openInventory(arena.getResourceConsumptionInventory(ability.getResourceConsumption(block)));
+								} else {
+									successed = ability.perform(event);//Perform ability here
+									if(successed) {
+										arena.consumeResources(ability.getResourceConsumption(block));
+										ability.consumeInHand(player);
+									}
 								}
 							}
-						}
-					}));
+							return successed;
+						}).collect(Collectors.toList()));
+
+				if(founds.isPresent()) {
+					if(founds.get().stream().anyMatch(f -> f == true)) {
+						return;
+					}
+				}
 			}
+
 			//Case: Found any ability but perfomed
 			performFailureEffect(player.getLocation());
 		}
 	}
+
 
 	private boolean canPerformLocation(Player player) {
 		boolean onGround = ((Entity) player).isOnGround();

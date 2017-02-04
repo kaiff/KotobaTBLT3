@@ -38,6 +38,7 @@ import com.github.orgs.kotobaminers.kotobatblt3.utility.Utility;
 
 public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 
+
 	CRYSTAL_CRUSHER(
 		Material.DIAMOND_PICKAXE,
 		(short) 0,
@@ -68,6 +69,7 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 		}
 	},
 
+
 	RESOURCES(
 		Material.ENDER_CHEST,
 		(short) 0,
@@ -85,6 +87,7 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 			return true;
 		}
 	},
+
 
 	SYPHON_MANA(
 		Material.EMERALD,
@@ -104,29 +107,24 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 				.map(a -> {
 					if(block.getState() instanceof Chest) {
 						Chest chest = (Chest) block.getState();
-						List<Boolean> founds = Stream.of(chest.getInventory().getContents())
-						.filter(i -> i != null)
-						.filter(i -> i.getType() != Material.AIR)
-						.map(i ->
-							TBLTResourceBlock.find(i.getType())
-								.map(r -> {
-									Stream.iterate(0, j -> j)
-										.limit(i.getAmount())
-										.forEach(j -> {
-											((ResourceHolder) a).addResources(r);
-											KotobaEffect.dropItemEffect(r.createResource(), block.getLocation().add(0, 1, 0));
-										});
-									return true;
-							}).orElse(false)
-						).filter(r -> r == true)
-						.collect(Collectors.toList());
+						Stream.of(chest.getInventory().getContents())
+							.filter(i -> i != null)
+							.filter(i -> i.getType() != Material.AIR)
+							.forEach(i ->
+								TBLTResourceBlock.find(i.getType())
+									.ifPresent(r -> {
+										Stream.iterate(0, j -> j)
+											.limit(i.getAmount())
+											.forEach(j -> {
+												((ResourceHolder) a).addResources(r);
+												KotobaEffect.dropItemEffect(r.createResource(), block.getLocation().add(0, 1, 0));
+											});
+									})
+							);
 
-						if(founds.contains(true)) {
-							chest.getInventory().clear();
-							TBLTResourceBlock.siphon(block);
-							return true;
-						}
-						return false;
+						chest.getInventory().clear();
+						TBLTResourceBlock.siphon(block);
+						return true;
 
 					} else {
 						return  TBLTResourceBlock.find(block.getType())
@@ -140,6 +138,7 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 				}).orElse(false);
 		}
 	},
+
 
 	EXTRACT_MANA(
 		Material.GOLD_PICKAXE,
@@ -166,6 +165,7 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 				).orElse(false);
 		}
 	},
+
 
 	PREDICTION(
 		Material.ENCHANTED_BOOK,
@@ -218,6 +218,7 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 		}
 	},
 
+
 	LOCK_PICKING(
 		Material.IRON_HOE,
 		(short) 0,
@@ -247,6 +248,7 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 			return false;
 		}
 	},
+
 
 	REWIND_TIME(
 		Material.WATCH,
@@ -278,6 +280,7 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 			return true;
 		}
 	},
+
 
 	CLAIRVOYANCE(
 		Material.GLASS,

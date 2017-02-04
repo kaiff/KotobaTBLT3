@@ -8,11 +8,14 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
+import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
@@ -21,6 +24,7 @@ import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
 
+import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaBook;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaEffect;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStack;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaUtility;
@@ -33,8 +37,88 @@ import com.github.orgs.kotobaminers.kotobatblt3.game.TBLTData;
 import com.github.orgs.kotobaminers.kotobatblt3.gui.TBLTPlayerGUI;
 import com.github.orgs.kotobaminers.kotobatblt3.resource.TBLTResource;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.RepeatingEffect;
+import com.github.orgs.kotobaminers.kotobatblt3.utility.Utility;
 
 public enum ClickBlockChestAbility implements ClickBlockAbilityInterface {
+
+
+	SEE_MEMORY(
+		Material.PAPER,
+		(short) 0,
+		"See Someone's Memory",
+		null,
+		Arrays.asList(Action.RIGHT_CLICK_BLOCK),
+		0,
+		FindType.UNDER_CHEST,
+		KotobaEffect.TWINCLE_MIDIUM,
+		KotobaEffect.TWINCLE_MIDIUM
+	) {
+		@Override
+		public boolean performAbility(PlayerInteractEvent event) {
+			Block block = event.getClickedBlock();
+			List<BookMeta> metas = findOptions(block.getLocation()).stream()
+				.filter(i -> i.getType() == Material.BOOK_AND_QUILL)
+				.map(i -> (BookMeta) i.getItemMeta())
+				.filter(meta -> 0 < meta.getPageCount())
+				.collect(Collectors.toList());
+			if(0 < metas.size()) {
+				event.setCancelled(true);
+
+				Player player = event.getPlayer();
+				new TBLTArenaMap().findUnique(player.getLocation())
+					.ifPresent(arena -> {
+						List<Player> others = Bukkit.getOnlinePlayers().stream()
+							.filter(p -> !p.getUniqueId().equals(player.getUniqueId()))
+							.filter(p -> arena.isIn(player.getLocation()))
+							.filter(p -> Utility.isTBLTPlayer(p))
+							.collect(Collectors.toList());
+
+						KotobaEffect.ENDER_SIGNAL.playEffect(block.getLocation());
+
+						removeMemoryBook(player.getInventory());
+						others.forEach(p -> removeMemoryBook(p.getInventory()));
+						giveOpenURLBook(player, metas.get(0));
+
+						if(1 < metas.size()) {
+							others.forEach(p -> giveOpenURLBook(p, metas.get(1)));
+						}
+					});
+			}
+			return true;
+		}
+
+		private static final String MEMORY = "Memory";
+		private static final String TEXT = "Memory";
+
+		private boolean isMemoryBook(ItemStack item) {
+			if(item.getType() == KotobaBook.MATERIAL) {
+				BookMeta meta = (BookMeta) item.getItemMeta();
+				String title = meta.getTitle();
+				if(title.equalsIgnoreCase(MEMORY)) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		private void removeMemoryBook(Inventory inventory) {
+			Stream.of(inventory.getContents())
+				.filter(i -> i != null)
+				.filter(i -> isMemoryBook(i))
+				.forEach(i -> inventory.remove(i));
+		}
+
+		private void giveOpenURLBook(Player player, BookMeta meta) {
+			String url = ChatColor.stripColor(meta.getPage(1));
+			KotobaBook book = new KotobaBook();
+			book.setAuthor(player.getName());
+			book.setTitle(MEMORY);
+			book.giveOpenURLBook(player, TEXT, url);
+			player.getWorld().playSound(player.getLocation(), Sound.SPIDER_WALK, 1f, 0.5f);
+		}
+
+
+	},
 
 
 	OPEN_PORTAL(
@@ -168,16 +252,16 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface {
 				.map(arena -> {
 					UniqueNPC unique = UniqueNPC.CAT;
 					boolean success = findOptions(block.getLocation()).stream()
-							.map(item -> unique.findNPCByKey(item))
-							.filter(npc -> npc.isPresent())
-							.map(Optional::get)
-							.map(npc -> {
-								unique.getNPCs().stream()
-									.filter(n -> arena.isIn(n.getStoredLocation()))
-									.forEach(n -> unique.despawn(n.getId()));
-								unique.spawn(npc.getId(), block.getLocation().clone().add(0.5,1.5,0.5));
-								return true;
-							}).collect(Collectors.toList()).contains(true);
+						.map(item -> unique.findNPCByKey(item))
+						.filter(npc -> npc.isPresent())
+						.map(Optional::get)
+						.map(npc -> {
+							unique.getNPCs().stream()
+								.filter(n -> arena.isIn(n.getStoredLocation()))
+								.forEach(n -> unique.despawn(n.getId()));
+							unique.spawn(npc.getId(), block.getLocation().clone().add(0.5,1.5,0.5));
+							return true;
+						}).collect(Collectors.toList()).contains(true);
 					return success;
 				}).orElse(false);
 		}

@@ -48,8 +48,8 @@ public class SentenceDatabase extends DatabaseManager {
 					prepared.setInt(3, sentence.getOrder());
 					prepared.setString(4, sentence.getTask());
 					prepared.setBoolean(5, sentence.getKey());
-					prepared.setString(6, sentence.getLines(Arrays.asList(Expression.KANJI)).get(0).replace("'", "''"));
-					prepared.setString(7, sentence.getLines(Arrays.asList(Expression.ENGLISH)).get(0).replace("'", "''"));
+					prepared.setString(6, sentence.getLines(Arrays.asList(Expression.KANJI)).get(0)/*.replace("'", "''")*/);
+					prepared.setString(7, sentence.getLines(Arrays.asList(Expression.ENGLISH)).get(0)/*.replace("'", "''")*/);
 					prepared.setString(8, sentence.getOwner().map(UUID::toString).orElse(""));
 					prepared.executeUpdate();
 				} else {
@@ -73,8 +73,8 @@ public class SentenceDatabase extends DatabaseManager {
 					prepared.setInt(4, sentence.getOrder());
 					prepared.setString(5, sentence.getTask());
 					prepared.setBoolean(6, sentence.getKey());
-					prepared.setString(7, sentence.getLines(Arrays.asList(Expression.KANJI)).get(0).replace("'", "''"));
-					prepared.setString(8, sentence.getLines(Arrays.asList(Expression.ENGLISH)).get(0).replace("'", "''"));
+					prepared.setString(7, sentence.getLines(Arrays.asList(Expression.KANJI)).get(0)/*.replace("'", "''")*/);
+					prepared.setString(8, sentence.getLines(Arrays.asList(Expression.ENGLISH)).get(0)/*.replace("'", "''")*/);
 					prepared.setString(9, sentence.getOwner().map(UUID::toString).orElse(""));
 					prepared.executeUpdate();
 				}
