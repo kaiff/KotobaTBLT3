@@ -19,7 +19,9 @@ import com.github.orgs.kotobaminers.kotobatblt3.ability.ClickBlockAbility;
 import com.github.orgs.kotobaminers.kotobatblt3.ability.ClickBlockAbilityInterface;
 import com.github.orgs.kotobaminers.kotobatblt3.ability.ClickBlockChestAbility;
 
+
 	public enum TBLTJob {
+
 		MAGICIAN(
 			new LinkedHashMap<ClickBlockAbilityInterface, Integer>() {{
 				put(ClickBlockChestAbility.SUMMON_SERVANT_1, 1);
@@ -33,6 +35,7 @@ import com.github.orgs.kotobaminers.kotobatblt3.ability.ClickBlockChestAbility;
 			true,
 			KotobaItemStack.create(Material.EMERALD, (short) 0, 1 ,"Magician", null)
 		),
+
 		ENGINEER(
 			new LinkedHashMap<ClickBlockAbilityInterface, Integer>() {{
 				put(ClickBlockChestAbility.SUMMON_SERVANT_2, 1);
