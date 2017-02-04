@@ -8,6 +8,8 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.util.Vector;
 
+import com.github.orgs.kotobaminers.kotobaapi.ability.ClickBlockAbilityInterface;
+
 public interface ProjectileAbilityInterface extends ClickBlockAbilityInterface {
 	void onHit(ProjectileHitEvent event);
 	EntityType getType();

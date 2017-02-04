@@ -23,9 +23,11 @@ import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
 
+import com.github.orgs.kotobaminers.kotobaapi.ability.ClickBlockAbilityInterface;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaBook;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaEffect;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStack;
+import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStackIcon;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaUtility;
 import com.github.orgs.kotobaminers.kotobatblt3.block.ChestPortal;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArena;
@@ -35,19 +37,16 @@ import com.github.orgs.kotobaminers.kotobatblt3.citizens.UniqueNPC;
 import com.github.orgs.kotobaminers.kotobatblt3.game.TBLTData;
 import com.github.orgs.kotobaminers.kotobatblt3.gui.TBLTPlayerGUI;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.RepeatingEffect;
+import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTItemStackIcon;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.Utility;
 
 public enum ClickBlockChestAbility implements ClickBlockAbilityInterface {
 
 
 	SEE_MEMORY(
-		Material.PAPER,
-		(short) 0,
-		"See Someone's Memory",
-		null,
-		Arrays.asList(Action.RIGHT_CLICK_BLOCK),
+		TBLTItemStackIcon.GREEN_GEM,
 		0,
-		FindType.UNDER_CHEST,
+		ChestFindType.UNDER_CHEST,
 		KotobaEffect.TWINCLE_MIDIUM,
 		KotobaEffect.TWINCLE_MIDIUM
 	) {
@@ -115,18 +114,13 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface {
 			player.getWorld().playSound(player.getLocation(), Sound.SPIDER_WALK, 1f, 0.5f);
 		}
 
-
 	},
 
 
 	OPEN_PORTAL(
-		Material.NETHER_STAR,
-		(short) 0,
-		"Open Portal",
-		null,
-		Arrays.asList(Action.RIGHT_CLICK_BLOCK),
+		TBLTItemStackIcon.GREEN_GEM,
 		0,
-		FindType.UNDER_CHEST,
+		ChestFindType.UNDER_CHEST,
 		KotobaEffect.TWINCLE_MIDIUM,
 		KotobaEffect.TWINCLE_MIDIUM
 	) {
@@ -144,13 +138,9 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface {
 
 
 	INVESTIGATE(
-		Material.TRIPWIRE_HOOK,
-		(short) 0,
-		"Investigate",
-		Arrays.asList("Use this skill on sparkling areas to get hints about the level.", "You can investigate things in more detail."),
-		Arrays.asList(Action.RIGHT_CLICK_BLOCK),
+		TBLTItemStackIcon.GREEN_GEM,
 		0,
-		FindType.UNDER_CHEST,
+		ChestFindType.UNDER_CHEST,
 		KotobaEffect.TWINCLE_MIDIUM,
 		KotobaEffect.TWINCLE_MIDIUM
 	) {
@@ -166,8 +156,8 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface {
 				.map(i -> (BookMeta) i.getItemMeta())
 				.map(meta -> KotobaUtility.toStringListFromBookMeta(meta))
 				.map(lore -> {
-					lore = 	lore.stream().flatMap(sentence -> KotobaUtility.splitSentence(sentence, ItemAbilityInterface.LORE_LENGTH).stream()).collect(Collectors.toList());
-					ItemStack item = KotobaItemStack.setColoredLore(createItem(1), ChatColor.RESET, lore);
+					lore = 	lore.stream().flatMap(sentence -> KotobaUtility.splitSentence(sentence, KotobaItemStackIcon.LORE_LENGTH).stream()).collect(Collectors.toList());
+					ItemStack item = KotobaItemStack.setColoredLore(getIcon().create(1), ChatColor.RESET, lore);
 					ItemMeta itemMeta = item.getItemMeta();
 					item.setItemMeta(itemMeta);
 					return item;
@@ -187,13 +177,9 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface {
 	},
 
 	FIND_SPELL(
-		Material.ENCHANTED_BOOK,
-		(short) 0,
-		"Find a new spell",
-		null,
-		Arrays.asList(Action.RIGHT_CLICK_BLOCK),
+		TBLTItemStackIcon.GREEN_GEM,
 		0,
-		FindType.UNDER_CHEST,
+		ChestFindType.UNDER_CHEST,
 		KotobaEffect.TWINCLE_MIDIUM,
 		KotobaEffect.TWINCLE_MIDIUM
 	) {
@@ -210,13 +196,9 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface {
 
 
 	FIND_TOOL(
-		Material.ENCHANTED_BOOK,
-		(short) 0,
-		"Find a new tool",
-		null,
-		Arrays.asList(Action.RIGHT_CLICK_BLOCK),
+		TBLTItemStackIcon.GREEN_GEM,
 		0,
-		FindType.UNDER_CHEST,
+		ChestFindType.UNDER_CHEST,
 		KotobaEffect.TWINCLE_MIDIUM,
 		KotobaEffect.TWINCLE_MIDIUM
 	) {
@@ -233,13 +215,9 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface {
 
 
 	SUMMON_SERVANT_1(
-		Material.REDSTONE_TORCH_ON,
-		(short) 0,
-		"Summon Chiro",
-		null,
-		Arrays.asList(Action.RIGHT_CLICK_BLOCK),
+		TBLTItemStackIcon.GREEN_GEM,
 		0,
-		FindType.UNDER_CHEST,
+		ChestFindType.UNDER_CHEST,
 		KotobaEffect.TWINCLE_MIDIUM,
 		KotobaEffect.TWINCLE_MIDIUM
 	) {
@@ -267,13 +245,9 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface {
 
 
 	SUMMON_SERVANT_2(
-		Material.SLIME_BALL,
-		(short) 0,
-		"Summon Sticky",
-		null,
-		Arrays.asList(Action.RIGHT_CLICK_BLOCK),
+		TBLTItemStackIcon.GREEN_GEM,
 		0,
-		FindType.UNDER_CHEST,
+		ChestFindType.UNDER_CHEST,
 		KotobaEffect.TWINCLE_MIDIUM,
 		KotobaEffect.TWINCLE_MIDIUM
 	) {
@@ -304,13 +278,10 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface {
 
 	public static final Material CHEST_MATERIAL = Material.TRAPPED_CHEST;
 
-	private Material material;
-	private short data;
-	private String name;
-	private List<String> lore;
-	private List<Action> triggers;
+
+	private KotobaItemStackIcon icon;
 	private int consume;
-	private FindType findType;
+	private ChestFindType findType;
 	private int period = 5;
 	private KotobaEffect effect;
 	private KotobaEffect sound;
@@ -320,21 +291,13 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface {
 
 
 	private ClickBlockChestAbility(
-		Material material,
-		short data,
-		String name,
-		List<String> lore,
-		List<Action> triggers,
+		KotobaItemStackIcon icon,
 		int consume,
-		FindType findType,
+		ChestFindType findType,
 		KotobaEffect effect,
 		KotobaEffect sound
 	) {
-		this.material = material;
-		this.data = data;
-		this.name = name;
-		this.lore = lore;
-		this.triggers = triggers;
+		this.icon = icon;
 		this.consume = consume;
 		this.findType = findType;
 		this.effect = effect;
@@ -349,12 +312,6 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface {
 		return collect;
 	}
 
-	public static List<ClickBlockChestAbility> find(ItemStack item) {
-		List<ClickBlockChestAbility> collect = Stream.of(ClickBlockChestAbility.values())
-			.filter(ability -> ability.createItem(1).isSimilar(item))
-			.collect(Collectors.toList());
-		return collect;
-	}
 
 	public RepeatingEffect createPeriodicEffect(Location location) {
 		return RepeatingEffect.create(period, effect, sound, true, location);
@@ -377,7 +334,7 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface {
 
 
 	protected List<ItemStack> findOptions(Location location) {
-		ItemStack item = createItem(1);
+		ItemStack item = getIcon().create(1);
 		return findChest(location.clone())
 			.map(chest -> {
 				Inventory inventory = chest.getInventory();
@@ -420,24 +377,12 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface {
 
 
 	@Override
-	public short getData() {
-		return data;
-	}
-	@Override
-	public Material getMaterial() {
-		return material;
-	}
-	@Override
-	public String getName() {
-		return name;
-	}
-	@Override
-	public List<String> getLore() {
-		return lore;
+	public KotobaItemStackIcon getIcon() {
+		return icon;
 	}
 	@Override
 	public List<Action> getTriggers() {
-		return triggers;
+		return Arrays.asList(Action.RIGHT_CLICK_BLOCK);
 	}
 	@Override
 	public int getConsumption() {
@@ -445,13 +390,12 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface {
 	}
 
 
-	protected enum FindType {
-		//Idea: UNDER_CHEST, NEXT_CHEST, NEAR_CHEST
+	protected enum ChestFindType {
 		UNDER_CHEST {
 			@Override
 			protected boolean canFind(PlayerInteractEvent event, ClickBlockChestAbility ability) {
 				if(event.getClickedBlock() == null) return false;
-				if(!event.getPlayer().getItemInHand().isSimilar(ability.createItem(1))) return false;
+				if(!event.getPlayer().getItemInHand().isSimilar(ability.getIcon().create(1))) return false;
 				return 0 < ability.findOptions(event.getClickedBlock().getLocation().clone()).size();
 			}
 		},
@@ -459,8 +403,7 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface {
 		ANYWHERE {
 			@Override
 			protected boolean canFind(PlayerInteractEvent event, ClickBlockChestAbility ability) {
-				if(event.getClickedBlock() == null) return false;
-				return event.getPlayer().getItemInHand().isSimilar(ability.createItem(1));
+				return true;
 			}
 		},
 		;

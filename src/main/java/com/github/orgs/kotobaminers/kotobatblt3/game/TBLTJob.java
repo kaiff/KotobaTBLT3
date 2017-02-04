@@ -14,9 +14,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import com.github.orgs.kotobaminers.kotobaapi.ability.ClickBlockAbilityInterface;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStack;
 import com.github.orgs.kotobaminers.kotobatblt3.ability.ClickBlockAbility;
-import com.github.orgs.kotobaminers.kotobatblt3.ability.ClickBlockAbilityInterface;
 import com.github.orgs.kotobaminers.kotobatblt3.ability.ClickBlockChestAbility;
 
 
@@ -75,7 +75,7 @@ import com.github.orgs.kotobaminers.kotobatblt3.ability.ClickBlockChestAbility;
 
 		public void setInventory(Player player) {
 			player.getInventory().clear();
-			abilities.entrySet().stream().forEach(entry ->player.getInventory().addItem(entry.getKey().createItem(entry.getValue())));
+			abilities.entrySet().stream().forEach(entry ->player.getInventory().addItem(entry.getKey().getIcon().create(entry.getValue())));
 		}
 
 		public ItemStack getIcon() {
@@ -114,7 +114,7 @@ import com.github.orgs.kotobaminers.kotobatblt3.ability.ClickBlockChestAbility;
 				.filter(job ->
 					job.getAbilities().keySet().stream()
 						.map(ability ->
-							ability.createItem(1)).anyMatch(ability -> items.stream().anyMatch(item -> item.isSimilar(ability)))
+							ability.getIcon().create(1)).anyMatch(ability -> items.stream().anyMatch(item -> item.isSimilar(ability)))
 				).findFirst();
 		}
 

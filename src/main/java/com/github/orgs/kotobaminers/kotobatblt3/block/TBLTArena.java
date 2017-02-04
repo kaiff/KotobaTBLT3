@@ -22,6 +22,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
+import com.github.orgs.kotobaminers.kotobaapi.ability.ItemStackAbilityManager;
 import com.github.orgs.kotobaminers.kotobaapi.block.KotobaBlockData;
 import com.github.orgs.kotobaminers.kotobaapi.block.KotobaBlockStorage;
 import com.github.orgs.kotobaminers.kotobaapi.sentence.Holograms;
@@ -151,18 +152,16 @@ public class TBLTArena extends KotobaBlockStorage {
 		this.repeatingEffects.stream().forEach(e -> e.setRepeat(false));
 		this.repeatingEffects = new HashSet<>();
 
-		List<ItemStack> icons = Stream.of(ClickBlockChestAbility.values())
-				.map(ability -> ability.createItem(1))
-				.collect(Collectors.toList());
-
 		List<RepeatingEffect> effects = getBlocks().stream()
 			.filter(b -> b.getType() == ClickBlockChestAbility.CHEST_MATERIAL)
 			.filter(b -> b.getState() instanceof Chest)
 			.map(b -> (Chest) b.getState())
 			.flatMap(b -> Stream.of(b.getInventory().getContents())
 				.filter(i -> i != null)
-				.filter(i -> icons.stream().anyMatch(icon -> icon.isSimilar(i)))
-				.flatMap(icon -> ClickBlockChestAbility.find(icon).stream().map(a -> a.createPeriodicEffect(b.getLocation().add(ClickBlockChestAbility.POSITION_TO_BLOCK))))
+				.flatMap(i -> ItemStackAbilityManager.find(i).stream())
+				.filter(a -> a instanceof ClickBlockChestAbility)
+				.map(a -> (ClickBlockChestAbility) a)
+				.map(a -> a.createPeriodicEffect(b.getLocation().add(ClickBlockChestAbility.POSITION_TO_BLOCK)))
 			).filter(e -> e instanceof RepeatingEffect)
 			.map(e -> (RepeatingEffect) e)
 			.collect(Collectors.toList());

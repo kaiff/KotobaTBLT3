@@ -7,10 +7,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.command.Command;
@@ -28,7 +26,6 @@ import com.github.orgs.kotobaminers.kotobaapi.citizens.KotobaCitizensManager;
 import com.github.orgs.kotobaminers.kotobaapi.kotobaapi.CommandEnumInterface;
 import com.github.orgs.kotobaminers.kotobaapi.kotobaapi.PermissionEnumInterface;
 import com.github.orgs.kotobaminers.kotobaapi.sentence.Holograms;
-import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaUtility;
 import com.github.orgs.kotobaminers.kotobatblt3.ability.ClickBlockAbility;
 import com.github.orgs.kotobaminers.kotobatblt3.ability.ClickBlockChestAbility;
 import com.github.orgs.kotobaminers.kotobatblt3.ability.ClickEntityAbility;
@@ -44,7 +41,6 @@ import com.github.orgs.kotobaminers.kotobatblt3.database.PlayerData;
 import com.github.orgs.kotobaminers.kotobatblt3.database.PlayerDatabase;
 import com.github.orgs.kotobaminers.kotobatblt3.database.SentenceDatabase;
 import com.github.orgs.kotobaminers.kotobatblt3.database.TBLTConversationEditorMap;
-import com.github.orgs.kotobaminers.kotobatblt3.game.Game.TBLTGameMode;
 import com.github.orgs.kotobaminers.kotobatblt3.game.TBLTJob;
 import com.github.orgs.kotobaminers.kotobatblt3.gui.IconCreatorUtility;
 import com.github.orgs.kotobaminers.kotobatblt3.gui.TBLTIconListGUI;
@@ -108,7 +104,7 @@ public class TBLTCommandExecutor implements CommandExecutor {
 			public boolean perform(Player player , String[] args) {
 				Inventory inventory = player.getInventory();
 				Stream.of(TBLTItem.values())
-					.map(item -> item.createItem(64))
+					.map(item -> item.getIcon().create(64))
 					.forEach(item -> inventory.addItem(item));
 				Stream.of(ChestPortal.values())
 					.map(item -> item.createKey())
@@ -139,13 +135,13 @@ public class TBLTCommandExecutor implements CommandExecutor {
 			public boolean perform(Player player , String[] args) {
 				Inventory inventory = player.getInventory();
 				Stream.of(ClickBlockAbility.values())
-					.forEach(a -> inventory.addItem(a.createItem(64)));
+					.forEach(a -> inventory.addItem(a.getIcon().create(64)));
 				Stream.of(ClickEntityAbility.values())
-					.forEach(a -> inventory.addItem(a.createItem(64)));
+					.forEach(a -> inventory.addItem(a.getIcon().create(64)));
 				Stream.of(ProjectileAbility.values())
-					.forEach(a -> inventory.addItem(a.createItem(64)));
+					.forEach(a -> inventory.addItem(a.getIcon().create(64)));
 				Stream.of(ClickBlockChestAbility.values())
-					.forEach(a -> inventory.addItem(a.createItem(64)));
+					.forEach(a -> inventory.addItem(a.getIcon().create(64)));
 				return true;
 			}
 		},
@@ -270,26 +266,6 @@ public class TBLTCommandExecutor implements CommandExecutor {
 					;
 				}
 				return true;
-			}
-		},
-
-
-		GAME_START(Arrays.asList(Arrays.asList("game", "g"), Arrays.asList("start", "s")), "<GameMode>", "Start Game Mode", PermissionEnum.OP) {
-			@Override
-			public boolean perform(Player player, String[] args) {
-				List<String> options = takeOptions(args);
-				if(1 < options.size()) {
-					return Stream.of(TBLTGameMode.values())
-					.filter(mode -> mode.name().equalsIgnoreCase(options.get(0)))
-					.findFirst()
-					.map(mode -> {
-						KotobaUtility.setCoundDownScoreboard(Setting.getPlugin(), Arrays.asList(player), "Time Left", mode.name(), Integer.valueOf(options.get(1)));
-						player.getWorld().playSound(player.getLocation(), Sound.CHICKEN_EGG_POP, 1, 1);
-						mode.start(Bukkit.getOnlinePlayers().stream().collect(Collectors.toList()));
-						return true;
-					}).orElse(false);
-				}
-				return false;
 			}
 		},
 

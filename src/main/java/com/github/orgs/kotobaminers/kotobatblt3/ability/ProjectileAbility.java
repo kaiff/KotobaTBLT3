@@ -19,27 +19,24 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.util.Vector;
 
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaEffect;
+import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStackIcon;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaSound;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaUtility;
 import com.github.orgs.kotobaminers.kotobatblt3.block.EditableBlock;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaMap;
 import com.github.orgs.kotobaminers.kotobatblt3.kotobatblt3.Setting;
+import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTItemStackIcon;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.Utility;
 
 public enum ProjectileAbility implements ProjectileAbilityInterface {
 
 	BLAST_ARROW(
+		TBLTItemStackIcon.GREEN_GEM,
 		EntityType.ARROW,
-		Material.ARROW,
-		(short) 0,
-		"Blast Arrow",
-		null,
-		Arrays.asList(Action.RIGHT_CLICK_AIR, Action.RIGHT_CLICK_BLOCK),
 		0,
 		2d
 	) {
@@ -73,12 +70,8 @@ public enum ProjectileAbility implements ProjectileAbilityInterface {
 	},
 
 	MAGNETIC_ARROW(
+		TBLTItemStackIcon.GREEN_GEM,
 		EntityType.ARROW,
-		Material.ARROW,
-		(short) 0,
-		"Magnetic Arrow",
-		null,
-		Arrays.asList(Action.RIGHT_CLICK_AIR, Action.RIGHT_CLICK_BLOCK),
 		0,
 		2d
 	) {
@@ -114,12 +107,8 @@ public enum ProjectileAbility implements ProjectileAbilityInterface {
 	},
 
 	FROST_ARROW(
+		TBLTItemStackIcon.GREEN_GEM,
 		EntityType.ARROW,
-		Material.ARROW,
-		(short) 0,
-		"Frost Arrow",
-		null,
-		Arrays.asList(Action.RIGHT_CLICK_AIR, Action.RIGHT_CLICK_BLOCK),
 		0,
 		2d
 	) {
@@ -150,12 +139,8 @@ public enum ProjectileAbility implements ProjectileAbilityInterface {
 	},
 
 	SMALL_BOMB(
+		TBLTItemStackIcon.GREEN_GEM,
 		EntityType.SNOWBALL,
-		Material.TNT,
-		(short) 0,
-		"Small bomb",
-		null,
-		Arrays.asList(Action.RIGHT_CLICK_AIR, Action.RIGHT_CLICK_BLOCK),
 		0,
 		0.7d
 	) {
@@ -187,12 +172,8 @@ public enum ProjectileAbility implements ProjectileAbilityInterface {
 	},
 
 	TREE_GROWTH(
+		TBLTItemStackIcon.GREEN_GEM,
 		EntityType.SPLASH_POTION,
-		Material.POTION,
-		(short) 0,
-		"Grow trees",
-		null,
-		Arrays.asList(Action.RIGHT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR),
 		1,
 		0.7d
 	){
@@ -218,12 +199,8 @@ public enum ProjectileAbility implements ProjectileAbilityInterface {
 	},
 
 	TRANSPARENT_BLOCK(
+		TBLTItemStackIcon.GREEN_GEM,
 		EntityType.SPLASH_POTION,
-		Material.POTION,
-		(short) 0,
-		"Transparent block",
-		null,
-		Arrays.asList(Action.RIGHT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR),
 		1,
 		0.7d
 	){
@@ -246,12 +223,8 @@ public enum ProjectileAbility implements ProjectileAbilityInterface {
 	},
 
 	GENERATE_BLOCK(
+		TBLTItemStackIcon.GREEN_GEM,
 		EntityType.SNOWBALL,
-		Material.SNOW_BALL,
-		(short) 0,
-		"Generate block",
-		null,
-		Arrays.asList(Action.RIGHT_CLICK_AIR, Action.RIGHT_CLICK_BLOCK),
 		1,
 		0.7d
 	) {
@@ -288,12 +261,8 @@ public enum ProjectileAbility implements ProjectileAbilityInterface {
 	},
 
 	MAGIC_WEB(
+		TBLTItemStackIcon.GREEN_GEM,
 		EntityType.SNOWBALL,
-		Material.WEB,
-		(short) 0,
-		"Generate magic web",
-		null,
-		Arrays.asList(Action.RIGHT_CLICK_AIR, Action.RIGHT_CLICK_BLOCK),
 		0,
 		0.7d
 	) {
@@ -330,12 +299,8 @@ public enum ProjectileAbility implements ProjectileAbilityInterface {
 
 
 	MAGIC_TRAMPOLINE(
+		TBLTItemStackIcon.GREEN_GEM,
 		EntityType.SNOWBALL,
-		Material.SNOW_BALL,
-		(short) 0,
-		"Generate jumber",
-		null,
-		Arrays.asList(Action.RIGHT_CLICK_AIR, Action.RIGHT_CLICK_BLOCK),
 		1,
 		0.7d
 	) {
@@ -374,34 +339,18 @@ public enum ProjectileAbility implements ProjectileAbilityInterface {
 	},
 	;
 
+	private KotobaItemStackIcon icon;
 	private EntityType type;
-	private Material material;
-	private short data;
-	private String name;
-	private List<String> lore;
-	private List<Action> triggers;
 	private int consume;
 	private double speed;
 
-	private ProjectileAbility(EntityType type, Material material, short data, String name, List<String> lore, List<Action> triggers, int consume, double speed) {
+	private ProjectileAbility(KotobaItemStackIcon icon, EntityType type, int consume, double speed) {
+		this.icon = icon;
 		this.type = type;
-		this.material = material;
-		this.data = data;
-		this.name = name;
-		this.lore = lore;
-		this.triggers = triggers;
 		this.consume = consume;
 		this.speed = speed;
 	}
 
-	public static List<ProjectileAbility> find(ItemStack itemStack) {
-		return Stream.of(ProjectileAbility.values())
-			.filter(ability ->
-				ability.getMaterial() == itemStack.getType() &&
-				ability.getName().equalsIgnoreCase(itemStack.getItemMeta().getDisplayName())
-			)
-			.collect(Collectors.toList());
-	}
 	public static Optional<ProjectileAbility> find(Projectile projectile) {
 		return Stream.of(ProjectileAbility.values())
 			.filter(ability ->
@@ -426,28 +375,20 @@ public enum ProjectileAbility implements ProjectileAbilityInterface {
 
 
 	@Override
+	public KotobaItemStackIcon getIcon() {
+		return icon;
+	}
+	@Override
 	public EntityType getType() {
 		return type;
 	}
 	@Override
 	public List<Action> getTriggers() {
-		return triggers;
-	}
-	@Override
-	public short getData() {
-		return data;
-	}
-	@Override
-	public Material getMaterial() {
-		return material;
+		return Arrays.asList(Action.RIGHT_CLICK_AIR, Action.RIGHT_CLICK_BLOCK);
 	}
 	@Override
 	public String getName() {
-		return name;
-	}
-	@Override
-	public List<String> getLore() {
-		return lore;
+		return name();
 	}
 	@Override
 	public double getSpeed() {

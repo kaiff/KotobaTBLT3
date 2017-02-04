@@ -69,7 +69,7 @@ public enum TBLTIcon implements GUIIcon {
 		}
 	},
 
-	WARP_CRYSTAL(Material.NETHER_STAR, 1, (short) 0, TBLTItem.PORTAL_CRYSTAL.getName(), null) {
+	WARP_CRYSTAL(Material.NETHER_STAR, 1, (short) 0, TBLTItem.PORTAL_CRYSTAL.getIcon().getName(), null) {
 		@Override
 		public void onClickEvent(InventoryClickEvent event) {
 			event.getWhoClicked().getInventory().addItem(event.getCurrentItem());

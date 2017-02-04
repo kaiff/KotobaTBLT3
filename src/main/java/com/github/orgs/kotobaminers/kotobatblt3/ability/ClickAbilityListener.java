@@ -13,12 +13,13 @@ import org.bukkit.entity.Snowball;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
+import com.github.orgs.kotobaminers.kotobaapi.ability.ClickBlockAbilityInterface;
+import com.github.orgs.kotobaminers.kotobaapi.ability.ItemStackAbilityManager;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaSound;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArena;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaMap;
@@ -33,14 +34,7 @@ public class ClickAbilityListener implements Listener {
 
 		List<ClickBlockAbilityInterface> abilities = new ArrayList<>();
 
-		ClickBlockChestAbility.find(event).stream()
-			.forEach(ability -> abilities.add(ability));
-
-		ClickBlockAbility.find(player.getItemInHand()).stream()
-			.forEach(ability -> abilities.add(ability));
-
-		ProjectileAbility.find(player.getItemInHand()).stream()
-			.forEach(ability -> abilities.add(ability));
+		ItemStackAbilityManager.find(player.getItemInHand());
 
 
 		if(0 < abilities.size()) {
@@ -94,16 +88,19 @@ public class ClickAbilityListener implements Listener {
 		if(!((Entity) player).isOnGround()) return;
 		if(!Utility.isTBLTPlayer(player)) return;
 
-		ClickEntityAbility.find(event.getPlayer().getItemInHand())
-			.ifPresent(ability -> {
+		ItemStackAbilityManager.find(event.getPlayer().getItemInHand())
+			.stream()
+			.filter(a -> a instanceof ClickEntityAbility)
+			.map(a -> (ClickEntityAbility) a)
+			.forEach(a -> {
 				event.setCancelled(true);
 				new TBLTArenaMap().findUnique(player.getLocation())
 					.map(arena -> (TBLTArena) arena)
 					.ifPresent(arena -> {
 						boolean successed = false;
-						successed = ability.perform(event);//Perform ability here
+						successed = a.perform(event);//Perform ability here
 						if(successed) {
-							ability.consumeInHand(player);
+							a.consumeInHand(player);
 						} else {
 							KotobaSound.SHEAR.play(player.getLocation());
 							return;
@@ -112,13 +109,6 @@ public class ClickAbilityListener implements Listener {
 		});
 	}
 
-	@EventHandler
-	public void onPotionSplash(PotionSplashEvent event) {
-		if(event.getPotion().getEffects().size() == 0) {
-			if(!new TBLTArenaMap().isInAny(event.getEntity().getLocation())) return;
-			TBLTPotion.find(event).eventSplash(event);
-		}
-	}
 
 	@EventHandler
 	public void onProjectileHit(ProjectileHitEvent event) {

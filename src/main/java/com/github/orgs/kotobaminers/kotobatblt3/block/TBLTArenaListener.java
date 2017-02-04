@@ -58,18 +58,6 @@ public class TBLTArenaListener implements Listener {
 
 
 	@EventHandler
-	void onPlayerInteractBlock(PlayerInteractEvent event) {
-		Player player = event.getPlayer();
-		Block block = event.getClickedBlock();
-		if(block == null) return;
-		if(Utility.isTBLTPlayer(player)) {
-			InteractiveBlock.find(block)
-				.forEach(i -> i.interact(event));
-		}
-	}
-
-
-	@EventHandler
 	void onHitEnemy(EntityDamageByEntityEvent event) {
 		Entity damager = event.getDamager();
 		Entity damaged = event.getEntity();

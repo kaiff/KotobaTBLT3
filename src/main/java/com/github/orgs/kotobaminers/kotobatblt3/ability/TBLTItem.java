@@ -1,78 +1,33 @@
 package com.github.orgs.kotobaminers.kotobatblt3.ability;
 
-import java.util.Arrays;
-import java.util.List;
+import com.github.orgs.kotobaminers.kotobaapi.ability.ItemStackAbilityInterface;
+import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStackIcon;
+import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTItemStackIcon;
 
-import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
+public enum TBLTItem implements ItemStackAbilityInterface {
 
-public enum TBLTItem implements ItemAbilityInterface {
-
-	PORTAL_CRYSTAL(
-		Material.NETHER_STAR,
-		(short) 0,
-		"Portal Crystal",
-		Arrays.asList("This special item is used to open the time travel portal to your next location.", "Click the portal to open it.")
-	) {
-	},
-
-	SINGLE_PORTAL(
-		Material.NETHER_STAR,
-		(short) 0,
-		"Single portal key",
-		null
-	) {
-	},
-
-	PREDICTION(
-		Material.WRITTEN_BOOK,
-		(short) 0,
-		"A written prediction",
-		null
-	) {
-	},
+	PORTAL_CRYSTAL(TBLTItemStackIcon.PORTAL_CRYSTAL),
+	SINGLE_PORTAL(TBLTItemStackIcon.SINGLE_PORTAL),
+	PREDICTION(TBLTItemStackIcon.WRITTEN_PREDICTION),
 	;
 
-	protected Material material;
-	protected short data;
-	protected String name;
-	protected List<String> lore;
+	protected KotobaItemStackIcon icon;
 
-	private TBLTItem(Material material, short data, String name, List<String> lore) {
-		this.material = material;
-		this.data = data;
-		this.name = name;
-		this.lore = lore;
-	}
-
-
-	public boolean isTBLTItem(ItemStack item) {
-		if(item.getType() == this.material && item.getItemMeta().getDisplayName().equalsIgnoreCase(name)) {
-			return true;
-		}
-		return false;
+	private TBLTItem(KotobaItemStackIcon icon) {
+		this.icon = icon;
 	}
 
 
 	@Override
-	public Material getMaterial() {
-		return material;
+	public KotobaItemStackIcon getIcon() {
+		return icon;
 	}
-	@Override
-	public short getData() {
-		return data;
-	}
-	@Override
-	public String getName() {
-		return name;
-	}
-	@Override
-	public List<String> getLore() {
-		return lore;
-	}
+
 	@Override
 	public int getConsumption() {
 		return 0;
 	}
+
+
 }
 

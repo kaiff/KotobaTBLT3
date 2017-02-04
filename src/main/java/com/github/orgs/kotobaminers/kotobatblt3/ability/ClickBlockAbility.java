@@ -21,23 +21,23 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.util.Vector;
 
+import com.github.orgs.kotobaminers.kotobaapi.ability.ClickBlockAbilityInterface;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaEffect;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStack;
+import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStackIcon;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaUtility;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArena;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaMap;
 import com.github.orgs.kotobaminers.kotobatblt3.gui.TBLTPlayerGUI;
 import com.github.orgs.kotobaminers.kotobatblt3.kotobatblt3.Setting;
+import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTItemStackIcon;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.Utility;
 
 public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 
 
 	PREDICTION(
-		Material.ENCHANTED_BOOK,
-		(short) 0,
-		"Prediction",
-		Arrays.asList("Are you stuck?", "Use prediction to get a useful hint about what to do next."),
+		TBLTItemStackIcon.PREDICTION,
 		Arrays.asList(Action.RIGHT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR),
 		0
 	) {
@@ -47,7 +47,7 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 			ItemStack prediction = new TBLTArenaMap().findUnique(player.getLocation())
 				.map(a -> (TBLTArena) a)
 				.map(a -> {
-					ItemStack base = TBLTItem.PREDICTION.createItem(1);
+					ItemStack base = TBLTItem.PREDICTION.getIcon().create(1);
 					BookMeta baseMeta = (BookMeta) base.getItemMeta();
 					List<String> pages = ((BookMeta) a.getPredictionWrittenBook().getItemMeta()).getPages();
 					baseMeta.setPages(pages);
@@ -58,7 +58,7 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 			if(prediction == null) return false;
 			List<ItemStack> currentPrediction = Stream.of(player.getInventory().getContents())
 				.filter(i -> i != null)
-				.filter(i -> TBLTItem.PREDICTION.isTBLTItem(i))
+				.filter(i -> TBLTItem.PREDICTION.getIcon().isSame(i))
 				.collect(Collectors.toList());
 			int currentPage = currentPrediction.stream()
 					.map(i -> ((BookMeta) i.getItemMeta()).getPageCount())
@@ -83,10 +83,7 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 
 
 	LOCK_PICKING(
-		Material.IRON_HOE,
-		(short) 0,
-		"Lock picking",
-		Arrays.asList("With this tool you can pick any lock.", "Use the lock pick on locked chest to instantly receive the contents."),
+		TBLTItemStackIcon.LOCK_PICKING,
 		Arrays.asList(Action.RIGHT_CLICK_BLOCK),
 		0
 	) {
@@ -111,10 +108,7 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 
 
 	REWIND_TIME(
-		Material.WATCH,
-		(short) 0,
-		"Rewind Time",
-		Arrays.asList("You can go back in time to the last checkpoint with this item."),
+		TBLTItemStackIcon.REWIND_TIME,
 		Arrays.asList(Action.RIGHT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR),
 		0
 	) {
@@ -140,10 +134,7 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 
 
 	CLAIRVOYANCE(
-		Material.GLASS,
-		(short) 0,
-		"Clairvoyance",
-		Arrays.asList("You can see the contents of locked chests with this skill."),
+		TBLTItemStackIcon.CLAIRVOYANCE,
 		Arrays.asList(Action.RIGHT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR),
 		0
 	) {
@@ -164,14 +155,11 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 	},
 
 	PSYCHOKINESIS(
-		Material.FEATHER,
-		(short) 0,
-		"Psychokinesis",
-		null,
+		TBLTItemStackIcon.GREEN_GEM,
 		Arrays.asList(Action.RIGHT_CLICK_BLOCK),
 		0
 	) {
-		@SuppressWarnings("deprecation")
+		@Deprecated
 		@Override
 		public boolean perform(PlayerInteractEvent event) {
 			Player player = event.getPlayer();
@@ -199,10 +187,7 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 	},
 
 	TELEPORT(
-		Material.NETHER_STAR,
-		(short) 0,
-		"Teleport+5",
-		null,
+		TBLTItemStackIcon.GREEN_GEM,
 		Arrays.asList(Action.RIGHT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR),
 		0
 	) {
@@ -221,10 +206,7 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 	},
 
 	TRANSITION(
-		Material.ENDER_CHEST,
-		(short) 0,
-		"Transition+5",
-		Arrays.asList("Exchange positions with each other", "Both of two players have to jump"),
+		TBLTItemStackIcon.GREEN_GEM,
 		Arrays.asList(Action.RIGHT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR),
 		1
 	) {
@@ -252,10 +234,7 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 	},
 
 	DISGUISE_BAT(
-		Material.BREWING_STAND_ITEM,
-		(short) 0,
-		"Drone",
-		null,
+		TBLTItemStackIcon.GREEN_GEM,
 		Arrays.asList(Action.RIGHT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR),
 		1
 	) {
@@ -271,43 +250,27 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 	},
 	;
 
-	private Material material;
-	private short data;
-	private String name;
-	private List<String> lore;
+
+	private KotobaItemStackIcon icon;
 	private List<Action> triggers;
 	private int consume;
 
-	private ClickBlockAbility(Material material, short data, String name, List<String> lore, List<Action> triggers, int consume) {
-		this.material = material;
-		this.data = data;
-		this.name = name;
-		this.lore = lore;
+
+	private ClickBlockAbility(KotobaItemStackIcon icon, List<Action> triggers, int consume) {
+		this.icon = icon;
 		this.triggers = triggers;
 		this.consume = consume;
 	}
 
 	public static List<ClickBlockAbility> find(ItemStack item) {
 		return Stream.of(ClickBlockAbility.values())
-			.filter(ability -> ability.createItem(1).isSimilar(item))
+			.filter(ability -> ability.getIcon().create(1).isSimilar(item))
 			.collect(Collectors.toList());
 	}
 
 	@Override
-	public short getData() {
-		return data;
-	}
-	@Override
-	public Material getMaterial() {
-		return material;
-	}
-	@Override
-	public String getName() {
-		return name;
-	}
-	@Override
-	public List<String> getLore() {
-		return lore;
+	public KotobaItemStackIcon getIcon() {
+		return icon;
 	}
 	@Override
 	public List<Action> getTriggers() {
@@ -317,4 +280,7 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 	public int getConsumption() {
 		return consume;
 	}
+
+
 }
+

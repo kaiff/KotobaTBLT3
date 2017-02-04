@@ -3,8 +3,6 @@ package com.github.orgs.kotobaminers.kotobatblt3.ability;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
 
 import org.bukkit.Effect;
 import org.bukkit.Location;
@@ -16,21 +14,21 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
+import com.github.orgs.kotobaminers.kotobaapi.ability.ClickEntityAbilityInterface;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaEffect;
+import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStackIcon;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaMap;
+import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTItemStackIcon;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.Utility;
 
 public enum ClickEntityAbility implements ClickEntityAbilityInterface {
 	MIRROR_IMAGE(
-		Material.THIN_GLASS,
-		(short) 0,
-		"Mirror Image",
-		null
+		TBLTItemStackIcon.GREEN_GEM,
+		1
 	) {
 		@Override
 		public boolean perform(PlayerInteractEntityEvent event) {
@@ -73,13 +71,12 @@ public enum ClickEntityAbility implements ClickEntityAbilityInterface {
 			}
 			return false;
 		}
+
 	},
 
 	FIRE_RESISTANCE(
-		Material.BLAZE_POWDER,
-		(short) 0,
-		"Fire resistance",
-		Arrays.asList("give fire resistance for 1 min")
+		TBLTItemStackIcon.GREEN_GEM,
+		1
 	) {
 		@Override
 		public boolean perform(PlayerInteractEntityEvent event) {
@@ -96,10 +93,8 @@ public enum ClickEntityAbility implements ClickEntityAbilityInterface {
 	},
 
 	GIVE_A_RIDE(
-		Material.IRON_INGOT,
-		(short) 0,
-		"Give a ride",
-		Arrays.asList("Summon a minecart when you touch with a player")
+		TBLTItemStackIcon.GREEN_GEM,
+		1
 	) {
 		@Override
 		public boolean perform(PlayerInteractEntityEvent event) {
@@ -119,91 +114,69 @@ public enum ClickEntityAbility implements ClickEntityAbilityInterface {
 	},
 
 	THROW_ABOVE_1(
-			Material.FEATHER,
-			(short) 0,
-			"Throw above+1",
-			null
-		) {
-			@Override
-			public boolean perform(PlayerInteractEntityEvent event) {
-				Entity entity = event.getRightClicked();
-				if(!entity.isOnGround()) return false;
+		TBLTItemStackIcon.GREEN_GEM,
+		1
+	) {
+		@Override
+		public boolean perform(PlayerInteractEntityEvent event) {
+			Entity entity = event.getRightClicked();
+			if(!entity.isOnGround()) return false;
 
-				entity.setVelocity(new Vector(0, 0.4, 0));
-				Utility.playJumpEffect(entity);
-				entity.getLocation().getWorld().playEffect(entity.getLocation(), Effect.POTION_BREAK, 0);
-				return true;
-			}
+			entity.setVelocity(new Vector(0, 0.4, 0));
+			Utility.playJumpEffect(entity);
+			entity.getLocation().getWorld().playEffect(entity.getLocation(), Effect.POTION_BREAK, 0);
+			return true;
+		}
 	},
 
 	THROW_AWAY_1(
-			Material.FEATHER,
-			(short) 0,
-			"Throw away+1",
-			null
-		) {
-			@Override
-			public boolean perform(PlayerInteractEntityEvent event) {
-				Player player = event.getPlayer();
-				Entity clicked = event.getRightClicked();
+		TBLTItemStackIcon.GREEN_GEM,
+		1
+	) {
+		@Override
+		public boolean perform(PlayerInteractEntityEvent event) {
+			Player player = event.getPlayer();
+			Entity clicked = event.getRightClicked();
 
-				if(!clicked.isOnGround()) return false;
+			if(!clicked.isOnGround()) return false;
 
-				double x = player.getLocation().getDirection().getX();
-				double z = player.getLocation().getDirection().getZ();
-				double rate = 1 / Math.sqrt(x*x + z*z);
-				x = x * rate * 3;
-				z = z * rate * 3;
+			double x = player.getLocation().getDirection().getX();
+			double z = player.getLocation().getDirection().getZ();
+			double rate = 1 / Math.sqrt(x*x + z*z);
+			x = x * rate * 3;
+			z = z * rate * 3;
 
-				Vector velocity = new Vector(x, 0.4, z);
-				clicked.setVelocity(velocity);
+			Vector velocity = new Vector(x, 0.4, z);
+			clicked.setVelocity(velocity);
 
-				KotobaEffect.MAGIC_MIDIUM.playEffect(clicked.getLocation());
-				Utility.playJumpEffect(clicked);
+			KotobaEffect.MAGIC_MIDIUM.playEffect(clicked.getLocation());
+			Utility.playJumpEffect(clicked);
 
-				return true;
-			}
-		},
+			return true;
+		}
+	},
 	;
 
 
-	private Material material;
-	private short data;
-	private String name;
-	private List<String> lore;
+	KotobaItemStackIcon icon;
+	int consumption;
 
 
-	private ClickEntityAbility(Material material, short data, String name, List<String> lore) {
-		this.material = material;
-		this.data = data;
-		this.name = name;
-		this.lore = lore;
+	private ClickEntityAbility(KotobaItemStackIcon icon, int consumption) {
+		this.icon = icon;
+		this.consumption = consumption;
 	}
 
-	public static Optional<ClickEntityAbility> find(ItemStack item) {
-		return Stream.of(ClickEntityAbility.values())
-			.filter(ability -> ability.createItem(1).isSimilar(item))
-			.findFirst();
-	}
+
 	@Override
-	public short getData() {
-		return data;
-	}
-	@Override
-	public Material getMaterial() {
-		return material;
-	}
-	@Override
-	public String getName() {
-		return name;
-	}
-	@Override
-	public List<String> getLore() {
-		return lore;
+	public KotobaItemStackIcon getIcon() {
+		return icon;
 	}
 	@Override
 	public int getConsumption() {
-		return 0;
+		return consumption;
 	}
 
+
 }
+

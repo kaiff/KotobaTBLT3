@@ -63,11 +63,11 @@ public enum ChestPortal implements KotobaPortalInterface {
 								.filter(p ->
 									Stream.of(p.getInventory().getContents())
 										.filter(i -> i != null)
-										.anyMatch(i -> TBLTItem.PORTAL_CRYSTAL.isTBLTItem(i)))
+										.anyMatch(i -> TBLTItem.PORTAL_CRYSTAL.getIcon().isSame(i)))
 								.findFirst();
 							if(crystalOwner.isPresent() || isSinglePortal(from)) {
 								List<Boolean> success = findChestsInRange(from).stream()
-									.flatMap(c -> Stream.of(c.getInventory().getContents()).filter(i -> i != null).filter(i -> TBLTItem.PORTAL_CRYSTAL.isTBLTItem(i)))
+									.flatMap(c -> Stream.of(c.getInventory().getContents()).filter(i -> i != null).filter(i -> TBLTItem.PORTAL_CRYSTAL.getIcon().isSame(i)))
 									.filter(i -> i.getItemMeta().getLore() != null)
 									.filter(i -> 0 < i.getItemMeta().getLore().size())
 									.map(i -> i.getItemMeta().getLore().get(0))
@@ -210,7 +210,7 @@ public enum ChestPortal implements KotobaPortalInterface {
 
 	protected boolean isSinglePortal(Location location) {
 		long singleKeyNumber = findChestsInRange(location).stream()
-			.flatMap(c -> Stream.of(c.getInventory().getContents()).filter(i -> i != null).filter(i -> TBLTItem.SINGLE_PORTAL.isTBLTItem(i)))
+			.flatMap(c -> Stream.of(c.getInventory().getContents()).filter(i -> i != null).filter(i -> TBLTItem.SINGLE_PORTAL.getIcon().isSame(i)))
 			.count();
 		if(0 < singleKeyNumber) {
 			return true;
