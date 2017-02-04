@@ -19,6 +19,7 @@ import com.github.orgs.kotobaminers.kotobatblt3.ability.ClickBlockAbility;
 import com.github.orgs.kotobaminers.kotobatblt3.ability.ClickBlockAbilityInterface;
 import com.github.orgs.kotobaminers.kotobatblt3.ability.ClickBlockChestAbility;
 
+
 	public enum TBLTJob {
 		MAGICIAN(
 			new LinkedHashMap<ClickBlockAbilityInterface, Integer>() {{
