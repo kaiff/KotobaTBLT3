@@ -49,7 +49,6 @@ import com.github.orgs.kotobaminers.kotobatblt3.game.TBLTJob;
 import com.github.orgs.kotobaminers.kotobatblt3.gui.IconCreatorUtility;
 import com.github.orgs.kotobaminers.kotobatblt3.gui.TBLTIconListGUI;
 import com.github.orgs.kotobaminers.kotobatblt3.gui.TBLTPlayerGUI;
-import com.github.orgs.kotobaminers.kotobatblt3.resource.TBLTResource;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.Utility;
 
 public class TBLTCommandExecutor implements CommandExecutor {
@@ -147,17 +146,6 @@ public class TBLTCommandExecutor implements CommandExecutor {
 					.forEach(a -> inventory.addItem(a.createItem(64)));
 				Stream.of(ClickBlockChestAbility.values())
 					.forEach(a -> inventory.addItem(a.createItem(64)));
-				return true;
-			}
-		},
-
-
-		RESOURCE(Arrays.asList(Arrays.asList("resource")), "", "Get Resources", PermissionEnum.OP) {
-			@Override
-			public boolean perform(Player player , String[] args) {
-				Inventory inventory = player.getInventory();
-				Stream.of(TBLTResource.values())
-					.forEach(r -> inventory.addItem(r.create(64)));
 				return true;
 			}
 		},
@@ -482,19 +470,6 @@ public class TBLTCommandExecutor implements CommandExecutor {
 			}
 		},
 
-		ARENA_RESOURCE_HERE(Arrays.asList(Arrays.asList("arena", "a"), Arrays.asList("resourcehere")), "", "Get Resources for arena", PermissionEnum.OP) {
-			@Override
-			public boolean perform(Player player , String[] args) {
-				List<String> options = takeOptions(args);
-				Optional<TBLTArena> arena = new TBLTArenaMap().findUnique(player.getLocation())
-						.map(storage -> (TBLTArena) storage);
-				if(0 < options.size()) {
-					arena.ifPresent(a -> Stream.of(TBLTResource.values()).forEach(resource -> a.setResources(resource, Integer.parseInt(options.get(0)))));
-				}
-				arena.ifPresent(a -> player.openInventory(a.getResourceInventory()));
-				return true;
-			}
-		},
 
 		ARENA_JOIN_HERE(Arrays.asList(Arrays.asList("arena", "a"), Arrays.asList("joinhere", "jh")), "", "Join arena where you are", PermissionEnum.OP) {
 			@Override

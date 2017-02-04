@@ -1,10 +1,8 @@
 package com.github.orgs.kotobaminers.kotobatblt3.ability;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -25,7 +23,6 @@ import org.bukkit.util.Vector;
 
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaEffect;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaMap;
-import com.github.orgs.kotobaminers.kotobatblt3.resource.TBLTResource;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.Utility;
 
 public enum ClickEntityAbility implements ClickEntityAbilityInterface {
@@ -33,9 +30,7 @@ public enum ClickEntityAbility implements ClickEntityAbilityInterface {
 		Material.THIN_GLASS,
 		(short) 0,
 		"Mirror Image",
-		null,
-		new HashMap<TBLTResource, Integer>() {{
-		}}
+		null
 	) {
 		@Override
 		public boolean perform(PlayerInteractEntityEvent event) {
@@ -84,10 +79,7 @@ public enum ClickEntityAbility implements ClickEntityAbilityInterface {
 		Material.BLAZE_POWDER,
 		(short) 0,
 		"Fire resistance",
-		Arrays.asList("give fire resistance for 1 min"),
-		new HashMap<TBLTResource, Integer>() {{
-			put(TBLTResource.MAGIC_MANA, 1);
-		}}
+		Arrays.asList("give fire resistance for 1 min")
 	) {
 		@Override
 		public boolean perform(PlayerInteractEntityEvent event) {
@@ -107,10 +99,7 @@ public enum ClickEntityAbility implements ClickEntityAbilityInterface {
 		Material.IRON_INGOT,
 		(short) 0,
 		"Give a ride",
-		Arrays.asList("Summon a minecart when you touch with a player"),
-		new HashMap<TBLTResource, Integer>() {{
-			put(TBLTResource.MAGIC_MANA, 1);
-		}}
+		Arrays.asList("Summon a minecart when you touch with a player")
 	) {
 		@Override
 		public boolean perform(PlayerInteractEntityEvent event) {
@@ -133,10 +122,7 @@ public enum ClickEntityAbility implements ClickEntityAbilityInterface {
 			Material.FEATHER,
 			(short) 0,
 			"Throw above+1",
-			null,
-			new HashMap<TBLTResource, Integer>() {{
-				put(TBLTResource.MAGIC_MANA, 1);
-			}}
+			null
 		) {
 			@Override
 			public boolean perform(PlayerInteractEntityEvent event) {
@@ -154,10 +140,7 @@ public enum ClickEntityAbility implements ClickEntityAbilityInterface {
 			Material.FEATHER,
 			(short) 0,
 			"Throw away+1",
-			null,
-			new HashMap<TBLTResource, Integer>() {{
-				put(TBLTResource.MAGIC_MANA, 1);
-			}}
+			null
 		) {
 			@Override
 			public boolean perform(PlayerInteractEntityEvent event) {
@@ -188,15 +171,13 @@ public enum ClickEntityAbility implements ClickEntityAbilityInterface {
 	private short data;
 	private String name;
 	private List<String> lore;
-	private Map<TBLTResource, Integer> resourceConsumption;
 
 
-	private ClickEntityAbility(Material material, short data, String name, List<String> lore, Map<TBLTResource, Integer> resourceConsumption) {
+	private ClickEntityAbility(Material material, short data, String name, List<String> lore) {
 		this.material = material;
 		this.data = data;
 		this.name = name;
 		this.lore = lore;
-		this.resourceConsumption = resourceConsumption;
 	}
 
 	public static Optional<ClickEntityAbility> find(ItemStack item) {
@@ -223,11 +204,6 @@ public enum ClickEntityAbility implements ClickEntityAbilityInterface {
 	@Override
 	public int getConsumption() {
 		return 0;
-	}
-
-	@Override
-	public Map<TBLTResource, Integer> getResourceConsumption(Block block) {
-		return resourceConsumption;
 	}
 
 }

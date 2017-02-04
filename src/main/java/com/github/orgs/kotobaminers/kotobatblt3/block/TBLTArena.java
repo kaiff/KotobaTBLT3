@@ -5,10 +5,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -36,13 +34,11 @@ import com.github.orgs.kotobaminers.kotobatblt3.ability.ClickBlockChestAbility;
 import com.github.orgs.kotobaminers.kotobatblt3.citizens.UniqueNPC;
 import com.github.orgs.kotobaminers.kotobatblt3.game.TBLTJob;
 import com.github.orgs.kotobaminers.kotobatblt3.kotobatblt3.Setting;
-import com.github.orgs.kotobaminers.kotobatblt3.resource.ResourceHolder;
-import com.github.orgs.kotobaminers.kotobatblt3.resource.TBLTResource;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.RepeatingEffect;
 
 import net.md_5.bungee.api.ChatColor;
 
-public class TBLTArena extends KotobaBlockStorage implements ResourceHolder {
+public class TBLTArena extends KotobaBlockStorage {
 
 
 	private static final File DIRECTORY = new File(Setting.getPlugin().getDataFolder().getAbsolutePath() + "/Arena/");
@@ -50,7 +46,6 @@ public class TBLTArena extends KotobaBlockStorage implements ResourceHolder {
 	private static final String PREDICTION = "Prediction";
 
 
-	private Map<TBLTResource, Integer> resources = getInitialResources();
 	private List<Location> checkPoints = new ArrayList<>();
 	private Location currentPoint = null;
 	private Set<RepeatingEffect> repeatingEffects = new HashSet<>();
@@ -64,13 +59,6 @@ public class TBLTArena extends KotobaBlockStorage implements ResourceHolder {
 
 	public static TBLTArena create(String name, Player player) {
 		return (TBLTArena) (new TBLTArena(name)).setData(name, player);
-	}
-
-	public static Map<TBLTResource, Integer> getInitialResources() {
-		Map<TBLTResource, Integer> initialResources = new TreeMap<TBLTResource, Integer>();
-		Stream.of(TBLTResource.values())
-			.forEach(r -> initialResources.put(r, 0));
-		return initialResources;
 	}
 
 
@@ -141,7 +129,6 @@ public class TBLTArena extends KotobaBlockStorage implements ResourceHolder {
 
 	@Override
 	protected void initialize() {
-		this.resources = getInitialResources();
 		new BlockReplacerMap().getReplacers(this).forEach(r -> r.setBefore());
 		Holograms.removeHolograms(Setting.getPlugin(), this);
 		initializeUniqueNPCs();
@@ -193,10 +180,6 @@ public class TBLTArena extends KotobaBlockStorage implements ResourceHolder {
 		return DIRECTORY;
 	}
 
-	@Override
-	public Map<TBLTResource, Integer> getResources() {
-		return resources;
-	}
 
 	public List<Location> getCheckPoints() {
 		return checkPoints;

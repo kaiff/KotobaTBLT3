@@ -1,10 +1,7 @@
 package com.github.orgs.kotobaminers.kotobatblt3.ability;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -15,7 +12,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.TreeType;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -33,7 +29,6 @@ import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaUtility;
 import com.github.orgs.kotobaminers.kotobatblt3.block.EditableBlock;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaMap;
 import com.github.orgs.kotobaminers.kotobatblt3.kotobatblt3.Setting;
-import com.github.orgs.kotobaminers.kotobatblt3.resource.TBLTResource;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.Utility;
 
 public enum ProjectileAbility implements ProjectileAbilityInterface {
@@ -46,9 +41,7 @@ public enum ProjectileAbility implements ProjectileAbilityInterface {
 		null,
 		Arrays.asList(Action.RIGHT_CLICK_AIR, Action.RIGHT_CLICK_BLOCK),
 		0,
-		2d,
-		new HashMap<TBLTResource, Integer>() {{
-		}}
+		2d
 	) {
 		@Override
 		public void onHit(ProjectileHitEvent event) {
@@ -87,9 +80,7 @@ public enum ProjectileAbility implements ProjectileAbilityInterface {
 		null,
 		Arrays.asList(Action.RIGHT_CLICK_AIR, Action.RIGHT_CLICK_BLOCK),
 		0,
-		2d,
-		new HashMap<TBLTResource, Integer>() {{
-		}}
+		2d
 	) {
 		@Override
 		public void onHit(ProjectileHitEvent event) {
@@ -130,9 +121,7 @@ public enum ProjectileAbility implements ProjectileAbilityInterface {
 		null,
 		Arrays.asList(Action.RIGHT_CLICK_AIR, Action.RIGHT_CLICK_BLOCK),
 		0,
-		2d,
-		new HashMap<TBLTResource, Integer>() {{
-		}}
+		2d
 	) {
 		@Override
 		public void onHit(ProjectileHitEvent event) {
@@ -168,10 +157,7 @@ public enum ProjectileAbility implements ProjectileAbilityInterface {
 		null,
 		Arrays.asList(Action.RIGHT_CLICK_AIR, Action.RIGHT_CLICK_BLOCK),
 		0,
-		0.7d,
-		new HashMap<TBLTResource, Integer>() {{
-			put(TBLTResource.MAGIC_MANA, 1);
-		}}
+		0.7d
 	) {
 		@Override
 		public void onHit(ProjectileHitEvent event) {
@@ -208,10 +194,7 @@ public enum ProjectileAbility implements ProjectileAbilityInterface {
 		null,
 		Arrays.asList(Action.RIGHT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR),
 		1,
-		0.7d,
-		new HashMap<TBLTResource, Integer>() {{
-			put(TBLTResource.MAGIC_MANA, 1);
-		}}
+		0.7d
 	){
 		@Override
 		public boolean perform(PlayerInteractEvent event) {
@@ -242,10 +225,7 @@ public enum ProjectileAbility implements ProjectileAbilityInterface {
 		null,
 		Arrays.asList(Action.RIGHT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR),
 		1,
-		0.7d,
-		new HashMap<TBLTResource, Integer>() {{
-			put(TBLTResource.MAGIC_MANA, 1);
-		}}
+		0.7d
 	){
 		@Override
 		public boolean perform(PlayerInteractEvent event) {
@@ -273,10 +253,7 @@ public enum ProjectileAbility implements ProjectileAbilityInterface {
 		null,
 		Arrays.asList(Action.RIGHT_CLICK_AIR, Action.RIGHT_CLICK_BLOCK),
 		1,
-		0.7d,
-		new HashMap<TBLTResource, Integer>() {{
-			put(TBLTResource.MAGIC_MANA, 1);
-		}}
+		0.7d
 	) {
 
 		@Override
@@ -318,10 +295,7 @@ public enum ProjectileAbility implements ProjectileAbilityInterface {
 		null,
 		Arrays.asList(Action.RIGHT_CLICK_AIR, Action.RIGHT_CLICK_BLOCK),
 		0,
-		0.7d,
-		new HashMap<TBLTResource, Integer>() {{
-			put(TBLTResource.MAGIC_MANA, 1);
-		}}
+		0.7d
 	) {
 		@Override
 		public boolean perform(PlayerInteractEvent event) {
@@ -363,10 +337,7 @@ public enum ProjectileAbility implements ProjectileAbilityInterface {
 		null,
 		Arrays.asList(Action.RIGHT_CLICK_AIR, Action.RIGHT_CLICK_BLOCK),
 		1,
-		0.7d,
-		new HashMap<TBLTResource, Integer>() {{
-			put(TBLTResource.MAGIC_MANA, 1);
-		}}
+		0.7d
 	) {
 		@Override
 		public void onHit(ProjectileHitEvent event) {
@@ -411,9 +382,8 @@ public enum ProjectileAbility implements ProjectileAbilityInterface {
 	private List<Action> triggers;
 	private int consume;
 	private double speed;
-	private Map<TBLTResource, Integer> resourceConsumption;
 
-	private ProjectileAbility(EntityType type, Material material, short data, String name, List<String> lore, List<Action> triggers, int consume, double speed, Map<TBLTResource, Integer> resourceConsumption) {
+	private ProjectileAbility(EntityType type, Material material, short data, String name, List<String> lore, List<Action> triggers, int consume, double speed) {
 		this.type = type;
 		this.material = material;
 		this.data = data;
@@ -422,7 +392,6 @@ public enum ProjectileAbility implements ProjectileAbilityInterface {
 		this.triggers = triggers;
 		this.consume = consume;
 		this.speed = speed;
-		this.resourceConsumption = resourceConsumption;
 	}
 
 	public static List<ProjectileAbility> find(ItemStack itemStack) {
@@ -478,12 +447,7 @@ public enum ProjectileAbility implements ProjectileAbilityInterface {
 	}
 	@Override
 	public List<String> getLore() {
-		List<String> all = new ArrayList<String>();
-		if(lore != null) {
-			all.addAll(lore);
-		}
-		all.addAll(getResourceLore(null));
-		return all;
+		return lore;
 	}
 	@Override
 	public double getSpeed() {
@@ -492,9 +456,5 @@ public enum ProjectileAbility implements ProjectileAbilityInterface {
 	@Override
 	public int getConsumption() {
 		return consume;
-	}
-	@Override
-	public Map<TBLTResource, Integer> getResourceConsumption(Block block) {
-		return resourceConsumption;
 	}
 }

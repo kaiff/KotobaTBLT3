@@ -3,7 +3,6 @@ package com.github.orgs.kotobaminers.kotobatblt3.ability;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -35,7 +34,6 @@ import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTPortalManager;
 import com.github.orgs.kotobaminers.kotobatblt3.citizens.UniqueNPC;
 import com.github.orgs.kotobaminers.kotobatblt3.game.TBLTData;
 import com.github.orgs.kotobaminers.kotobatblt3.gui.TBLTPlayerGUI;
-import com.github.orgs.kotobaminers.kotobatblt3.resource.TBLTResource;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.RepeatingEffect;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.Utility;
 
@@ -444,11 +442,6 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface {
 	@Override
 	public int getConsumption() {
 		return consume;
-	}
-	@Override
-	public Map<TBLTResource, Integer> getResourceConsumption(Block clicked) {
-		if(clicked == null) return null;
-		return TBLTResource.getResources(findOptions(clicked.getLocation().clone()));
 	}
 
 

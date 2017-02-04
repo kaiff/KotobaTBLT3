@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Snowball;
@@ -29,7 +28,6 @@ public class ClickAbilityListener implements Listener {
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
-		Block block = event.getClickedBlock();
 
 		if(!Utility.isTBLTPlayer(player)) return;
 
@@ -54,15 +52,9 @@ public class ClickAbilityListener implements Listener {
 						ability -> {
 							boolean successed = false;
 							if(ability.isCorrectAction(event.getAction())) {
-								TBLTArena arena = (TBLTArena) storage;
-								if(!arena.hasResources(ability.getResourceConsumption(block))) {
-									player.openInventory(arena.getResourceConsumptionInventory(ability.getResourceConsumption(block)));
-								} else {
-									successed = ability.perform(event);//Perform ability here
-									if(successed) {
-										arena.consumeResources(ability.getResourceConsumption(block));
-										ability.consumeInHand(player);
-									}
+								successed = ability.perform(event);//Perform ability here
+								if(successed) {
+									ability.consumeInHand(player);
 								}
 							}
 							return successed;
@@ -108,16 +100,9 @@ public class ClickAbilityListener implements Listener {
 				new TBLTArenaMap().findUnique(player.getLocation())
 					.map(arena -> (TBLTArena) arena)
 					.ifPresent(arena -> {
-						if(!arena.hasResources(ability.getResourceConsumption(null))) {
-							player.openInventory(arena.getResourceConsumptionInventory(ability.getResourceConsumption(null)));
-							KotobaSound.SHEAR.play(player.getLocation());
-							return;
-						}
-
 						boolean successed = false;
 						successed = ability.perform(event);//Perform ability here
 						if(successed) {
-							arena.consumeResources(ability.getResourceConsumption(null));
 							ability.consumeInHand(player);
 						} else {
 							KotobaSound.SHEAR.play(player.getLocation());

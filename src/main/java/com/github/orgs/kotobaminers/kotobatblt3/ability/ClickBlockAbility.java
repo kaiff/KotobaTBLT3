@@ -1,11 +1,8 @@
 package com.github.orgs.kotobaminers.kotobatblt3.ability;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -31,140 +28,9 @@ import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArena;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaMap;
 import com.github.orgs.kotobaminers.kotobatblt3.gui.TBLTPlayerGUI;
 import com.github.orgs.kotobaminers.kotobatblt3.kotobatblt3.Setting;
-import com.github.orgs.kotobaminers.kotobatblt3.resource.ResourceHolder;
-import com.github.orgs.kotobaminers.kotobatblt3.resource.TBLTResource;
-import com.github.orgs.kotobaminers.kotobatblt3.resource.TBLTResourceBlock;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.Utility;
 
 public enum ClickBlockAbility implements ClickBlockAbilityInterface {
-
-
-	CRYSTAL_CRUSHER(
-		Material.DIAMOND_PICKAXE,
-		(short) 0,
-		"Crystal Crusher",
-		Arrays.asList("This special item is used to gather the essence from crystals."),
-		Arrays.asList(Action.RIGHT_CLICK_BLOCK),
-		0,
-		new HashMap<TBLTResource, Integer>() {{
-		}}
-	) {
-		@Override
-		public boolean perform(PlayerInteractEvent event) {
-			Location location = event.getClickedBlock().getLocation();
-			List<Location> locations = Utility.getSpherePositions(location, 3).stream()
-				.filter(loc -> loc.getBlock().getType() == Material.EMERALD_BLOCK)
-				.collect(Collectors.toList());
-			if(0 < locations.size()) {
-				locations.forEach(loc -> {
-					KotobaEffect.MAGIC_MIDIUM.playEffect(loc);
-					KotobaEffect.BREAK_BLOCK_MIDIUM.playEffect(loc);
-					loc.getBlock().setType(Material.AIR);
-					KotobaItemStack.consume(event.getPlayer().getInventory(), event.getPlayer().getInventory().getItemInHand(), 64);
-					event.getPlayer().getInventory().addItem(TBLTItem.PORTAL_CRYSTAL.createItem(1));
-				});
-				KotobaEffect.MAGIC_MIDIUM.playSound(location);
-			}
-			return false;
-		}
-	},
-
-
-	RESOURCES(
-		Material.ENDER_CHEST,
-		(short) 0,
-		"Resources",
-		null,
-		Arrays.asList(Action.RIGHT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR),
-		0,
-		new HashMap<TBLTResource, Integer>() {{
-		}}
-	) {
-		@Override
-		public boolean perform(PlayerInteractEvent event) {
-			new TBLTArenaMap().findUnique(event.getPlayer().getLocation())
-				.ifPresent(a -> event.getPlayer().openInventory(((TBLTArena) a).getResourceInventory()));
-			return true;
-		}
-	},
-
-
-	SYPHON_MANA(
-		Material.EMERALD,
-		(short) 0,
-		"Syphon Mana",
-		null,
-		Arrays.asList(Action.RIGHT_CLICK_BLOCK),
-		1,
-		new HashMap<TBLTResource, Integer>() {{
-		}}
-	) {
-		@Override
-		public boolean perform(PlayerInteractEvent event) {
-			Block block = event.getClickedBlock();
-
-			return new TBLTArenaMap().findUnique(event.getPlayer().getLocation())
-				.map(a -> {
-					if(block.getState() instanceof Chest) {
-						Chest chest = (Chest) block.getState();
-						Stream.of(chest.getInventory().getContents())
-							.filter(i -> i != null)
-							.filter(i -> i.getType() != Material.AIR)
-							.forEach(i ->
-								TBLTResourceBlock.find(i.getType())
-									.ifPresent(r -> {
-										Stream.iterate(0, j -> j)
-											.limit(i.getAmount())
-											.forEach(j -> {
-												((ResourceHolder) a).addResources(r);
-												KotobaEffect.dropItemEffect(r.createResource(), block.getLocation().add(0, 1, 0));
-											});
-									})
-							);
-
-						chest.getInventory().clear();
-						TBLTResourceBlock.siphon(block);
-						return true;
-
-					} else {
-						return  TBLTResourceBlock.find(block.getType())
-							.map(r -> {
-								((ResourceHolder) a).addResources(r);
-								TBLTResourceBlock.siphon(block);
-								KotobaEffect.dropItemEffect(r.createResource(), block.getLocation().add(0, 1, 0));
-								return true;
-							}).orElse(false);
-					}
-				}).orElse(false);
-		}
-	},
-
-
-	EXTRACT_MANA(
-		Material.GOLD_PICKAXE,
-		(short) 0,
-		"Mana Extracter",
-		null,
-		Arrays.asList(Action.RIGHT_CLICK_BLOCK),
-		1,
-		new HashMap<TBLTResource, Integer>() {{
-		}}
-			) {
-		@Override
-		public boolean perform(PlayerInteractEvent event) {
-			Block block = event.getClickedBlock();
-			return new TBLTArenaMap().findUnique(event.getPlayer().getLocation())
-				.map(a ->
-					TBLTResourceBlock.find(block.getType())
-						.map(r -> {
-							((ResourceHolder) a).addResources(r);
-							TBLTResourceBlock.extract(block);
-							KotobaEffect.dropItemEffect(r.createResource(), block.getLocation().add(0, 1, 0));
-							return true;
-						}).orElse(false)
-				).orElse(false);
-		}
-	},
 
 
 	PREDICTION(
@@ -173,10 +39,7 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 		"Prediction",
 		Arrays.asList("Are you stuck?", "Use prediction to get a useful hint about what to do next."),
 		Arrays.asList(Action.RIGHT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR),
-		0,
-		new HashMap<TBLTResource, Integer>() {{
-			put(TBLTResource.MAGIC_MANA, 1);
-		}}
+		0
 	) {
 		@Override
 		public boolean perform(PlayerInteractEvent event) {
@@ -225,10 +88,7 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 		"Lock picking",
 		Arrays.asList("With this tool you can pick any lock.", "Use the lock pick on locked chest to instantly receive the contents."),
 		Arrays.asList(Action.RIGHT_CLICK_BLOCK),
-		0,
-		new HashMap<TBLTResource, Integer>() {{
-			put(TBLTResource.MAGIC_MANA, 1);
-		}}
+		0
 	) {
 		@Override
 		public boolean perform(PlayerInteractEvent event) {
@@ -256,9 +116,7 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 		"Rewind Time",
 		Arrays.asList("You can go back in time to the last checkpoint with this item."),
 		Arrays.asList(Action.RIGHT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR),
-		0,
-		new HashMap<TBLTResource, Integer>() {{
-		}}
+		0
 	) {
 		@Override
 		public boolean perform(PlayerInteractEvent event) {
@@ -273,7 +131,6 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 					if(players.stream().allMatch(p -> p.isSneaking())) {
 						TBLTArena a = (TBLTArena) arena;
 						a.load();
-						a.initializeResources();
 						players.forEach(p -> a.continueFromCurrent((Player) p));
 					}
 				});
@@ -288,9 +145,7 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 		"Clairvoyance",
 		Arrays.asList("You can see the contents of locked chests with this skill."),
 		Arrays.asList(Action.RIGHT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR),
-		0,
-		new HashMap<TBLTResource, Integer>() {{
-		}}
+		0
 	) {
 		@Override
 		public boolean perform(PlayerInteractEvent event) {
@@ -314,9 +169,7 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 		"Psychokinesis",
 		null,
 		Arrays.asList(Action.RIGHT_CLICK_BLOCK),
-		0,
-		new HashMap<TBLTResource, Integer>() {{
-		}}
+		0
 	) {
 		@SuppressWarnings("deprecation")
 		@Override
@@ -351,9 +204,7 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 		"Teleport+5",
 		null,
 		Arrays.asList(Action.RIGHT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR),
-		0,
-		new HashMap<TBLTResource, Integer>() {{
-		}}
+		0
 	) {
 		@Override
 		public boolean perform(PlayerInteractEvent event) {
@@ -375,10 +226,7 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 		"Transition+5",
 		Arrays.asList("Exchange positions with each other", "Both of two players have to jump"),
 		Arrays.asList(Action.RIGHT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR),
-		1,
-		new HashMap<TBLTResource, Integer>() {{
-			put(TBLTResource.MAGIC_MANA, 1);
-		}}
+		1
 	) {
 		@Override
 		public boolean perform(PlayerInteractEvent event) {
@@ -409,9 +257,7 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 		"Drone",
 		null,
 		Arrays.asList(Action.RIGHT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR),
-		1,
-		new HashMap<TBLTResource, Integer>() {{
-		}}
+		1
 	) {
 		@Override
 		public boolean perform(PlayerInteractEvent event) {
@@ -423,110 +269,6 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 			return false;
 		}
 	},
-
-	TALK(
-		Material.SKULL_ITEM,
-		(short) 3,
-		"Talk with people",
-		null,
-		Arrays.asList(Action.RIGHT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR),
-		0,
-		new HashMap<TBLTResource, Integer>() {{
-		}}
-	) {
-		@Override
-		public boolean perform(PlayerInteractEvent event) {
-			return true;
-		}
-	},
-
-//	@Deprecated
-//	MAGIC_BLOCK_RANGE(
-//		Material.ENCHANTED_BOOK,
-//		(short) 0,
-//		"Magic block range",
-//		null,
-//		Arrays.asList(Action.RIGHT_CLICK_BLOCK),
-//		0,
-//		new HashMap<TBLTResource, Integer>() {{
-//		}}
-//			) {
-//		@Override
-//		public boolean perform(PlayerInteractEvent event) {
-//			Block block = event.getClickedBlock();
-//			MagicBlock.find(block.getType())
-//			.ifPresent(b -> b.showRange(block.getLocation()));
-//			return true;
-//		}
-//	},
-//
-//	@Deprecated
-//	MAGIC_BLOCK_START(
-//			Material.DIAMOND,
-//			(short) 0,
-//			"Magic",
-//			null,
-//			Arrays.asList(Action.RIGHT_CLICK_BLOCK),
-//			0,
-//			new HashMap<TBLTResource, Integer>() {{
-//			}}
-//			) {
-//		@Override
-//		public boolean perform(PlayerInteractEvent event) {
-//			Block block = event.getClickedBlock();
-//			MagicBlock.find(block.getType())
-//			.filter(b -> b.equals(MagicBlock.START))
-//			.ifPresent(b -> b.perform(block.getLocation()));
-//			return true;
-//		}
-//	},
-//
-//	@Deprecated
-//	MAGIC_BLOCK_CHAIN(
-//			Material.ENCHANTED_BOOK,
-//			(short) 0,
-//			"Replace a chain block",
-//			null,
-//			Arrays.asList(Action.RIGHT_CLICK_BLOCK),
-//			1,
-//			new HashMap<TBLTResource, Integer>() {{
-//			}}
-//			) {
-//		@Override
-//		public boolean perform(PlayerInteractEvent event) {
-//			Block block = event.getClickedBlock();
-//			if(block.getType() == Material.CHEST) {
-//				KotobaEffect.MAGIC_MIDIUM.playEffect(block.getLocation());
-//				KotobaEffect.MAGIC_MIDIUM.playSound(block.getLocation());
-//				block.setType(Material.LAPIS_BLOCK);
-//			}
-//			return true;
-//		}
-//	},
-//
-//	@Deprecated
-//	MAGIC_BLOCK_GREEN(
-//			Material.EMERALD_BLOCK,
-//			(short) 0,
-//			"Place a magic block",
-//			null,
-//			Arrays.asList(Action.RIGHT_CLICK_BLOCK),
-//			0,
-//			new HashMap<TBLTResource, Integer>() {{
-//			}}
-//			) {
-//		@Override
-//		public boolean perform(PlayerInteractEvent event) {
-//			BlockFace face = event.getBlockFace();
-//			Location location = event.getClickedBlock().getLocation();
-//			Location newLocation = location.clone().add(face.getModX(), face.getModY(), face.getModZ());
-//			Block block = location.getWorld().getBlockAt(newLocation);
-//			block.setType(MagicBlock.CHEST.getMaterial());
-//			KotobaEffect.MAGIC_MIDIUM.playEffect(newLocation);
-//			KotobaEffect.MAGIC_MIDIUM.playSound(newLocation);
-//			return true;
-//		}
-//	},
 	;
 
 	private Material material;
@@ -535,16 +277,14 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 	private List<String> lore;
 	private List<Action> triggers;
 	private int consume;
-	private Map<TBLTResource, Integer> resourceConsumption;
 
-	private ClickBlockAbility(Material material, short data, String name, List<String> lore, List<Action> triggers, int consume, Map<TBLTResource, Integer> resourceConsumption) {
+	private ClickBlockAbility(Material material, short data, String name, List<String> lore, List<Action> triggers, int consume) {
 		this.material = material;
 		this.data = data;
 		this.name = name;
 		this.lore = lore;
 		this.triggers = triggers;
 		this.consume = consume;
-		this.resourceConsumption = resourceConsumption;
 	}
 
 	public static List<ClickBlockAbility> find(ItemStack item) {
@@ -567,12 +307,7 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 	}
 	@Override
 	public List<String> getLore() {
-		List<String> all = new ArrayList<String>();
-		if(lore != null) {
-			all.addAll(lore);
-		}
-		all.addAll(getResourceLore(null));
-		return all;
+		return lore;
 	}
 	@Override
 	public List<Action> getTriggers() {
@@ -581,9 +316,5 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 	@Override
 	public int getConsumption() {
 		return consume;
-	}
-	@Override
-	public Map<TBLTResource, Integer> getResourceConsumption(Block block) {
-		return resourceConsumption;
 	}
 }
