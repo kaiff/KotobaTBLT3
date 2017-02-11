@@ -10,6 +10,33 @@ import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStackIcon;
 public enum TBLTItemStackIcon implements KotobaItemStackIcon {
 
 
+	TEST(
+			Material.APPLE,
+			(short) 0,
+			"Test",
+			null,
+			IconFindType.SIMILAR
+	),
+
+
+	MAGIC_WAND(
+			Material.REDSTONE_TORCH_ON,
+			(short) 0,
+			"Magic Wand",
+			null,
+			IconFindType.SIMILAR
+	),
+
+
+	MAGIC_SPADE(
+			Material.DIAMOND_SPADE,
+			(short) 0,
+			"Magic Spade",
+			null,
+			IconFindType.SIMILAR
+	),
+
+
 	PLAYER_GATE_KEY(
 			Material.GLASS,
 			(short) 0,
@@ -37,7 +64,7 @@ public enum TBLTItemStackIcon implements KotobaItemStackIcon {
 	),
 
 	BLUE_GEM(
-			Material.EMERALD_BLOCK,
+			Material.DIAMOND_BLOCK,
 			(short) 0,
 			"Blue Gem",
 			null,
@@ -85,44 +112,52 @@ public enum TBLTItemStackIcon implements KotobaItemStackIcon {
 	),
 
 
-		WRITTEN_PREDICTION(
+	WRITTEN_PREDICTION(
 			Material.WRITTEN_BOOK,
 			(short) 0,
 			"A written prediction",
 			null,
 			IconFindType.EXCEPT_LORE
-		),
-
-		PREDICTION(
-				Material.ENCHANTED_BOOK,
-				(short) 0,
-				"Prediction",
-				Arrays.asList("Are you stuck?", "Use prediction to get a useful hint about what to do next."),
-				IconFindType.SIMILAR
 			),
-		LOCK_PICKING(
-				Material.IRON_HOE,
-				(short) 0,
-				"Lock picking",
-				Arrays.asList("With this tool you can pick any lock.", "Use the lock pick on locked chest to instantly receive the contents."),
-				IconFindType.SIMILAR
+
+	PREDICTION(
+			Material.ENCHANTED_BOOK,
+			(short) 0,
+			"Prediction",
+			Arrays.asList("Are you stuck?", "Use prediction to get a useful hint about what to do next."),
+			IconFindType.SIMILAR
 			),
-		REWIND_TIME(
-				Material.WATCH,
-				(short) 0,
-				"Rewind Time",
-				Arrays.asList("You can go back in time to the last checkpoint with this item."),
-				IconFindType.SIMILAR
+	LOCK_PICKING(
+			Material.IRON_HOE,
+			(short) 0,
+			"Lock picking",
+			Arrays.asList("With this tool you can pick any lock.", "Use the lock pick on locked chest to instantly receive the contents."),
+			IconFindType.SIMILAR
 			),
-		CLAIRVOYANCE(
-				Material.GLASS,
-				(short) 0,
-				"Clairvoyance",
-				Arrays.asList("You can see the contents of locked chests with this skill."),
-				IconFindType.SIMILAR
-			) ,
+	REWIND_TIME(
+			Material.WATCH,
+			(short) 0,
+			"Rewind Time",
+			Arrays.asList("You can go back in time to the last checkpoint with this item."),
+			IconFindType.SIMILAR
+			),
+
+	CLAIRVOYANCE(
+			Material.GLASS,
+			(short) 0,
+			"Clairvoyance",
+			Arrays.asList("You can see the contents of locked chests with this skill."),
+			IconFindType.SIMILAR
+	) ,
 
 
+	INVESTIGATE(
+			Material.TRIPWIRE_HOOK,
+			(short) 0,
+			"Investigate",
+			Arrays.asList("Investigate"),
+			IconFindType.SIMILAR
+	) ,
 	;
 
 

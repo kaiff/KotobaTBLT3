@@ -22,6 +22,7 @@ import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.util.Vector;
 
 import com.github.orgs.kotobaminers.kotobaapi.ability.ClickBlockAbilityInterface;
+import com.github.orgs.kotobaminers.kotobaapi.block.KotobaBlockData;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaEffect;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStack;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStackIcon;
@@ -36,17 +37,64 @@ import com.github.orgs.kotobaminers.kotobatblt3.utility.Utility;
 public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 
 
-	QUEST_LIST(
-		TBLTItemStackIcon.QUEST_LIST,
-		Arrays.asList(Action.RIGHT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR),
-		0
-	) {
-		@Override
-		public boolean perform(PlayerInteractEvent event) {
+	MAGIC_WAND(
+			TBLTItemStackIcon.MAGIC_WAND,
+			Arrays.asList(Action.RIGHT_CLICK_BLOCK),
+			0
+		) {
+			@Override
+			public boolean perform(PlayerInteractEvent event) {
+				Block block = event.getClickedBlock();
+				List<ItemStack> gems = Stream.of(TBLTItemStackIcon.GREEN_GEM, TBLTItemStackIcon.RED_GEM)
+					.filter(i -> block.getType() == i.getMaterial())
+					.map(i -> i.create(1))
+					.collect(Collectors.toList());
+				if(0 < gems.size()) {
+					new KotobaBlockData(block.getLocation(), Material.AIR, 0).placeBlock();
+					KotobaEffect.MAGIC_MIDIUM.playEffect(block.getLocation());
+					KotobaEffect.MAGIC_MIDIUM.playSound(block.getLocation());
+					gems.forEach(g -> event.getPlayer().getInventory().addItem(g));
+					return true;
+				}
+				return false;
+			}
+		},
 
-			return false;
-		}
-	},
+
+	MAGIC_SPADE(
+			TBLTItemStackIcon.MAGIC_SPADE,
+			Arrays.asList(Action.RIGHT_CLICK_BLOCK),
+			0
+		) {
+			@Override
+			public boolean perform(PlayerInteractEvent event) {
+				Block block = event.getClickedBlock();
+				List<ItemStack> gems = Stream.of(TBLTItemStackIcon.GREEN_GEM, TBLTItemStackIcon.BLUE_GEM)
+					.filter(i -> block.getType() == i.getMaterial())
+					.map(i -> i.create(1))
+					.collect(Collectors.toList());
+				if(0 < gems.size()) {
+					new KotobaBlockData(block.getLocation(), Material.AIR, 0).placeBlock();
+					KotobaEffect.MAGIC_MIDIUM.playEffect(block.getLocation());
+					KotobaEffect.MAGIC_MIDIUM.playSound(block.getLocation());
+					gems.forEach(g -> event.getPlayer().getInventory().addItem(g));
+					return true;
+				}
+				return false;
+			}
+		},
+
+
+	QUEST_LIST(
+			TBLTItemStackIcon.QUEST_LIST,
+			Arrays.asList(Action.RIGHT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR),
+			0
+		) {
+			@Override
+			public boolean perform(PlayerInteractEvent event) {
+				return false;
+			}
+		},
 
 
 	PREDICTION(

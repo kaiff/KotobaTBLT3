@@ -51,6 +51,7 @@ public class TBLTCommandExecutor implements CommandExecutor {
 
 	private final KotobaTBLT3 plugin;
 
+
 	public TBLTCommandExecutor (KotobaTBLT3 plugin) {
 		this.plugin = plugin;
 	}

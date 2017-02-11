@@ -59,6 +59,8 @@ public interface KotobaItemStackIcon {
 				ItemMeta itemMeta1 = itemStack1.getItemMeta();
 				ItemMeta itemMeta2 = itemStack2.getItemMeta();
 
+				if(itemMeta1 == null || itemMeta2 == null) return false;
+
 				boolean type = itemStack1.getType() == itemStack2.getType();
 				boolean data= itemStack1.getDurability() == itemStack2.getDurability();
 				boolean name = itemMeta1.getDisplayName() == itemMeta2.getDisplayName();

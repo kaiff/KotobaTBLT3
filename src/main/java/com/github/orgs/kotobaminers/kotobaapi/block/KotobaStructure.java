@@ -15,17 +15,6 @@ import org.bukkit.util.Vector;
 public interface KotobaStructure {
 	Map<Vector, Material> getStructure();
 
-//	default boolean isStructure(Location location) {
-//		Block block = location.getBlock();
-//		return getStructures().stream().anyMatch(s -> s.entrySet().stream()
-//			.filter(e -> e.getValue() == block.getType())
-//			.anyMatch(e -> {
-//				Location origin = block.getLocation().clone().subtract(e.getKey());
-//				return s.entrySet().stream()
-//					.allMatch(e2 -> origin.clone().add(e2.getKey()).getBlock().getType() == e2.getValue());
-//			}));
-//	}
-
 	default List<Map<Vector, Material>> getStructures() {
 		Map<Vector, Material> rotated = new HashMap<Vector, Material>();
 		getStructure().entrySet().stream()
@@ -33,7 +22,7 @@ public interface KotobaStructure {
 		return Arrays.asList(getStructure(), rotated);
 	}
 
-	default List<Location> findOrigin(Location location) {
+	default List<Location> findOrigins(Location location) {
 		List<Location> origins = new ArrayList<Location>();
 
 		Block block = location.getBlock();

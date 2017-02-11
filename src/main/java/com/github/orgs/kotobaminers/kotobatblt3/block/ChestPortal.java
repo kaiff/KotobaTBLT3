@@ -1,9 +1,6 @@
 package com.github.orgs.kotobaminers.kotobatblt3.block;
 
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -12,38 +9,25 @@ import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
 
-import com.github.orgs.kotobaminers.kotobaapi.block.ConfigChest;
+import com.github.orgs.kotobaminers.kotobaapi.block.KotobaBlockData;
 import com.github.orgs.kotobaminers.kotobaapi.block.KotobaPortalInterface;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaEffect;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStackIcon;
 import com.github.orgs.kotobaminers.kotobatblt3.ability.ChestKey;
+import com.github.orgs.kotobaminers.kotobatblt3.ability.ChestReader;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTItemStackIcon;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.Utility;
 
-public enum ChestPortal implements KotobaPortalInterface, ConfigChest {
+public enum ChestPortal implements KotobaPortalInterface {
 	GEM_PORTAL(
 		TBLTItemStackIcon.GEM_PORTAL_KEY_3X3,
-		new HashMap<Vector, Material>(){{
-			put(new Vector(1,0,1), Material.ENDER_PORTAL);
-			put(new Vector(1,0,0), Material.ENDER_PORTAL);
-			put(new Vector(1,0,-1), Material.ENDER_PORTAL);
-			put(new Vector(0,0,1), Material.ENDER_PORTAL);
-			put(new Vector(0,0,0), Material.ENDER_PORTAL);
-			put(new Vector(0,0,-1), Material.ENDER_PORTAL);
-			put(new Vector(-1,0,1), Material.ENDER_PORTAL);
-			put(new Vector(-1,0,0), Material.ENDER_PORTAL);
-			put(new Vector(-1,0,-1), Material.ENDER_PORTAL);
-		}},
-		new Vector(0, -2, 0)
+		Material.ENDER_PORTAL,
+		TBLTConfigChest.THREE_BY_THREE
 	) {
 
 		@Override
@@ -88,23 +72,39 @@ public enum ChestPortal implements KotobaPortalInterface, ConfigChest {
 			return true;
 		}
 
+
 		@Override
-		public boolean canOpen(PlayerInteractEvent event) {
-			Block block = event.getClickedBlock().getRelative(event.getBlockFace());
-			findChests(block.getLocation()).stream()
-				;
+		public boolean canOpen(Location center) {
+			if(center.getBlock().getState() instanceof Chest) {
+				return ChestReader.checkPattern3By3((Chest) center.getBlock().getState(), new Vector(0, 2, 0));
+			}
 			return false;
+		}
+
+		@Override
+		public void failOpen(Location center) {
+			List<Location> locations = getPositions().stream()
+				.map(vec -> center.clone().add(vec))
+				.collect(Collectors.toList());
+
+			if(locations.stream().allMatch(l -> l.getBlock().getType() != Material.AIR)) {
+				KotobaEffect.EXPLODE_SMALL.playSound(center);
+				locations.forEach(l -> {
+					KotobaEffect.EXPLODE_SMALL.playEffect(l);
+					new KotobaBlockData(l, Material.AIR, 0).placeBlock();
+				});
+			}
+
 		}
 
 
 	},
 
+
 	CHECK_POINT_PORTAL(
 		TBLTItemStackIcon.DUMMY,
-		new HashMap<Vector, Material>(){{
-			put(new Vector(0,0,0), Material.ENDER_PORTAL);
-		}},
-		new Vector(0, -2, 0)
+		Material.ENDER_PORTAL,
+		TBLTConfigChest.VERTICAL
 	) {
 		@Override
 		public boolean enterPortal(PlayerPortalEvent event) {
@@ -139,55 +139,39 @@ public enum ChestPortal implements KotobaPortalInterface, ConfigChest {
 		}
 
 		@Override
-		public boolean canOpen(PlayerInteractEvent event) {
+		public boolean canOpen(Location center) {
 			return true;
 		}
+		@Override
+		public void failOpen(Location center) {
+		}
+
 	},
 	;
 
 
 	private KotobaItemStackIcon icon;
-	private Map<Vector, Material> pattern;
-	private Vector chestPosition;
+	private Material portal;
+	protected TBLTConfigChest chest;
 
 
-	private ChestPortal(KotobaItemStackIcon icon, Map<Vector, Material> pattern, Vector chestPosition) {
+	private ChestPortal(KotobaItemStackIcon icon, Material portal, TBLTConfigChest chest) {
 		this.icon = icon;
-		this.pattern = pattern;
-		this.chestPosition = chestPosition;
+		this.portal = portal;
+		this.chest = chest;
 	}
 
 
 	@Override
-	public List<Chest> findChests(Location location) {
-		return pattern.keySet().stream()
-			.map(v -> location.clone().subtract(v).add(chestPosition))
-			.filter(l -> l.getBlock().getState() instanceof Chest)
-			.map(l -> (Chest) l.getBlock().getState())
-			.filter(c -> Stream.of(c.getInventory().getContents()).filter(i -> i != null).anyMatch(i -> getKey().isIconItemStack(i)))
-			.collect(Collectors.toList());
-	}
-
-
-	@Override
-	public void openPortal(Location center) {
-		Location origin = center.clone();
-		pattern.entrySet().forEach(entry -> {
-			Location location = origin.clone().add(entry.getKey());
-			location.getBlock().setType(entry.getValue());
+	public void successOpen(Location center) {
+		chest.getPositions().forEach(vec -> {
+			Location location = center.clone().add(vec);
+			location.getBlock().setType(portal);
 			location.getWorld().playEffect(location.clone().add(0,1,0), Effect.ENDER_SIGNAL, 0);
 		});
-		KotobaEffect.PORTAL.playSound(origin);
+		KotobaEffect.PORTAL.playSound(center);
 	}
 
-
-	public ItemStack createKey(String point) {
-		ItemStack result = icon.create(1);
-		ItemMeta itemMeta = result.getItemMeta();
-		itemMeta.setLore(Arrays.asList(point));
-		result.setItemMeta(itemMeta);
-		return result;
-	}
 
 	protected boolean isSinglePortal(Location location) {
 		long singleKeyNumber = findChests(location).stream()
@@ -201,11 +185,28 @@ public enum ChestPortal implements KotobaPortalInterface, ConfigChest {
 	}
 
 
-	@Override
-	public KotobaItemStackIcon getKey() {
-		return icon;
+	public List<Chest> findChests(Location location) {
+		return chest.findChests(location).stream()
+			.filter(c -> Stream.of(c.getInventory().getContents()).filter(i -> i != null).anyMatch(i -> icon.isIconItemStack(i)))
+			.collect(Collectors.toList());
 	}
 
+
+	@Override
+	public List<Vector> getPositions() {
+		return chest.getPositions();
+	}
+
+
+	@Override
+	public Material getPortal() {
+		return portal;
+	}
+
+	@Override
+	public List<Location> findCenters(Location location) {
+		return findChests(location).stream().map(c -> c.getLocation()).collect(Collectors.toList());
+	}
 
 
 }

@@ -6,7 +6,9 @@ C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminer
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\database\PlayerData.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\kotobaapi\PotionEnumInterface.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\ability\ItemStackConsumer.java
+C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\block\KotobaConfigChest.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\block\Takable.java
+C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\ability\Gems.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\ability\GeneratableBlockListener.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\block\TBLTArenaMap.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\block\BlockReplacerMap.java
@@ -14,10 +16,10 @@ C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminer
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\kotobaapi\MessageEnumInterface.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\ability\ClickAbilityListener.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\block\BlockReplacer.java
+C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\block\InteractiveChest.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\sentence\ConversationEditorMap.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\sentence\ConversationGUIIcon.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\block\TBLTArena.java
-C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\block\Interactive.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\sentence\ConversationEditor.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\ability\ItemStackAbilityInterface.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\ability\ProjectileAbilityInterface.java
@@ -25,10 +27,10 @@ C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminer
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\game\TBLTJob.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\block\Placeble.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\gui\TBLTIconListGUI.java
+C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\block\KotobaConfigChestInterface.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\ability\ClickBlockChestAbility.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\sentence\Holograms.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\utility\TBLTItemStackIcon.java
-C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\block\ConfigChest.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\ability\ChestKey.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\block\KotobaPortalInterface.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\sentence\ConversationGUI.java
@@ -65,6 +67,7 @@ C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminer
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\block\EditableBlock.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\ability\ProjectileAbility.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\userinterface\ChestGUI.java
+C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\block\TBLTConfigChest.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\gui\TBLTIcon.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\gui\IconCreatorUtility.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\userinterface\IconListGUI.java

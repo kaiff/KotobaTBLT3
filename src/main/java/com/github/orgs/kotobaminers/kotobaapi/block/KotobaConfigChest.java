@@ -11,15 +11,17 @@ import org.bukkit.inventory.ItemStack;
 
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStackIcon;
 
-public interface ConfigChest {
+public interface KotobaConfigChest {
 
 	List<Chest> findChests(Location location);
 	KotobaItemStackIcon getKey();
+
 
 	default boolean hasChests(Location location) {
 		if(0 < findChests(location).size()) return true;
 		return false;
 	}
+
 
 	default List<ItemStack> findOptions(Location location) {
 		List<ItemStack> contents = findChests(location).stream()

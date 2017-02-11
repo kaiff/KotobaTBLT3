@@ -15,7 +15,7 @@ import org.bukkit.util.Vector;
 public class ChestReader {
 
 
-	public static boolean checkPattern(Chest chest, Vector offset) {
+	public static boolean checkPattern3By3(Chest chest, Vector offset) {
 		Location origin = chest.getLocation().clone().add(offset);
 		return findPattern3By3(chest)
 			.map(pattern -> pattern.entrySet().stream().map(e -> origin.clone().add(e.getKey()).getBlock().getType() == e.getValue()).allMatch(b -> b == true))

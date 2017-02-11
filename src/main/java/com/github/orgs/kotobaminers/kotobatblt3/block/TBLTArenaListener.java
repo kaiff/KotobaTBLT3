@@ -36,7 +36,6 @@ import org.bukkit.potion.Potion;
 
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaEffect;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStack;
-import com.github.orgs.kotobaminers.kotobatblt3.ability.InteractiveBlockAbility;
 import com.github.orgs.kotobaminers.kotobatblt3.ability.ProjectileAbility;
 import com.github.orgs.kotobaminers.kotobatblt3.gui.TBLTPlayerGUI;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.Utility;
@@ -69,9 +68,13 @@ public class TBLTArenaListener implements Listener {
 		if(player.getItemInHand().getType() != Material.AIR) return;
 		if(!Utility.isTBLTPlayer(player)) return;
 
-		Arrays.asList(InteractiveBlockAbility.values(), InteractiveStructure.values()).stream()
-			.flatMap(interactives -> Stream.of(interactives))
+		Stream.of(InteractiveStructure.values())
 			.forEach(interactive -> interactive.interact(event));
+
+//		Arrays.asList(InteractiveBlockAbility.values(), InteractiveStructure.values()).stream()
+//			.flatMap(interactives -> Stream.of(interactives))
+//			.forEach(interactive -> interactive.interact(event));
+
 	}
 
 
@@ -201,6 +204,7 @@ public class TBLTArenaListener implements Listener {
 		}
 	}
 
+
 	@EventHandler
 	void onItemDrop(PlayerDropItemEvent event) {
 		if(Utility.isTBLTPlayer(event.getPlayer())) {
@@ -240,6 +244,7 @@ public class TBLTArenaListener implements Listener {
 		}
 	}
 
+
 	@EventHandler
 	void onInventoryClick(InventoryClickEvent event) {
 		if(event.getWhoClicked() instanceof Player) {
@@ -259,9 +264,11 @@ public class TBLTArenaListener implements Listener {
 		if(Utility.isTBLTPlayer(event.getPlayer())) {
 			event.setCancelled(true);
 			Stream.of(ChestPortal.values())
-				.filter(p -> 0 < p.findChests(event.getFrom()).size())
+				.filter(p -> 0 < p.chest.findChests(event.getFrom()).size())
 				.forEach(p -> p.enterPortal(event));
 		}
 	}
 
+
 }
+

@@ -3,46 +3,47 @@ package com.github.orgs.kotobaminers.kotobatblt3.block;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
-import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
-import com.github.orgs.kotobaminers.kotobaapi.block.ConfigChest;
-import com.github.orgs.kotobaminers.kotobaapi.block.Interactive;
+import com.github.orgs.kotobaminers.kotobaapi.block.InteractiveChest;
+import com.github.orgs.kotobaminers.kotobaapi.block.KotobaConfigChestInterface;
 import com.github.orgs.kotobaminers.kotobaapi.block.KotobaStructure;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaEffect;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStackIcon;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTItemStackIcon;
 
-public enum InteractiveStructure implements KotobaStructure, ConfigChest, Interactive {
-	MAGIC_MIRROR_1(new HashMap<Vector, Material>() {{
-		put(new Vector(0,0,0), Material.SEA_LANTERN);
-		put(new Vector(1,0,0), Material.SEA_LANTERN);
-		put(new Vector(0,1,0), Material.STAINED_GLASS_PANE);
-		put(new Vector(1,1,0), Material.STAINED_GLASS_PANE);
-		put(new Vector(0,2,0), Material.STAINED_GLASS_PANE);
-		put(new Vector(1,2,0), Material.STAINED_GLASS_PANE);
-		put(new Vector(0,3,0), Material.STAINED_GLASS_PANE);
-		put(new Vector(1,3,0), Material.STAINED_GLASS_PANE);
-		put(new Vector(0,4,0), Material.STAINED_GLASS_PANE);
-		put(new Vector(1,4,0), Material.STAINED_GLASS_PANE);
-		put(new Vector(0,5,0), Material.SEA_LANTERN);
-		put(new Vector(1,5,0), Material.SEA_LANTERN);
-	}},
-		TBLTItemStackIcon.PLAYER_GATE_KEY
+public enum InteractiveStructure implements KotobaStructure, InteractiveChest {
+	MAGIC_MIRROR(
+		TBLTItemStackIcon.PLAYER_GATE_KEY,
+		new HashMap<Vector, Material>() {{
+			put(new Vector(0,2,0), Material.SEA_LANTERN);
+			put(new Vector(1,2,0), Material.SEA_LANTERN);
+			put(new Vector(0,3,0), Material.STAINED_GLASS_PANE);
+			put(new Vector(1,3,0), Material.STAINED_GLASS_PANE);
+			put(new Vector(0,4,0), Material.STAINED_GLASS_PANE);
+			put(new Vector(1,4,0), Material.STAINED_GLASS_PANE);
+			put(new Vector(0,5,0), Material.STAINED_GLASS_PANE);
+			put(new Vector(1,5,0), Material.STAINED_GLASS_PANE);
+			put(new Vector(0,6,0), Material.STAINED_GLASS_PANE);
+			put(new Vector(1,6,0), Material.STAINED_GLASS_PANE);
+			put(new Vector(0,7,0), Material.SEA_LANTERN);
+			put(new Vector(1,7,0), Material.SEA_LANTERN);
+		}},
+		TBLTConfigChest.TWO_BY_SEVEN
 	) {
 		@Override
 		public boolean interact(PlayerInteractEvent event) {
-			List<ItemStack> options = findOptions(event.getClickedBlock().getLocation());
+			if(0 == findOrigins(event.getClickedBlock().getLocation()).size()) return false;
+			List<ItemStack> options = findOptions(event);
 			if(0 < options.size()) {
 				Player player = event.getPlayer();
 				boolean isTarget = Stream.of(player.getInventory().getContents())
@@ -69,36 +70,32 @@ public enum InteractiveStructure implements KotobaStructure, ConfigChest, Intera
 	;
 
 
-	private static final Vector ORIGIN_TO_CHEST = new Vector(0,-2,0);
-
-
+	private KotobaItemStackIcon icon;
 	private Map<Vector, Material> structure;
-	private KotobaItemStackIcon key;
+	private TBLTConfigChest chest;
 
 
-	private InteractiveStructure(Map<Vector, Material> structure, KotobaItemStackIcon key) {
+	private InteractiveStructure(KotobaItemStackIcon icon, Map<Vector, Material> structure, TBLTConfigChest chest) {
+		this.icon = icon;
 		this.structure = structure;
-		this.key = key;
+		this.chest = chest;
 	}
+
 
 	@Override
 	public Map<Vector, Material> getStructure() {
 		return structure;
 	}
 
+
 	@Override
-	public List<Chest> findChests(Location location) {
-		return findOrigin(location).stream()
-			.map(l -> l.clone().add(ORIGIN_TO_CHEST).getBlock())
-			.filter(b -> b.getState() instanceof Chest)
-			.map(b -> (Chest) b.getState())
-			.filter(c -> Stream.of(c.getInventory().getContents()).filter(i -> i != null).anyMatch(i -> getKey().isIconItemStack(i)))
-			.collect(Collectors.toList());
+	public KotobaConfigChestInterface getChest() {
+		return chest;
 	}
 
 	@Override
-	public KotobaItemStackIcon getKey() {
-		return key;
+	public KotobaItemStackIcon getIcon() {
+		return icon;
 	}
 
 
