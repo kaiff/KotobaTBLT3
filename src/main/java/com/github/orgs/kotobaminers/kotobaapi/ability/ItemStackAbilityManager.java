@@ -10,13 +10,15 @@ import org.bukkit.inventory.ItemStack;
 import com.github.orgs.kotobaminers.kotobatblt3.ability.ClickBlockAbility;
 import com.github.orgs.kotobaminers.kotobatblt3.ability.ClickBlockChestAbility;
 import com.github.orgs.kotobaminers.kotobatblt3.ability.ClickEntityAbility;
+import com.github.orgs.kotobaminers.kotobatblt3.ability.InteractiveBlockAbility;
 import com.github.orgs.kotobaminers.kotobatblt3.ability.ProjectileAbility;
 
 public class ItemStackAbilityManager {
 
 
-	private static List<ItemStackAbilityInterface> getAbilities() {
+	public static List<ItemStackAbilityInterface> getAbilities() {
 		return Arrays.asList(
+			Stream.of(InteractiveBlockAbility.values()),
 			Stream.of(ClickBlockAbility.values()),
 			Stream.of(ClickEntityAbility.values()),
 			Stream.of(ClickBlockChestAbility.values()),
@@ -29,7 +31,7 @@ public class ItemStackAbilityManager {
 
 	public static List<ItemStackAbilityInterface> find(ItemStack itemStack) {
 		return getAbilities().stream()
-			.filter(a -> a.getIcon().isSame(itemStack))
+			.filter(a -> a.getIcon().isIconItemStack(itemStack))
 			.collect(Collectors.toList());
 	}
 

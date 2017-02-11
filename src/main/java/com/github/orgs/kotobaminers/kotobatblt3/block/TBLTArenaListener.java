@@ -2,6 +2,7 @@ package com.github.orgs.kotobaminers.kotobatblt3.block;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -35,6 +36,7 @@ import org.bukkit.potion.Potion;
 
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaEffect;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStack;
+import com.github.orgs.kotobaminers.kotobatblt3.ability.InteractiveBlockAbility;
 import com.github.orgs.kotobaminers.kotobatblt3.ability.ProjectileAbility;
 import com.github.orgs.kotobaminers.kotobatblt3.gui.TBLTPlayerGUI;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.Utility;
@@ -54,6 +56,22 @@ public class TBLTArenaListener implements Listener {
 					if(success) KotobaItemStack.consume(player.getInventory(), player.getItemInHand(), 1);
 				});
 		}
+	}
+
+
+	@EventHandler
+	void onPlayerRightClickBlockWithAir(PlayerInteractEvent event) {
+		Player player = event.getPlayer();
+		Block block = event.getClickedBlock();
+		if(block == null) return;
+		if(block.getType() == Material.AIR) return;
+		if(event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+		if(player.getItemInHand().getType() != Material.AIR) return;
+		if(!Utility.isTBLTPlayer(player)) return;
+
+		Arrays.asList(InteractiveBlockAbility.values(), InteractiveStructure.values()).stream()
+			.flatMap(interactives -> Stream.of(interactives))
+			.forEach(interactive -> interactive.interact(event));
 	}
 
 
@@ -240,8 +258,9 @@ public class TBLTArenaListener implements Listener {
 	public void onPlayerPortalEvent(PlayerPortalEvent event) {
 		if(Utility.isTBLTPlayer(event.getPlayer())) {
 			event.setCancelled(true);
-			new TBLTPortalManager().find(event.getFrom())
-				.forEach(portal -> portal.enterPortal(event));
+			Stream.of(ChestPortal.values())
+				.filter(p -> 0 < p.findChests(event.getFrom()).size())
+				.forEach(p -> p.enterPortal(event));
 		}
 	}
 

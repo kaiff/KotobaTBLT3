@@ -27,7 +27,7 @@ import com.github.orgs.kotobaminers.kotobatblt3.utility.Utility;
 
 public enum ClickEntityAbility implements ClickEntityAbilityInterface {
 	MIRROR_IMAGE(
-		TBLTItemStackIcon.GREEN_GEM,
+		TBLTItemStackIcon.DUMMY,
 		1
 	) {
 		@Override
@@ -75,7 +75,7 @@ public enum ClickEntityAbility implements ClickEntityAbilityInterface {
 	},
 
 	FIRE_RESISTANCE(
-		TBLTItemStackIcon.GREEN_GEM,
+		TBLTItemStackIcon.DUMMY,
 		1
 	) {
 		@Override
@@ -93,7 +93,7 @@ public enum ClickEntityAbility implements ClickEntityAbilityInterface {
 	},
 
 	GIVE_A_RIDE(
-		TBLTItemStackIcon.GREEN_GEM,
+		TBLTItemStackIcon.DUMMY,
 		1
 	) {
 		@Override
@@ -114,7 +114,7 @@ public enum ClickEntityAbility implements ClickEntityAbilityInterface {
 	},
 
 	THROW_ABOVE_1(
-		TBLTItemStackIcon.GREEN_GEM,
+		TBLTItemStackIcon.DUMMY,
 		1
 	) {
 		@Override
@@ -130,7 +130,7 @@ public enum ClickEntityAbility implements ClickEntityAbilityInterface {
 	},
 
 	THROW_AWAY_1(
-		TBLTItemStackIcon.GREEN_GEM,
+		TBLTItemStackIcon.DUMMY,
 		1
 	) {
 		@Override

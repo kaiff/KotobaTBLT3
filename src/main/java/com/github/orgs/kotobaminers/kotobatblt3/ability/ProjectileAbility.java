@@ -35,7 +35,7 @@ import com.github.orgs.kotobaminers.kotobatblt3.utility.Utility;
 public enum ProjectileAbility implements ProjectileAbilityInterface {
 
 	BLAST_ARROW(
-		TBLTItemStackIcon.GREEN_GEM,
+		TBLTItemStackIcon.DUMMY,
 		EntityType.ARROW,
 		0,
 		2d
@@ -70,7 +70,7 @@ public enum ProjectileAbility implements ProjectileAbilityInterface {
 	},
 
 	MAGNETIC_ARROW(
-		TBLTItemStackIcon.GREEN_GEM,
+		TBLTItemStackIcon.DUMMY,
 		EntityType.ARROW,
 		0,
 		2d
@@ -107,7 +107,7 @@ public enum ProjectileAbility implements ProjectileAbilityInterface {
 	},
 
 	FROST_ARROW(
-		TBLTItemStackIcon.GREEN_GEM,
+		TBLTItemStackIcon.DUMMY,
 		EntityType.ARROW,
 		0,
 		2d
@@ -139,7 +139,7 @@ public enum ProjectileAbility implements ProjectileAbilityInterface {
 	},
 
 	SMALL_BOMB(
-		TBLTItemStackIcon.GREEN_GEM,
+		TBLTItemStackIcon.DUMMY,
 		EntityType.SNOWBALL,
 		0,
 		0.7d
@@ -172,7 +172,7 @@ public enum ProjectileAbility implements ProjectileAbilityInterface {
 	},
 
 	TREE_GROWTH(
-		TBLTItemStackIcon.GREEN_GEM,
+		TBLTItemStackIcon.DUMMY,
 		EntityType.SPLASH_POTION,
 		1,
 		0.7d
@@ -199,7 +199,7 @@ public enum ProjectileAbility implements ProjectileAbilityInterface {
 	},
 
 	TRANSPARENT_BLOCK(
-		TBLTItemStackIcon.GREEN_GEM,
+		TBLTItemStackIcon.DUMMY,
 		EntityType.SPLASH_POTION,
 		1,
 		0.7d
@@ -223,7 +223,7 @@ public enum ProjectileAbility implements ProjectileAbilityInterface {
 	},
 
 	GENERATE_BLOCK(
-		TBLTItemStackIcon.GREEN_GEM,
+		TBLTItemStackIcon.DUMMY,
 		EntityType.SNOWBALL,
 		1,
 		0.7d
@@ -261,7 +261,7 @@ public enum ProjectileAbility implements ProjectileAbilityInterface {
 	},
 
 	MAGIC_WEB(
-		TBLTItemStackIcon.GREEN_GEM,
+		TBLTItemStackIcon.DUMMY,
 		EntityType.SNOWBALL,
 		0,
 		0.7d
@@ -299,7 +299,7 @@ public enum ProjectileAbility implements ProjectileAbilityInterface {
 
 
 	MAGIC_TRAMPOLINE(
-		TBLTItemStackIcon.GREEN_GEM,
+		TBLTItemStackIcon.DUMMY,
 		EntityType.SNOWBALL,
 		1,
 		0.7d

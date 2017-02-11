@@ -4,16 +4,17 @@ import com.github.orgs.kotobaminers.kotobaapi.ability.ItemStackAbilityInterface;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStackIcon;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTItemStackIcon;
 
-public enum TBLTItem implements ItemStackAbilityInterface {
+public enum ChestKey implements ItemStackAbilityInterface {
 
 	PORTAL_CRYSTAL(TBLTItemStackIcon.PORTAL_CRYSTAL),
 	SINGLE_PORTAL(TBLTItemStackIcon.SINGLE_PORTAL),
-	PREDICTION(TBLTItemStackIcon.WRITTEN_PREDICTION),
+	GEM_PORTAL_KEY_3X3(TBLTItemStackIcon.GEM_PORTAL_KEY_3X3),
+	PREDICTION(TBLTItemStackIcon.WRITTEN_PREDICTION),//TODO: Not ChestKey
 	;
 
 	protected KotobaItemStackIcon icon;
 
-	private TBLTItem(KotobaItemStackIcon icon) {
+	private ChestKey(KotobaItemStackIcon icon) {
 		this.icon = icon;
 	}
 

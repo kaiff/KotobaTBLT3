@@ -12,6 +12,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -20,15 +21,17 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
 
+import com.github.orgs.kotobaminers.kotobaapi.block.ConfigChest;
 import com.github.orgs.kotobaminers.kotobaapi.block.KotobaPortalInterface;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaEffect;
-import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStack;
-import com.github.orgs.kotobaminers.kotobatblt3.ability.TBLTItem;
+import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStackIcon;
+import com.github.orgs.kotobaminers.kotobatblt3.ability.ChestKey;
+import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTItemStackIcon;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.Utility;
 
-public enum ChestPortal implements KotobaPortalInterface {
-	ARENA_PORTAL(
-		KotobaItemStack.create(Material.EYE_OF_ENDER, (short) 0, 1, "Arena portal key", null),
+public enum ChestPortal implements KotobaPortalInterface, ConfigChest {
+	GEM_PORTAL(
+		TBLTItemStackIcon.GEM_PORTAL_KEY_3X3,
 		new HashMap<Vector, Material>(){{
 			put(new Vector(1,0,1), Material.ENDER_PORTAL);
 			put(new Vector(1,0,0), Material.ENDER_PORTAL);
@@ -40,8 +43,7 @@ public enum ChestPortal implements KotobaPortalInterface {
 			put(new Vector(-1,0,0), Material.ENDER_PORTAL);
 			put(new Vector(-1,0,-1), Material.ENDER_PORTAL);
 		}},
-		new Vector(0, -2, 0),
-		2
+		new Vector(0, -2, 0)
 	) {
 
 		@Override
@@ -63,11 +65,11 @@ public enum ChestPortal implements KotobaPortalInterface {
 								.filter(p ->
 									Stream.of(p.getInventory().getContents())
 										.filter(i -> i != null)
-										.anyMatch(i -> TBLTItem.PORTAL_CRYSTAL.getIcon().isSame(i)))
+										.anyMatch(i -> ChestKey.PORTAL_CRYSTAL.getIcon().isIconItemStack(i)))
 								.findFirst();
 							if(crystalOwner.isPresent() || isSinglePortal(from)) {
-								List<Boolean> success = findChestsInRange(from).stream()
-									.flatMap(c -> Stream.of(c.getInventory().getContents()).filter(i -> i != null).filter(i -> TBLTItem.PORTAL_CRYSTAL.getIcon().isSame(i)))
+								List<Boolean> success = findChests(from).stream()
+									.flatMap(c -> Stream.of(c.getInventory().getContents()).filter(i -> i != null).filter(i -> ChestKey.PORTAL_CRYSTAL.getIcon().isIconItemStack(i)))
 									.filter(i -> i.getItemMeta().getLore() != null)
 									.filter(i -> 0 < i.getItemMeta().getLore().size())
 									.map(i -> i.getItemMeta().getLore().get(0))
@@ -85,15 +87,24 @@ public enum ChestPortal implements KotobaPortalInterface {
 				});
 			return true;
 		}
+
+		@Override
+		public boolean canOpen(PlayerInteractEvent event) {
+			Block block = event.getClickedBlock().getRelative(event.getBlockFace());
+			findChests(block.getLocation()).stream()
+				;
+			return false;
+		}
+
+
 	},
 
 	CHECK_POINT_PORTAL(
-		KotobaItemStack.create(Material.EYE_OF_ENDER, (short) 0, 1, "Check point key", null),
+		TBLTItemStackIcon.DUMMY,
 		new HashMap<Vector, Material>(){{
 			put(new Vector(0,0,0), Material.ENDER_PORTAL);
 		}},
-		new Vector(0, -2, 0),
-		1
+		new Vector(0, -2, 0)
 	) {
 		@Override
 		public boolean enterPortal(PlayerPortalEvent event) {
@@ -126,91 +137,61 @@ public enum ChestPortal implements KotobaPortalInterface {
 				});
 			return true;
 		}
-	},
 
-	BOTTOM_PORTAL(
-		KotobaItemStack.create(Material.EYE_OF_ENDER, (short) 0, 1, "Arena portal key", null),
-		new HashMap<Vector, Material>(){{
-		}},
-		new Vector(0, -2, 0),
-		2
-	) {
 		@Override
-		public boolean enterPortal(PlayerPortalEvent event) {
-			return false;
+		public boolean canOpen(PlayerInteractEvent event) {
+			return true;
 		}
-	}
+	},
 	;
 
 
-	private ItemStack key;
+	private KotobaItemStackIcon icon;
 	private Map<Vector, Material> pattern;
 	private Vector chestPosition;
-	private int chestRange;
 
 
-	private ChestPortal(ItemStack key, Map<Vector, Material> pattern, Vector chestPosition, int chestRange) {
-		this.key = key;
+	private ChestPortal(KotobaItemStackIcon icon, Map<Vector, Material> pattern, Vector chestPosition) {
+		this.icon = icon;
 		this.pattern = pattern;
 		this.chestPosition = chestPosition;
-		this.chestRange = chestRange;
 	}
 
-	@Override//TODO check
-	public boolean isThis(Location location) {
-		return findChestsInRange(location).stream()
-			.flatMap(chest -> Stream.of(chest.getInventory().getContents()))
-			.filter(i -> i != null)
-			.anyMatch(i -> isPortalKey(i));
-	}
 
-	private boolean isPortalKey(ItemStack itemStack) {
-		if(itemStack.getType() == key.getType() && itemStack.getItemMeta().getDisplayName().equalsIgnoreCase(key.getItemMeta().getDisplayName())) {
-			return true;
-		}
-		return false;
-	}
-
-	protected List<Chest> findChestsInRange(Location location) {
-		return Utility.getSpherePositions(location.clone().add(chestPosition), chestRange).stream()
-			.map(loc -> loc.getBlock())
-			.filter(block -> block.getState() instanceof Chest)
-			.map(block -> (Chest) block.getState())
+	@Override
+	public List<Chest> findChests(Location location) {
+		return pattern.keySet().stream()
+			.map(v -> location.clone().subtract(v).add(chestPosition))
+			.filter(l -> l.getBlock().getState() instanceof Chest)
+			.map(l -> (Chest) l.getBlock().getState())
+			.filter(c -> Stream.of(c.getInventory().getContents()).filter(i -> i != null).anyMatch(i -> getKey().isIconItemStack(i)))
 			.collect(Collectors.toList());
 	}
 
 
-	public boolean openPortal(PlayerInteractEvent event) {
-		Location origin = event.getClickedBlock().getLocation().clone();
+	@Override
+	public void openPortal(Location center) {
+		Location origin = center.clone();
 		pattern.entrySet().forEach(entry -> {
 			Location location = origin.clone().add(entry.getKey());
 			location.getBlock().setType(entry.getValue());
 			location.getWorld().playEffect(location.clone().add(0,1,0), Effect.ENDER_SIGNAL, 0);
 		});
 		KotobaEffect.PORTAL.playSound(origin);
-		return true;
 	}
 
-
-	public ItemStack createKey() {
-		return key;
-	}
 
 	public ItemStack createKey(String point) {
-		ItemStack result = key.clone();
+		ItemStack result = icon.create(1);
 		ItemMeta itemMeta = result.getItemMeta();
 		itemMeta.setLore(Arrays.asList(point));
 		result.setItemMeta(itemMeta);
 		return result;
 	}
 
-	public Map<Vector, Material> getPattern() {
-		return pattern;
-	}
-
 	protected boolean isSinglePortal(Location location) {
-		long singleKeyNumber = findChestsInRange(location).stream()
-			.flatMap(c -> Stream.of(c.getInventory().getContents()).filter(i -> i != null).filter(i -> TBLTItem.SINGLE_PORTAL.getIcon().isSame(i)))
+		long singleKeyNumber = findChests(location).stream()
+			.flatMap(c -> Stream.of(c.getInventory().getContents()).filter(i -> i != null).filter(i -> ChestKey.SINGLE_PORTAL.getIcon().isIconItemStack(i)))
 			.count();
 		if(0 < singleKeyNumber) {
 			return true;
@@ -218,6 +199,14 @@ public enum ChestPortal implements KotobaPortalInterface {
 			return false;
 		}
 	}
+
+
+	@Override
+	public KotobaItemStackIcon getKey() {
+		return icon;
+	}
+
+
 
 }
 

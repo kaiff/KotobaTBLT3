@@ -1,6 +1,7 @@
 package com.github.orgs.kotobaminers.kotobaapi.block;
 
 import org.bukkit.Location;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 
 public interface KotobaPortalInterface {
@@ -8,9 +9,9 @@ public interface KotobaPortalInterface {
 
 	boolean enterPortal(PlayerPortalEvent event);
 
+	void openPortal(Location center);
 
-	boolean isThis(Location location);
-
+	boolean canOpen(PlayerInteractEvent event);
 
 
 }

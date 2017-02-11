@@ -76,6 +76,13 @@ public enum TBLTPlayerGUI implements ChestGUI {
 		}
 	},
 
+	QUEST_LIST("Quests", ChestSize.MINIMUM) {
+		@Override
+		public void onInventoryClick(InventoryClickEvent event) {
+			event.setCancelled(true);
+		}
+	},
+
 	BLOCK_REPLACER("Block Replacer", ChestSize.MINIMUM) {
 		@Override
 		public void onInventoryClick(InventoryClickEvent event) {

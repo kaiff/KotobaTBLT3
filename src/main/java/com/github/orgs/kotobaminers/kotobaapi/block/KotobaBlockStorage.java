@@ -302,3 +302,4 @@ public abstract class KotobaBlockStorage extends KotobaYamlConfiguration {
 	}
 	public abstract File getDirectory();
 }
+

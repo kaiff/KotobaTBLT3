@@ -10,10 +10,52 @@ import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStackIcon;
 public enum TBLTItemStackIcon implements KotobaItemStackIcon {
 
 
+	PLAYER_GATE_KEY(
+			Material.GLASS,
+			(short) 0,
+			"Player Gate Key",
+			null,
+			IconFindType.SIMILAR
+	),
+
+
+	GEM_PORTAL_KEY_3X3(
+			Material.TRAPPED_CHEST,
+			(short) 0,
+			"Gem Portal Key 3x3",
+			null,
+			IconFindType.SIMILAR
+	),
+
+
 	GREEN_GEM(
 			Material.EMERALD_BLOCK,
 			(short) 0,
 			"Green Gem",
+			null,
+			IconFindType.SIMILAR
+	),
+
+	BLUE_GEM(
+			Material.EMERALD_BLOCK,
+			(short) 0,
+			"Blue Gem",
+			null,
+			IconFindType.SIMILAR
+	),
+
+	RED_GEM(
+			Material.REDSTONE_BLOCK,
+			(short) 0,
+			"Red Gem",
+			null,
+			IconFindType.SIMILAR
+	),
+
+	DUMMY(
+			Material.BARRIER,
+			(short) 0,
+			"Temporaty Dummy",
 			null,
 			IconFindType.SIMILAR
 	),
@@ -34,12 +76,21 @@ public enum TBLTItemStackIcon implements KotobaItemStackIcon {
 			IconFindType.EXCEPT_LORE
 		),
 
+	QUEST_LIST(
+			Material.BOOK_AND_QUILL,
+			(short) 0,
+			"Quest List",
+			Arrays.asList("See the list of your quests."),
+			IconFindType.EXCEPT_LORE
+	),
+
+
 		WRITTEN_PREDICTION(
 			Material.WRITTEN_BOOK,
 			(short) 0,
 			"A written prediction",
 			null,
-			IconFindType.SIMILAR
+			IconFindType.EXCEPT_LORE
 		),
 
 		PREDICTION(

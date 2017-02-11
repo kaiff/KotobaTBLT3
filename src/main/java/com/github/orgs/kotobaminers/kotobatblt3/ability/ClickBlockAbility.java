@@ -36,6 +36,19 @@ import com.github.orgs.kotobaminers.kotobatblt3.utility.Utility;
 public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 
 
+	QUEST_LIST(
+		TBLTItemStackIcon.QUEST_LIST,
+		Arrays.asList(Action.RIGHT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR),
+		0
+	) {
+		@Override
+		public boolean perform(PlayerInteractEvent event) {
+
+			return false;
+		}
+	},
+
+
 	PREDICTION(
 		TBLTItemStackIcon.PREDICTION,
 		Arrays.asList(Action.RIGHT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR),
@@ -47,7 +60,7 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 			ItemStack prediction = new TBLTArenaMap().findUnique(player.getLocation())
 				.map(a -> (TBLTArena) a)
 				.map(a -> {
-					ItemStack base = TBLTItem.PREDICTION.getIcon().create(1);
+					ItemStack base = ChestKey.PREDICTION.getIcon().create(1);
 					BookMeta baseMeta = (BookMeta) base.getItemMeta();
 					List<String> pages = ((BookMeta) a.getPredictionWrittenBook().getItemMeta()).getPages();
 					baseMeta.setPages(pages);
@@ -58,7 +71,7 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 			if(prediction == null) return false;
 			List<ItemStack> currentPrediction = Stream.of(player.getInventory().getContents())
 				.filter(i -> i != null)
-				.filter(i -> TBLTItem.PREDICTION.getIcon().isSame(i))
+				.filter(i -> ChestKey.PREDICTION.getIcon().isIconItemStack(i))
 				.collect(Collectors.toList());
 			int currentPage = currentPrediction.stream()
 					.map(i -> ((BookMeta) i.getItemMeta()).getPageCount())
@@ -155,7 +168,7 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 	},
 
 	PSYCHOKINESIS(
-		TBLTItemStackIcon.GREEN_GEM,
+		TBLTItemStackIcon.DUMMY,
 		Arrays.asList(Action.RIGHT_CLICK_BLOCK),
 		0
 	) {
@@ -187,7 +200,7 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 	},
 
 	TELEPORT(
-		TBLTItemStackIcon.GREEN_GEM,
+		TBLTItemStackIcon.DUMMY,
 		Arrays.asList(Action.RIGHT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR),
 		0
 	) {
@@ -206,7 +219,7 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 	},
 
 	TRANSITION(
-		TBLTItemStackIcon.GREEN_GEM,
+		TBLTItemStackIcon.DUMMY,
 		Arrays.asList(Action.RIGHT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR),
 		1
 	) {
@@ -234,7 +247,7 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 	},
 
 	DISGUISE_BAT(
-		TBLTItemStackIcon.GREEN_GEM,
+		TBLTItemStackIcon.DUMMY,
 		Arrays.asList(Action.RIGHT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR),
 		1
 	) {

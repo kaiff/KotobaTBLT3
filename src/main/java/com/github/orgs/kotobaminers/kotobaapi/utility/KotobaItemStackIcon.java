@@ -24,7 +24,7 @@ public interface KotobaItemStackIcon {
 	List<String> getLore();
 
 
-	default boolean isSame(ItemStack itemStack) {
+	default boolean isIconItemStack(ItemStack itemStack) {
 		return getFindType().isSame(create(1), itemStack);
 	}
 

@@ -33,6 +33,7 @@ import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaTitle.TitleOption;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaUtility;
 import com.github.orgs.kotobaminers.kotobatblt3.ability.ClickBlockChestAbility;
 import com.github.orgs.kotobaminers.kotobatblt3.citizens.UniqueNPC;
+import com.github.orgs.kotobaminers.kotobatblt3.game.TBLTData;
 import com.github.orgs.kotobaminers.kotobatblt3.game.TBLTJob;
 import com.github.orgs.kotobaminers.kotobatblt3.kotobatblt3.Setting;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.RepeatingEffect;
@@ -65,6 +66,7 @@ public class TBLTArena extends KotobaBlockStorage {
 
 	private void start(Player player, Location location) {
 		TBLTJob.initializeInventory(player);
+		TBLTData.getOrDefault(player.getUniqueId()).initialize();
 		player.teleport(location);
 		KotobaEffect.ENDER_SIGNAL.playEffect(location);
 		KotobaEffect.ENDER_SIGNAL.playSound(location);

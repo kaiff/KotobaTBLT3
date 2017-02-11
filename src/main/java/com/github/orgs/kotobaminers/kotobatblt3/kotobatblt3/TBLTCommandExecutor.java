@@ -22,18 +22,14 @@ import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.github.orgs.kotobaminers.develop.TBLTTest;
+import com.github.orgs.kotobaminers.kotobaapi.ability.ItemStackAbilityManager;
 import com.github.orgs.kotobaminers.kotobaapi.citizens.KotobaCitizensManager;
 import com.github.orgs.kotobaminers.kotobaapi.kotobaapi.CommandEnumInterface;
 import com.github.orgs.kotobaminers.kotobaapi.kotobaapi.PermissionEnumInterface;
 import com.github.orgs.kotobaminers.kotobaapi.sentence.Holograms;
 import com.github.orgs.kotobaminers.kotobatblt3.ability.ClickBlockAbility;
-import com.github.orgs.kotobaminers.kotobatblt3.ability.ClickBlockChestAbility;
-import com.github.orgs.kotobaminers.kotobatblt3.ability.ClickEntityAbility;
-import com.github.orgs.kotobaminers.kotobatblt3.ability.ProjectileAbility;
-import com.github.orgs.kotobaminers.kotobatblt3.ability.TBLTItem;
 import com.github.orgs.kotobaminers.kotobatblt3.block.BlockReplacer;
 import com.github.orgs.kotobaminers.kotobatblt3.block.BlockReplacerMap;
-import com.github.orgs.kotobaminers.kotobatblt3.block.ChestPortal;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArena;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaMap;
 import com.github.orgs.kotobaminers.kotobatblt3.citizens.UniqueNPC;
@@ -41,10 +37,13 @@ import com.github.orgs.kotobaminers.kotobatblt3.database.PlayerData;
 import com.github.orgs.kotobaminers.kotobatblt3.database.PlayerDatabase;
 import com.github.orgs.kotobaminers.kotobatblt3.database.SentenceDatabase;
 import com.github.orgs.kotobaminers.kotobatblt3.database.TBLTConversationEditorMap;
+import com.github.orgs.kotobaminers.kotobatblt3.game.TBLTData;
 import com.github.orgs.kotobaminers.kotobatblt3.game.TBLTJob;
 import com.github.orgs.kotobaminers.kotobatblt3.gui.IconCreatorUtility;
 import com.github.orgs.kotobaminers.kotobatblt3.gui.TBLTIconListGUI;
 import com.github.orgs.kotobaminers.kotobatblt3.gui.TBLTPlayerGUI;
+import com.github.orgs.kotobaminers.kotobatblt3.quest.AbilityUseQuest;
+import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTItemStackIcon;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.Utility;
 
 public class TBLTCommandExecutor implements CommandExecutor {
@@ -77,6 +76,9 @@ public class TBLTCommandExecutor implements CommandExecutor {
 		TEST(Arrays.asList(Arrays.asList("test")), "", "Command Test", PermissionEnum.OP) {
 			@Override
 			public boolean perform(Player player , String[] args) {
+				TBLTData data = TBLTData.getOrDefault(player.getUniqueId());
+				data.registerQuest(AbilityUseQuest.create(ClickBlockAbility.CLAIRVOYANCE, 10));
+				System.out.println(data.toString());
 				return true;
 			}
 		},
@@ -102,13 +104,8 @@ public class TBLTCommandExecutor implements CommandExecutor {
 		ITEM(Arrays.asList(Arrays.asList("item")), "", "Get Items", PermissionEnum.OP) {
 			@Override
 			public boolean perform(Player player , String[] args) {
-				Inventory inventory = player.getInventory();
-				Stream.of(TBLTItem.values())
-					.map(item -> item.getIcon().create(64))
-					.forEach(item -> inventory.addItem(item));
-				Stream.of(ChestPortal.values())
-					.map(item -> item.createKey())
-					.forEach(item -> inventory.addItem(item));
+				Stream.of(TBLTItemStackIcon.values())
+					.forEach(i -> player.getWorld().dropItem(player.getLocation(), i.create(1)));
 				return true;
 			}
 		},
@@ -134,14 +131,7 @@ public class TBLTCommandExecutor implements CommandExecutor {
 			@Override
 			public boolean perform(Player player , String[] args) {
 				Inventory inventory = player.getInventory();
-				Stream.of(ClickBlockAbility.values())
-					.forEach(a -> inventory.addItem(a.getIcon().create(64)));
-				Stream.of(ClickEntityAbility.values())
-					.forEach(a -> inventory.addItem(a.getIcon().create(64)));
-				Stream.of(ProjectileAbility.values())
-					.forEach(a -> inventory.addItem(a.getIcon().create(64)));
-				Stream.of(ClickBlockChestAbility.values())
-					.forEach(a -> inventory.addItem(a.getIcon().create(64)));
+				ItemStackAbilityManager.getAbilities().forEach(a -> inventory.addItem(a.getIcon().create(64)));
 				return true;
 			}
 		},

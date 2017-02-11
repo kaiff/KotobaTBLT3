@@ -7,12 +7,16 @@ import org.bukkit.event.player.PlayerInteractEvent;
 
 public interface ClickBlockAbilityInterface extends ItemStackAbilityInterface {
 
+
 	List<Action> getTriggers();
+
 
 	default boolean isCorrectAction(Action action) {
 		return getTriggers().contains(action);
 	}
 
+
 	boolean perform(PlayerInteractEvent event);
+
 
 }
