@@ -13,6 +13,16 @@ import com.github.orgs.kotobaminers.kotobatblt3.kotobatblt3.Setting;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.Utility;
 
 public enum KotobaEffect {
+	MUTE() {
+		@Override
+		public void playSound(Location location) {
+		}
+		@Override
+		public void playEffect(Location location) {
+		}
+	},
+
+
 	MAGIC_MIDIUM() {
 		@Override
 		public void playSound(Location location) {
@@ -28,6 +38,7 @@ public enum KotobaEffect {
 			}
 		}
 	},
+
 
 	MAGIC_SMALL() {
 		@Override
@@ -57,6 +68,18 @@ public enum KotobaEffect {
 			for(int i = 0; i < 10; i++) {
 				location.getWorld().playEffect(Utility.getRandomLocation(location, 1), effect, i);
 			}
+		}
+	},
+
+	TWINCLE_SMALL() {
+		@Override
+		public void playSound(Location location) {
+			KotobaSound.playRandomPitch(location, Sound.ORB_PICKUP, 0.5f, 0.5f, 2.0f, 10);
+		}
+		@Override
+		public void playEffect(Location location) {
+			Effect effect = Effect.valueOf("HAPPY_VILLAGER");
+			location.getWorld().playEffect(Utility.getRandomLocation(location, 1), effect, 0);
 		}
 	},
 

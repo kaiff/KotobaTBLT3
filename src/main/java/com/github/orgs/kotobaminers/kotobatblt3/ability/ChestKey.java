@@ -8,7 +8,7 @@ public enum ChestKey implements ItemStackAbilityInterface {
 
 	PORTAL_CRYSTAL(TBLTItemStackIcon.PORTAL_CRYSTAL),
 	SINGLE_PORTAL(TBLTItemStackIcon.SINGLE_PORTAL),
-	GEM_PORTAL_KEY_3X3(TBLTItemStackIcon.GEM_PORTAL_KEY_3X3),
+	GEM_PORTAL_KEY_3X3(TBLTItemStackIcon.GEM_PORTAL_KEY_3x3),
 	PREDICTION(TBLTItemStackIcon.WRITTEN_PREDICTION),//TODO: Not ChestKey
 	;
 

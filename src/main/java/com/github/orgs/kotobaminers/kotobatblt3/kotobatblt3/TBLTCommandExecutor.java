@@ -16,20 +16,19 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.github.orgs.kotobaminers.develop.TBLTTest;
-import com.github.orgs.kotobaminers.kotobaapi.ability.ItemStackAbilityManager;
 import com.github.orgs.kotobaminers.kotobaapi.citizens.KotobaCitizensManager;
 import com.github.orgs.kotobaminers.kotobaapi.kotobaapi.CommandEnumInterface;
 import com.github.orgs.kotobaminers.kotobaapi.kotobaapi.PermissionEnumInterface;
 import com.github.orgs.kotobaminers.kotobaapi.sentence.Holograms;
-import com.github.orgs.kotobaminers.kotobatblt3.ability.ClickBlockAbility;
+import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaStructureUtility;
 import com.github.orgs.kotobaminers.kotobatblt3.block.BlockReplacer;
 import com.github.orgs.kotobaminers.kotobatblt3.block.BlockReplacerMap;
+import com.github.orgs.kotobaminers.kotobatblt3.block.InteractiveStructure;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArena;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaMap;
 import com.github.orgs.kotobaminers.kotobatblt3.citizens.UniqueNPC;
@@ -37,12 +36,10 @@ import com.github.orgs.kotobaminers.kotobatblt3.database.PlayerData;
 import com.github.orgs.kotobaminers.kotobatblt3.database.PlayerDatabase;
 import com.github.orgs.kotobaminers.kotobatblt3.database.SentenceDatabase;
 import com.github.orgs.kotobaminers.kotobatblt3.database.TBLTConversationEditorMap;
-import com.github.orgs.kotobaminers.kotobatblt3.game.TBLTData;
 import com.github.orgs.kotobaminers.kotobatblt3.game.TBLTJob;
 import com.github.orgs.kotobaminers.kotobatblt3.gui.IconCreatorUtility;
 import com.github.orgs.kotobaminers.kotobatblt3.gui.TBLTIconListGUI;
 import com.github.orgs.kotobaminers.kotobatblt3.gui.TBLTPlayerGUI;
-import com.github.orgs.kotobaminers.kotobatblt3.quest.AbilityUseQuest;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTItemStackIcon;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.Utility;
 
@@ -73,13 +70,14 @@ public class TBLTCommandExecutor implements CommandExecutor {
 		;
 	}
 
+
 	public enum PlayerCommand implements CommandEnumInterface {
 		TEST(Arrays.asList(Arrays.asList("test")), "", "Command Test", PermissionEnum.OP) {
 			@Override
 			public boolean perform(Player player , String[] args) {
-				TBLTData data = TBLTData.getOrDefault(player.getUniqueId());
-				data.registerQuest(AbilityUseQuest.create(ClickBlockAbility.CLAIRVOYANCE, 10));
-				System.out.println(data.toString());
+				KotobaStructureUtility.getRotations(InteractiveStructure.ONE_TIME_GATE.getStructure())
+					.forEach(m -> m.keySet().forEach(v -> player.getLocation().clone().add(v).getBlock().setType(Material.GLASS)));;
+
 				return true;
 			}
 		},
@@ -128,14 +126,14 @@ public class TBLTCommandExecutor implements CommandExecutor {
 		},
 
 
-		ABILITY(Arrays.asList(Arrays.asList("ability")), "", "Get Abilities", PermissionEnum.OP) {
-			@Override
-			public boolean perform(Player player , String[] args) {
-				Inventory inventory = player.getInventory();
-				ItemStackAbilityManager.getAbilities().forEach(a -> inventory.addItem(a.getIcon().create(64)));
-				return true;
-			}
-		},
+//		ABILITY(Arrays.asList(Arrays.asList("ability")), "", "Get Abilities", PermissionEnum.OP) {
+//			@Override
+//			public boolean perform(Player player , String[] args) {
+//				Inventory inventory = player.getInventory();
+//				PlayerInteractiveManager.getAbilities().forEach(a -> inventory.addItem(a.getIcon().create(64)));
+//				return true;
+//			}
+//		},
 
 
 		HOLOGRAM_REMOVE(Arrays.asList(Arrays.asList("hologram"), Arrays.asList("remove")), "", "Remove All Holograms", PermissionEnum.OP) {

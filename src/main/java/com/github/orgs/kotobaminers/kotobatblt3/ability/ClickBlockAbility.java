@@ -323,20 +323,24 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 		this.consume = consume;
 	}
 
+
 	public static List<ClickBlockAbility> find(ItemStack item) {
 		return Stream.of(ClickBlockAbility.values())
 			.filter(ability -> ability.getIcon().create(1).isSimilar(item))
 			.collect(Collectors.toList());
 	}
 
+
 	@Override
 	public KotobaItemStackIcon getIcon() {
 		return icon;
 	}
+
 	@Override
 	public List<Action> getTriggers() {
 		return triggers;
 	}
+
 	@Override
 	public int getConsumption() {
 		return consume;

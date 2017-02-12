@@ -25,9 +25,9 @@ import com.github.orgs.kotobaminers.kotobatblt3.utility.Utility;
 
 public enum ChestPortal implements KotobaPortalInterface {
 	GEM_PORTAL(
-		TBLTItemStackIcon.GEM_PORTAL_KEY_3X3,
+		TBLTItemStackIcon.GEM_PORTAL_KEY_3x3,
 		Material.ENDER_PORTAL,
-		TBLTConfigChest.THREE_BY_THREE
+		TBLTInteractiveChestType.THREE_BY_THREE
 	) {
 
 		@Override
@@ -104,7 +104,7 @@ public enum ChestPortal implements KotobaPortalInterface {
 	CHECK_POINT_PORTAL(
 		TBLTItemStackIcon.DUMMY,
 		Material.ENDER_PORTAL,
-		TBLTConfigChest.VERTICAL
+		TBLTInteractiveChestType.VERTICAL
 	) {
 		@Override
 		public boolean enterPortal(PlayerPortalEvent event) {
@@ -152,10 +152,10 @@ public enum ChestPortal implements KotobaPortalInterface {
 
 	private KotobaItemStackIcon icon;
 	private Material portal;
-	protected TBLTConfigChest chest;
+	protected TBLTInteractiveChestType chest;
 
 
-	private ChestPortal(KotobaItemStackIcon icon, Material portal, TBLTConfigChest chest) {
+	private ChestPortal(KotobaItemStackIcon icon, Material portal, TBLTInteractiveChestType chest) {
 		this.icon = icon;
 		this.portal = portal;
 		this.chest = chest;

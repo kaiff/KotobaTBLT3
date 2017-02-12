@@ -19,6 +19,7 @@ public class RepeatingEffect {
 	private RepeatingEffect() {
 	}
 
+
 	public static RepeatingEffect create(int period, KotobaEffect effect, KotobaEffect sound, boolean repeat, Location blockLocation) {
 		RepeatingEffect periodicEffect = new RepeatingEffect();
 		periodicEffect.period = period;
@@ -38,15 +39,16 @@ public class RepeatingEffect {
 			public void run() {
 				if(repeat == false) return;
 				effect.playEffect(center);
-//				sound.playSound(center);
+				sound.playSound(center);
 				startRepeating();
 			}
 		}, period * 20);
 	}
 
 
-	public void setRepeat(boolean repeat) {
+	public RepeatingEffect setRepeat(boolean repeat) {
 		this.repeat = repeat;
+		return this;
 	}
 
 	public Location getBlockLocation() {

@@ -2,7 +2,6 @@ package com.github.orgs.kotobaminers.kotobatblt3.ability;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.bukkit.Location;
@@ -17,8 +16,7 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
-import com.github.orgs.kotobaminers.kotobaapi.ability.ClickBlockAbilityInterface;
-import com.github.orgs.kotobaminers.kotobaapi.ability.ItemStackAbilityManager;
+import com.github.orgs.kotobaminers.kotobaapi.block.PlayerBlockInteractive;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaSound;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArena;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaMap;
@@ -27,7 +25,7 @@ import com.github.orgs.kotobaminers.kotobatblt3.utility.Utility;
 
 public class ClickAbilityListener implements Listener {
 	@EventHandler
-	public void onPlayerInteract(PlayerInteractEvent event) {
+	void onPlayerInteractBlock(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
 
 		List<Action> clicks = Arrays.asList(Action.LEFT_CLICK_AIR, Action.LEFT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR, Action.RIGHT_CLICK_BLOCK);
@@ -35,54 +33,23 @@ public class ClickAbilityListener implements Listener {
 
 		if(!Utility.isTBLTPlayer(player)) return;
 
-		List<ClickBlockAbilityInterface> abilities = ItemStackAbilityManager.find(player.getItemInHand())
-			.stream()
-			.filter(a -> a instanceof ClickBlockAbilityInterface)
-			.map(a -> (ClickBlockAbilityInterface) a)
-			.collect(Collectors.toList());
+		List<PlayerBlockInteractive> interactives = PlayerInteractiveManager.find(event);
 
-		if(0 < abilities.size()) {
+
+		if(0 < interactives.size()) {
 			event.setCancelled(true);
-			if(canPerformLocation(player)) {
-
-				Optional<List<Boolean>> founds = new TBLTArenaMap().findUnique(player.getLocation())
-					.map(storage -> abilities.stream().map(
-						a -> {
-							boolean successed = false;
-							if(a.isCorrectAction(event.getAction())) {
-								successed = a.perform(event);//Perform ability here
-								if(successed) {
-									a.consumeInHand(player);
-									TBLTData.getOrDefault(player.getUniqueId()).updateAbilityUsed(a);
-								}
-							}
-							return successed;
-						}).collect(Collectors.toList()));
-
-				if(founds.isPresent()) {
-					if(founds.get().stream().anyMatch(f -> f == true)) {
-						return;
-					}
-				}
+			List<Boolean> success = interactives.stream().map(a -> a.interact(event)).collect(Collectors.toList());
+			if(!success.contains(true)) {
+				playFailureEffect(player.getLocation());
 			}
-
-			//Case: Found any ability but perfomed
-			performFailureEffect(player.getLocation());
 		}
 	}
 
 
-	private boolean canPerformLocation(Player player) {
-		boolean onGround = ((Entity) player).isOnGround();
-		boolean atLadder = player.getLocation().getBlock().getType() == Material.LADDER;
-		if(onGround || atLadder) {
-			return true;
-		}
-		return false;
-	}
-	private void performFailureEffect(Location location) {
+	private void playFailureEffect(Location location) {
 		KotobaSound.SHEAR.play(location);
 	}
+
 
 	@EventHandler
 	public void onPlayerInteractEntityEvent(PlayerInteractEntityEvent event) {
@@ -93,7 +60,7 @@ public class ClickAbilityListener implements Listener {
 		if(!((Entity) player).isOnGround()) return;
 		if(!Utility.isTBLTPlayer(player)) return;
 
-		ItemStackAbilityManager.find(event.getPlayer().getItemInHand())
+		PlayerInteractiveManager.find(event)
 			.stream()
 			.filter(a -> a instanceof ClickEntityAbility)
 			.map(a -> (ClickEntityAbility) a)
@@ -103,7 +70,7 @@ public class ClickAbilityListener implements Listener {
 					.map(arena -> (TBLTArena) arena)
 					.ifPresent(arena -> {
 						boolean successed = false;
-						successed = a.perform(event);//Perform ability here
+						successed = a.interact(event);//Perform ability here
 						if(successed) {
 							a.consumeInHand(player);
 							TBLTData.getOrDefault(player.getUniqueId()).updateAbilityUsed(a);

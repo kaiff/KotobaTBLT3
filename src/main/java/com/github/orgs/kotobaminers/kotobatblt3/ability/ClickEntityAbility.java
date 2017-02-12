@@ -31,7 +31,7 @@ public enum ClickEntityAbility implements ClickEntityAbilityInterface {
 		1
 	) {
 		@Override
-		public boolean perform(PlayerInteractEntityEvent event) {
+		public boolean interact(PlayerInteractEntityEvent event) {
 			if(event.getRightClicked() instanceof Player) {
 				Player clicked = (Player) event.getRightClicked();
 				if(!Utility.isTBLTPlayer(clicked)) return false;
@@ -79,7 +79,7 @@ public enum ClickEntityAbility implements ClickEntityAbilityInterface {
 		1
 	) {
 		@Override
-		public boolean perform(PlayerInteractEntityEvent event) {
+		public boolean interact(PlayerInteractEntityEvent event) {
 			Entity entity = event.getRightClicked();
 			if(entity instanceof Player) {
 				Player player = (Player) entity;
@@ -97,7 +97,7 @@ public enum ClickEntityAbility implements ClickEntityAbilityInterface {
 		1
 	) {
 		@Override
-		public boolean perform(PlayerInteractEntityEvent event) {
+		public boolean interact(PlayerInteractEntityEvent event) {
 			if(event.getRightClicked() instanceof Player) {
 				Player player = (Player) event.getRightClicked();
 				if(Utility.isTBLTPlayer(player)) {
@@ -118,7 +118,7 @@ public enum ClickEntityAbility implements ClickEntityAbilityInterface {
 		1
 	) {
 		@Override
-		public boolean perform(PlayerInteractEntityEvent event) {
+		public boolean interact(PlayerInteractEntityEvent event) {
 			Entity entity = event.getRightClicked();
 			if(!entity.isOnGround()) return false;
 
@@ -134,7 +134,7 @@ public enum ClickEntityAbility implements ClickEntityAbilityInterface {
 		1
 	) {
 		@Override
-		public boolean perform(PlayerInteractEntityEvent event) {
+		public boolean interact(PlayerInteractEntityEvent event) {
 			Player player = event.getPlayer();
 			Entity clicked = event.getRightClicked();
 

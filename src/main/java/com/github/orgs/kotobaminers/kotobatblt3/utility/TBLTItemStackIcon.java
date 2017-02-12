@@ -2,8 +2,11 @@ package com.github.orgs.kotobaminers.kotobatblt3.utility;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStackIcon;
 
@@ -37,20 +40,38 @@ public enum TBLTItemStackIcon implements KotobaItemStackIcon {
 	),
 
 
-	PLAYER_GATE_KEY(
+	ONE_TIME_GATE_KEY(
 			Material.GLASS,
 			(short) 0,
-			"Player Gate Key",
-			null,
+			"Structure Key",
+			Arrays.asList("One Time Gate"),
 			IconFindType.SIMILAR
 	),
 
 
-	GEM_PORTAL_KEY_3X3(
+	CHOOS_ONE_KEY(
+			Material.ENCHANTMENT_TABLE,
+			(short) 0,
+			"Structure Key",
+			Arrays.asList("Choose One"),
+			IconFindType.SIMILAR
+	),
+
+
+	PLAYER_GATE_KEY(
+			Material.GLASS,
+			(short) 0,
+			"Structure Key",
+			Arrays.asList("Player Gate"),
+			IconFindType.SIMILAR
+	),
+
+
+	GEM_PORTAL_KEY_3x3(
 			Material.TRAPPED_CHEST,
 			(short) 0,
-			"Gem Portal Key 3x3",
-			null,
+			"Portal Key",
+			Arrays.asList("Gem 3x3"),
 			IconFindType.SIMILAR
 	),
 
@@ -174,6 +195,13 @@ public enum TBLTItemStackIcon implements KotobaItemStackIcon {
 		this.name = name;
 		this.lore = lore;
 		this.findType = findType;
+	}
+
+
+	public static List<TBLTItemStackIcon> find(ItemStack itemStack) {
+		return Stream.of(TBLTItemStackIcon.values())
+			.filter(icon -> icon.isIconItemStack(itemStack))
+			.collect(Collectors.toList());
 	}
 
 

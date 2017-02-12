@@ -22,7 +22,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
-import com.github.orgs.kotobaminers.kotobaapi.ability.ItemStackAbilityManager;
 import com.github.orgs.kotobaminers.kotobaapi.block.KotobaBlockData;
 import com.github.orgs.kotobaminers.kotobaapi.block.KotobaBlockStorage;
 import com.github.orgs.kotobaminers.kotobaapi.sentence.Holograms;
@@ -31,12 +30,13 @@ import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStack;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaTitle;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaTitle.TitleOption;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaUtility;
-import com.github.orgs.kotobaminers.kotobatblt3.ability.ClickBlockChestAbility;
 import com.github.orgs.kotobaminers.kotobatblt3.citizens.UniqueNPC;
 import com.github.orgs.kotobaminers.kotobatblt3.game.TBLTData;
 import com.github.orgs.kotobaminers.kotobatblt3.game.TBLTJob;
 import com.github.orgs.kotobaminers.kotobatblt3.kotobatblt3.Setting;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.RepeatingEffect;
+import com.github.orgs.kotobaminers.kotobatblt3.utility.RepeatingEffectHolderManager;
+import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTItemStackIcon;
 
 import net.md_5.bungee.api.ChatColor;
 
@@ -136,6 +136,7 @@ public class TBLTArena extends KotobaBlockStorage {
 		Holograms.removeHolograms(Setting.getPlugin(), this);
 		initializeUniqueNPCs();
 	}
+
 	@Override
 	protected void loadFromWorld() {
 		initializeRepeatingEffects();
@@ -151,24 +152,32 @@ public class TBLTArena extends KotobaBlockStorage {
 	}
 
 	private void initializeRepeatingEffects() {
+
 		this.repeatingEffects.stream().forEach(e -> e.setRepeat(false));
 		this.repeatingEffects = new HashSet<>();
 
+
 		List<RepeatingEffect> effects = getBlocks().stream()
-			.filter(b -> b.getType() == ClickBlockChestAbility.CHEST_MATERIAL)
 			.filter(b -> b.getState() instanceof Chest)
 			.map(b -> (Chest) b.getState())
-			.flatMap(b -> Stream.of(b.getInventory().getContents())
-				.filter(i -> i != null)
-				.flatMap(i -> ItemStackAbilityManager.find(i).stream())
-				.filter(a -> a instanceof ClickBlockChestAbility)
-				.map(a -> (ClickBlockChestAbility) a)
-				.map(a -> a.createPeriodicEffect(b.getLocation().add(ClickBlockChestAbility.POSITION_TO_BLOCK)))
-			).filter(e -> e instanceof RepeatingEffect)
-			.map(e -> (RepeatingEffect) e)
+			.flatMap(b ->
+				Stream.of(b.getInventory().getContents())
+					.filter(i -> i != null)
+					.flatMap(i -> TBLTItemStackIcon.find(i).stream())
+					.flatMap(icon -> RepeatingEffectHolderManager.findHolders(icon).stream())
+					.flatMap(holder -> holder.createPeriodicEffects(b.getLocation()).stream())
+			)
 			.collect(Collectors.toList());
+
 		this.repeatingEffects.addAll(effects);
 		this.repeatingEffects.forEach(RepeatingEffect::startRepeating);
+
+	}
+
+	public void stopRepeatingEffects(Location blockLocation) {
+		this.repeatingEffects.stream()
+			.filter(e -> e.getBlockLocation().clone().distance(blockLocation.clone()) == 0)
+			.forEach(e -> e.setRepeat(false));
 	}
 
 	@Override
@@ -196,12 +205,6 @@ public class TBLTArena extends KotobaBlockStorage {
 	public void setCurrentPoint(Location location) {
 		findNearestCheckPoint(location)
 			.ifPresent(a -> this.currentPoint = a);
-	}
-
-	public List<RepeatingEffect> findRepeatingEffects(Location blockLocation) {
-		return this.repeatingEffects.stream()
-			.filter(e -> e.getBlockLocation().clone().distance(blockLocation.clone()) == 0)
-			.collect(Collectors.toList());
 	}
 
 	public ItemStack getPredictionWrittenBook() {

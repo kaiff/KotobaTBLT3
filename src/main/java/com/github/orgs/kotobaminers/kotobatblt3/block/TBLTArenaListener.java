@@ -44,6 +44,23 @@ public class TBLTArenaListener implements Listener {
 
 
 	@EventHandler
+	void onPlayerInteractStructure(PlayerInteractEvent event) {
+//		Player player = event.getPlayer();
+//		Block block = event.getClickedBlock();
+//		if(block == null) return;
+//		ItemStack itemStack = player.getItemInHand();
+//		if(itemStack == null) return;
+//		if(itemStack.getType() != Material.AIR) return;
+//
+//		PlayerInteractiveManager.find(event).stream()
+//			.filter(i -> i instanceof InteractiveStructure)
+//			.map(i -> (InteractiveStructure) i)
+//			.forEach(i -> i.interact(event));
+
+	}
+
+
+	@EventHandler
 	void onBlockReplacerPlayerInteract(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
 		Block block = event.getClickedBlock();
@@ -55,26 +72,6 @@ public class TBLTArenaListener implements Listener {
 					if(success) KotobaItemStack.consume(player.getInventory(), player.getItemInHand(), 1);
 				});
 		}
-	}
-
-
-	@EventHandler
-	void onPlayerRightClickBlockWithAir(PlayerInteractEvent event) {
-		Player player = event.getPlayer();
-		Block block = event.getClickedBlock();
-		if(block == null) return;
-		if(block.getType() == Material.AIR) return;
-		if(event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
-		if(player.getItemInHand().getType() != Material.AIR) return;
-		if(!Utility.isTBLTPlayer(player)) return;
-
-		Stream.of(InteractiveStructure.values())
-			.forEach(interactive -> interactive.interact(event));
-
-//		Arrays.asList(InteractiveBlockAbility.values(), InteractiveStructure.values()).stream()
-//			.flatMap(interactives -> Stream.of(interactives))
-//			.forEach(interactive -> interactive.interact(event));
-
 	}
 
 
