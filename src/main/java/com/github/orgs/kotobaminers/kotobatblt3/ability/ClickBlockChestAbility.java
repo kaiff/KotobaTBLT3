@@ -32,11 +32,11 @@ import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArena;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaMap;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTInteractiveChestType;
 import com.github.orgs.kotobaminers.kotobatblt3.citizens.UniqueNPC;
-import com.github.orgs.kotobaminers.kotobatblt3.gui.TBLTPlayerGUI;
+import com.github.orgs.kotobaminers.kotobatblt3.userinterface.TBLTPlayerGUI;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.RepeatingEffect;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.RepeatingEffectHolder;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTItemStackIcon;
-import com.github.orgs.kotobaminers.kotobatblt3.utility.Utility;
+import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTUtility;
 
 public enum ClickBlockChestAbility implements ClickBlockAbilityInterface, RepeatingEffectHolder {
 
@@ -144,7 +144,7 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface, Repeat
 						List<Player> others = Bukkit.getOnlinePlayers().stream()
 							.filter(p -> !p.getUniqueId().equals(player.getUniqueId()))
 							.filter(p -> arena.isIn(player.getLocation()))
-							.filter(p -> Utility.isTBLTPlayer(p))
+							.filter(p -> TBLTUtility.isTBLTPlayer(p))
 							.collect(Collectors.toList());
 
 						KotobaEffect.ENDER_SIGNAL.playEffect(block.getLocation());

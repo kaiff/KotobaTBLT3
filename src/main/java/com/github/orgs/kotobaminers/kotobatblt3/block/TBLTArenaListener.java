@@ -37,8 +37,8 @@ import org.bukkit.potion.Potion;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaEffect;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStack;
 import com.github.orgs.kotobaminers.kotobatblt3.ability.ProjectileAbility;
-import com.github.orgs.kotobaminers.kotobatblt3.gui.TBLTPlayerGUI;
-import com.github.orgs.kotobaminers.kotobatblt3.utility.Utility;
+import com.github.orgs.kotobaminers.kotobatblt3.userinterface.TBLTPlayerGUI;
+import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTUtility;
 
 public class TBLTArenaListener implements Listener {
 
@@ -65,7 +65,7 @@ public class TBLTArenaListener implements Listener {
 		Player player = event.getPlayer();
 		Block block = event.getClickedBlock();
 		if(block == null) return;
-		if(Utility.isTBLTPlayer(player)) {
+		if(TBLTUtility.isTBLTPlayer(player)) {
 			new BlockReplacerMap().findUnique(block.getLocation())
 				.ifPresent(replacer -> {
 					boolean success = ((BlockReplacer) replacer).replace(player, block);
@@ -95,7 +95,7 @@ public class TBLTArenaListener implements Listener {
 	void onEntityDamage(EntityDamageEvent event) {
 		if(event.getEntity() instanceof Player) {
 			Player player = (Player) event.getEntity();
-			if(!Utility.isTBLTPlayer(player)) return;
+			if(!TBLTUtility.isTBLTPlayer(player)) return;
 
 			double damage = 0;
 			//Fall damage multiply
@@ -127,7 +127,7 @@ public class TBLTArenaListener implements Listener {
 	void onPlayerRegainHealth(EntityRegainHealthEvent event) {
 		if(event.getEntity() instanceof Player) {
 			Player player = (Player) event.getEntity();
-			if(!Utility.isTBLTPlayer(player)) return;
+			if(!TBLTUtility.isTBLTPlayer(player)) return;
 
 			if(event.getRegainReason() == RegainReason.SATIATED) {
 				int rate = 5;
@@ -144,7 +144,7 @@ public class TBLTArenaListener implements Listener {
 	void onPlayerChangeFoodLevel(FoodLevelChangeEvent event) {
 		if(event.getEntity() instanceof Player) {
 			Player player = (Player) event.getEntity();
-			if(Utility.isTBLTPlayer(player)) {
+			if(TBLTUtility.isTBLTPlayer(player)) {
 				event.setCancelled(true);
 				player.setFoodLevel(20);
 				player.setSaturation(20);
@@ -163,7 +163,7 @@ public class TBLTArenaListener implements Listener {
 			if(block.getType() != Material.REDSTONE_ORE) return;
 			if(event.getTo() != Material.GLOWING_REDSTONE_ORE) return;
 
-			if(Utility.isTBLTPlayer(player)) {
+			if(TBLTUtility.isTBLTPlayer(player)) {
 				new TBLTArenaMap().findUnique(block.getLocation())
 					.ifPresent(storage -> {
 						TBLTArena arena = (TBLTArena) storage;
@@ -183,7 +183,7 @@ public class TBLTArenaListener implements Listener {
 		LivingEntity exited = event.getExited();
 		if(exited instanceof Player) {
 			Player player = (Player) exited;
-			if(Utility.isTBLTPlayer(player)) {
+			if(TBLTUtility.isTBLTPlayer(player)) {
 				Vehicle vehicle = event.getVehicle();
 				Location location = exited.getLocation();
 				KotobaEffect.MAGIC_MIDIUM.playEffect(location);
@@ -196,7 +196,7 @@ public class TBLTArenaListener implements Listener {
 
 	@EventHandler
 	void onItemPickup(PlayerPickupItemEvent event) {
-		if(Utility.isTBLTPlayer(event.getPlayer())) {
+		if(TBLTUtility.isTBLTPlayer(event.getPlayer())) {
 			event.setCancelled(true);
 		}
 	}
@@ -204,7 +204,7 @@ public class TBLTArenaListener implements Listener {
 
 	@EventHandler
 	void onItemDrop(PlayerDropItemEvent event) {
-		if(Utility.isTBLTPlayer(event.getPlayer())) {
+		if(TBLTUtility.isTBLTPlayer(event.getPlayer())) {
 			event.setCancelled(true);
 		}
 	}
@@ -219,7 +219,7 @@ public class TBLTArenaListener implements Listener {
 			if(itemStack.getType() == Material.POTION) {
 				Potion potion = Potion.fromItemStack(itemStack);
 				if(potion.isSplash()) {
-					if(Utility.isTBLTPlayer(player)) {
+					if(TBLTUtility.isTBLTPlayer(player)) {
 						event.setCancelled(true);
 						return;
 					}
@@ -233,7 +233,7 @@ public class TBLTArenaListener implements Listener {
 	void onInventoryOpen(InventoryOpenEvent event) {
 		if(event.getPlayer() instanceof Player) {
 			Player player = (Player) event.getPlayer();
-			if(Utility.isTBLTPlayer(player)) {
+			if(TBLTUtility.isTBLTPlayer(player)) {
 				if(!TBLTPlayerGUI.find(event.getInventory()).isPresent()) {
 					event.setCancelled(true);
 				}
@@ -246,7 +246,7 @@ public class TBLTArenaListener implements Listener {
 	void onInventoryClick(InventoryClickEvent event) {
 		if(event.getWhoClicked() instanceof Player) {
 			Player player = (Player) event.getWhoClicked();
-			if(Utility.isTBLTPlayer(player)) {
+			if(TBLTUtility.isTBLTPlayer(player)) {
 				if(!TBLTPlayerGUI.find(event.getInventory()).isPresent()) {
 					event.getWhoClicked().closeInventory();
 					event.setCancelled(true);
@@ -258,7 +258,7 @@ public class TBLTArenaListener implements Listener {
 
 	@EventHandler
 	public void onPlayerPortalEvent(PlayerPortalEvent event) {
-		if(Utility.isTBLTPlayer(event.getPlayer())) {
+		if(TBLTUtility.isTBLTPlayer(event.getPlayer())) {
 			event.setCancelled(true);
 			Stream.of(ChestPortal.values())
 				.filter(p -> 0 < p.chest.findChests(event.getFrom()).size())

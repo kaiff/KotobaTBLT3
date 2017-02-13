@@ -29,10 +29,11 @@ import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStackIcon;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaUtility;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArena;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaMap;
-import com.github.orgs.kotobaminers.kotobatblt3.gui.TBLTPlayerGUI;
 import com.github.orgs.kotobaminers.kotobatblt3.kotobatblt3.Setting;
+import com.github.orgs.kotobaminers.kotobatblt3.userinterface.TBLTPlayerGUI;
+import com.github.orgs.kotobaminers.kotobatblt3.utility.ChestKey;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTItemStackIcon;
-import com.github.orgs.kotobaminers.kotobatblt3.utility.Utility;
+import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTUtility;
 
 public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 
@@ -181,7 +182,7 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 				.ifPresent(arena -> {
 					List<Player> players = Bukkit.getOnlinePlayers().stream()
 						.filter(p -> arena.isIn(p.getLocation()))
-						.filter(p -> Utility.isTBLTPlayer(p))
+						.filter(p -> TBLTUtility.isTBLTPlayer(p))
 						.collect(Collectors.toList());
 					if(players.stream().allMatch(p -> p.isSneaking())) {
 						TBLTArena a = (TBLTArena) arena;
@@ -237,9 +238,9 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 				falling.setVelocity(new Vector(0, 1.2, 0));
 				falling.setDropItem(false);
 				block.setType(Material.AIR);
-				Utility.playJumpEffect(falling);
+				TBLTUtility.playJumpEffect(falling);
 				int duration = 3;
-				Utility.stopPlayer(player, duration);
+				TBLTUtility.stopPlayer(player, duration);
 				KotobaUtility.playCountDown(Setting.getPlugin(), Arrays.asList(player), duration);
 				return true;
 			}
@@ -259,7 +260,7 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 				.filter(e -> e instanceof Player)
 				.map(e -> (Player) player)
 				.filter(p -> p.isSneaking())
-				.filter(p -> Utility.isTBLTPlayer(p))
+				.filter(p -> TBLTUtility.isTBLTPlayer(p))
 				.findFirst()
 				.ifPresent(e -> player.teleport(e.getLocation()));
 			return true;

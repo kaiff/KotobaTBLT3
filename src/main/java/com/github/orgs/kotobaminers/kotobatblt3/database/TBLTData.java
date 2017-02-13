@@ -1,4 +1,4 @@
-package com.github.orgs.kotobaminers.kotobatblt3.game;
+package com.github.orgs.kotobaminers.kotobatblt3.database;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,9 +16,9 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 import com.github.orgs.kotobaminers.kotobaapi.ability.ItemStackAbilityInterface;
-import com.github.orgs.kotobaminers.kotobaapi.quest.KotobaQuest;
+import com.github.orgs.kotobaminers.kotobaapi.game.KotobaQuest;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaMap;
-import com.github.orgs.kotobaminers.kotobatblt3.quest.AbilityUseQuest;
+import com.github.orgs.kotobaminers.kotobatblt3.game.AbilityUseQuest;
 
 public class TBLTData {
 

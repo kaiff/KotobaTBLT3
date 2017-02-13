@@ -20,8 +20,8 @@ import com.github.orgs.kotobaminers.kotobaapi.block.PlayerBlockInteractive;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaSound;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArena;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaMap;
-import com.github.orgs.kotobaminers.kotobatblt3.game.TBLTData;
-import com.github.orgs.kotobaminers.kotobatblt3.utility.Utility;
+import com.github.orgs.kotobaminers.kotobatblt3.database.TBLTData;
+import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTUtility;
 
 public class ClickAbilityListener implements Listener {
 	@EventHandler
@@ -31,7 +31,7 @@ public class ClickAbilityListener implements Listener {
 		List<Action> clicks = Arrays.asList(Action.LEFT_CLICK_AIR, Action.LEFT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR, Action.RIGHT_CLICK_BLOCK);
 		if(!clicks.contains(event.getAction())) return;
 
-		if(!Utility.isTBLTPlayer(player)) return;
+		if(!TBLTUtility.isTBLTPlayer(player)) return;
 
 		List<PlayerBlockInteractive> interactives = PlayerInteractiveManager.find(event);
 
@@ -58,7 +58,7 @@ public class ClickAbilityListener implements Listener {
 
 		if(itemStack.getType() == Material.AIR) return;
 		if(!((Entity) player).isOnGround()) return;
-		if(!Utility.isTBLTPlayer(player)) return;
+		if(!TBLTUtility.isTBLTPlayer(player)) return;
 
 		PlayerInteractiveManager.find(event)
 			.stream()

@@ -1,4 +1,4 @@
-package com.github.orgs.kotobaminers.kotobatblt3.gui;
+package com.github.orgs.kotobaminers.kotobatblt3.userinterface;
 
 import java.util.List;
 
@@ -8,7 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
 import com.github.orgs.kotobaminers.kotobaapi.userinterface.GUIIcon;
-import com.github.orgs.kotobaminers.kotobatblt3.ability.ChestKey;
+import com.github.orgs.kotobaminers.kotobatblt3.utility.ChestKey;
 
 public enum TBLTIcon implements GUIIcon {
 	INFORMATION(Material.BOOK, 1, (short) 0, "Information", null) {

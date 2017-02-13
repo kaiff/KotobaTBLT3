@@ -8,7 +8,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 
-import com.github.orgs.kotobaminers.kotobatblt3.utility.Utility;
+import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTUtility;
 
 public class GeneratableBlockListener implements Listener {
 	@EventHandler
@@ -17,7 +17,7 @@ public class GeneratableBlockListener implements Listener {
 			Block clickedBlock = event.getClickedBlock();
 			if(clickedBlock.getType() == Material.GOLD_PLATE) {
 				Player player = event.getPlayer();
-				if(!Utility.isTBLTPlayer(player)) return;
+				if(!TBLTUtility.isTBLTPlayer(player)) return;
 				GeneratableBlock.find(clickedBlock.getLocation())
 					.ifPresent(b -> b.perform(event));
 			}

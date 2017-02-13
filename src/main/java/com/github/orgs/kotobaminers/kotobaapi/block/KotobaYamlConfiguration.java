@@ -19,7 +19,7 @@ import org.bukkit.block.Chest;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
 
-import com.github.orgs.kotobaminers.kotobatblt3.utility.Utility;
+import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTUtility;
 
 public abstract class KotobaYamlConfiguration {
 
@@ -81,7 +81,7 @@ public abstract class KotobaYamlConfiguration {
 
 	public static List<KotobaBlockData> loadBlocksData(YamlConfiguration config, String blockPath, String worldPath) {
 		return Optional.ofNullable(config.getString(worldPath))
-			.flatMap(name -> Utility.findWorld(name))
+			.flatMap(name -> TBLTUtility.findWorld(name))
 			.map(world ->
 				config.getStringList(blockPath)
 					.stream()
@@ -106,7 +106,7 @@ public abstract class KotobaYamlConfiguration {
 	public static List<Chest> loadChests(YamlConfiguration config, String chestPath, String worldPath, boolean update) {
 		List<Chest> chests = new ArrayList<>();
 		Optional.ofNullable(config.getString(worldPath))
-			.flatMap(name -> Utility.findWorld(name))
+			.flatMap(name -> TBLTUtility.findWorld(name))
 			.ifPresent(world -> {
 				if(!config.isConfigurationSection(chestPath)) return;
 				config.getConfigurationSection(chestPath).getKeys(false).stream()

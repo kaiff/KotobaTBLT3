@@ -1,6 +1,6 @@
 package com.github.orgs.kotobaminers.kotobatblt3.kotobatblt3;
 
-import com.github.orgs.kotobaminers.kotobaapi.sentence.Holograms;
+import com.github.orgs.kotobaminers.kotobaapi.userinterface.Holograms;
 import com.github.orgs.kotobaminers.kotobatblt3.block.BlockReplacerMap;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaMap;
 import com.github.orgs.kotobaminers.kotobatblt3.database.PlayerDatabase;

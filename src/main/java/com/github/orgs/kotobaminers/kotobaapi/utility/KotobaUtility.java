@@ -37,6 +37,8 @@ import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.selections.Selection;
 
 public class KotobaUtility {
+
+
 	public static List<String> splitSentence(String sentence, int number) {
 		List<String> words = Arrays.asList(sentence.split(" "));
 		List<List<String>> groups = new ArrayList<>();
@@ -57,6 +59,7 @@ public class KotobaUtility {
 		return groups.stream().filter(g -> 0 < g.size()).map(g -> String.join(" ", g)).collect(Collectors.toList());
 	}
 
+
 	public static void shootFirework(World world, Location location) {
 		Firework fw = world.spawn(location, Firework.class);
 		FireworkMeta fwm = fw.getFireworkMeta();
@@ -66,6 +69,7 @@ public class KotobaUtility {
 		fwm.setPower(0);
 		fw.setFireworkMeta(fwm);
 	}
+
 
 	public static List<Block> getBlocks(World world, int xMax, int yMax, int zMax, int xMin, int yMin, int zMin) {
 		List<Block> blocks = new ArrayList<>();
@@ -102,6 +106,7 @@ public class KotobaUtility {
 			.collect(Collectors.toList());
 	}
 
+
 	public static List<String> toStringListFromBookMeta(BookMeta bookMeta, int page) {
 		if(bookMeta.getPageCount() <= page) {
 			return Stream.of(bookMeta.getPage(page).split("\n"))
@@ -111,6 +116,7 @@ public class KotobaUtility {
 		return new ArrayList<>();
 
 	}
+
 
 	public static ItemStack createPlayerSkull(String owner) {
 		ItemStack skull = new ItemStack(Material.SKULL_ITEM, 1, (short) SkullType.PLAYER.ordinal());

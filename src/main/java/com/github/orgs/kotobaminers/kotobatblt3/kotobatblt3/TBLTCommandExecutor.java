@@ -24,7 +24,7 @@ import com.github.orgs.kotobaminers.develop.TBLTTest;
 import com.github.orgs.kotobaminers.kotobaapi.citizens.KotobaCitizensManager;
 import com.github.orgs.kotobaminers.kotobaapi.kotobaapi.CommandEnumInterface;
 import com.github.orgs.kotobaminers.kotobaapi.kotobaapi.PermissionEnumInterface;
-import com.github.orgs.kotobaminers.kotobaapi.sentence.Holograms;
+import com.github.orgs.kotobaminers.kotobaapi.userinterface.Holograms;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaStructureUtility;
 import com.github.orgs.kotobaminers.kotobatblt3.block.BlockReplacer;
 import com.github.orgs.kotobaminers.kotobatblt3.block.BlockReplacerMap;
@@ -37,11 +37,11 @@ import com.github.orgs.kotobaminers.kotobatblt3.database.PlayerDatabase;
 import com.github.orgs.kotobaminers.kotobatblt3.database.SentenceDatabase;
 import com.github.orgs.kotobaminers.kotobatblt3.database.TBLTConversationEditorMap;
 import com.github.orgs.kotobaminers.kotobatblt3.game.TBLTJob;
-import com.github.orgs.kotobaminers.kotobatblt3.gui.IconCreatorUtility;
-import com.github.orgs.kotobaminers.kotobatblt3.gui.TBLTIconListGUI;
-import com.github.orgs.kotobaminers.kotobatblt3.gui.TBLTPlayerGUI;
+import com.github.orgs.kotobaminers.kotobatblt3.userinterface.IconCreatorUtility;
+import com.github.orgs.kotobaminers.kotobatblt3.userinterface.TBLTIconListGUI;
+import com.github.orgs.kotobaminers.kotobatblt3.userinterface.TBLTPlayerGUI;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTItemStackIcon;
-import com.github.orgs.kotobaminers.kotobatblt3.utility.Utility;
+import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTUtility;
 
 public class TBLTCommandExecutor implements CommandExecutor {
 
@@ -114,7 +114,7 @@ public class TBLTCommandExecutor implements CommandExecutor {
 			@Override
 			public boolean perform(Player player , String[] args) {
 				Location location = player.getLocation();
-				Utility.getSpherePositions(player.getLocation(), 5).stream()
+				TBLTUtility.getSpherePositions(player.getLocation(), 5).stream()
 					.map(l -> l.getBlock())
 					.filter(b -> b.getState() instanceof Chest)
 					.map(b -> b.getLocation())

@@ -1,4 +1,4 @@
-package com.github.orgs.kotobaminers.kotobatblt3.gui;
+package com.github.orgs.kotobaminers.kotobatblt3.userinterface;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,9 +10,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStack;
-import com.github.orgs.kotobaminers.kotobatblt3.ability.ChestKey;
 import com.github.orgs.kotobaminers.kotobatblt3.block.BlockReplacer;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArena;
+import com.github.orgs.kotobaminers.kotobatblt3.utility.ChestKey;
 
 public class IconCreatorUtility {
 	public static List<ItemStack> getIcons(TBLTArena arena) {

@@ -1,4 +1,4 @@
-package com.github.orgs.kotobaminers.kotobatblt3.gui;
+package com.github.orgs.kotobaminers.kotobatblt3.userinterface;
 
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -13,7 +13,7 @@ import com.github.orgs.kotobaminers.kotobaapi.userinterface.ChestGUI;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaEffect;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStack;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaSound;
-import com.github.orgs.kotobaminers.kotobatblt3.game.TBLTData;
+import com.github.orgs.kotobaminers.kotobatblt3.database.TBLTData;
 import com.github.orgs.kotobaminers.kotobatblt3.game.TBLTJob;
 
 public enum TBLTPlayerGUI implements ChestGUI {

@@ -1,8 +1,7 @@
-package com.github.orgs.kotobaminers.kotobatblt3.ability;
+package com.github.orgs.kotobaminers.kotobatblt3.utility;
 
 import com.github.orgs.kotobaminers.kotobaapi.ability.ItemStackAbilityInterface;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStackIcon;
-import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTItemStackIcon;
 
 public enum ChestKey implements ItemStackAbilityInterface {
 

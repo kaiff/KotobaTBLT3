@@ -1,4 +1,4 @@
-package com.github.orgs.kotobaminers.kotobatblt3.gui;
+package com.github.orgs.kotobaminers.kotobatblt3.userinterface;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;

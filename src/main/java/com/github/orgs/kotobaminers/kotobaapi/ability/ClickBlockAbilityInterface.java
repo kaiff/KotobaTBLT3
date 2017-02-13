@@ -10,7 +10,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.github.orgs.kotobaminers.kotobaapi.block.PlayerBlockInteractive;
-import com.github.orgs.kotobaminers.kotobatblt3.game.TBLTData;
+import com.github.orgs.kotobaminers.kotobatblt3.database.TBLTData;
 
 public interface ClickBlockAbilityInterface extends ItemStackAbilityInterface, PlayerBlockInteractive {
 

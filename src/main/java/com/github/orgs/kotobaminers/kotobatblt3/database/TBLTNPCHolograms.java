@@ -12,12 +12,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import com.github.orgs.kotobaminers.kotobaapi.citizens.KotobaCitizensManager;
-import com.github.orgs.kotobaminers.kotobaapi.sentence.Holograms;
 import com.github.orgs.kotobaminers.kotobaapi.sentence.Sentence;
 import com.github.orgs.kotobaminers.kotobaapi.sentence.Sentence.Expression;
+import com.github.orgs.kotobaminers.kotobaapi.userinterface.Holograms;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaSound;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaUtility;
-import com.github.orgs.kotobaminers.kotobatblt3.utility.Utility;
+import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTUtility;
 
 import net.citizensnpcs.api.npc.NPC;
 
@@ -30,7 +30,7 @@ public class TBLTNPCHolograms extends Holograms {
 	private List<String> getLines(Sentence sentence) {
 		List<String> lines = sentence.getLines(EXPRESSIONS);
 		List<Sentence> sentences = new SentenceDatabase().getSentencesByConversation(sentence.getConversation());
-		lines.add(0, Utility.patternProgress("◇", "◆", sentences.size(), sentences.stream().map(Sentence::getId).collect(Collectors.toList()).indexOf(sentence.getId()), ChatColor.GREEN));
+		lines.add(0, TBLTUtility.patternProgress("◇", "◆", sentences.size(), sentences.stream().map(Sentence::getId).collect(Collectors.toList()).indexOf(sentence.getId()), ChatColor.GREEN));
 		return lines;
 	}
 

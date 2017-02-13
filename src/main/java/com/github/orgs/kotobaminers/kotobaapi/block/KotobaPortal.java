@@ -7,7 +7,7 @@ import org.bukkit.Material;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.util.Vector;
 
-public interface KotobaPortalInterface {
+public interface KotobaPortal {
 
 
 	List<Vector> getPositions();

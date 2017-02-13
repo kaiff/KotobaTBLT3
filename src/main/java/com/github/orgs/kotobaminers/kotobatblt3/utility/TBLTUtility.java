@@ -19,7 +19,7 @@ import org.bukkit.entity.Player;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaMap;
 import com.github.orgs.kotobaminers.kotobatblt3.kotobatblt3.Setting;
 
-public class Utility {
+public class TBLTUtility {
 	public static Location getRandomLocation(Location location, double radius) {
 		Random random = new Random();
 		double x = (random.nextDouble() - 0.5) * radius * 2;

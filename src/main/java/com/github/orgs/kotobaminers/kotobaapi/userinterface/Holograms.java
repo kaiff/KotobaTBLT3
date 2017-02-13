@@ -1,4 +1,4 @@
-package com.github.orgs.kotobaminers.kotobaapi.sentence;
+package com.github.orgs.kotobaminers.kotobaapi.userinterface;
 
 import java.util.Collections;
 import java.util.List;
@@ -12,12 +12,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.github.orgs.kotobaminers.kotobaapi.block.KotobaBlockStorage;
 
-public abstract class Holograms {
+public class Holograms {
 
 
 	private static final double SPACE = 0.25;
 	private static final int DUPLICATE =  3;
 	private static final double ARMOR_STAND_HEIGHT = 1.5;
+
 
 	public boolean display(List<String> lines, Location base) {
 		Collections.reverse(lines);
@@ -45,16 +46,6 @@ public abstract class Holograms {
 	}
 
 
-	private static boolean isHologramArmorStand(Entity entity) {
-		if(entity instanceof ArmorStand) {
-			ArmorStand stand = (ArmorStand) entity;
-			if(stand.hasGravity() == false && stand.isVisible() == false && stand.isCustomNameVisible() == true) {
-				return true;
-			}
-		}
-		return false;
-	}
-
 	public void removeNear(Location location) {
 		location.getWorld().getNearbyEntities(location, 0.1, 2, 0.1).stream()
 			.filter(e -> isHologramArmorStand(e))
@@ -66,9 +57,22 @@ public abstract class Holograms {
 		plugin.getServer().getWorlds().stream()
 			.forEach(world -> world.getEntities().stream().filter(Holograms::isHologramArmorStand).forEach(e -> e.remove()));
 	}
+
+
 	public static void removeHolograms(JavaPlugin plugin, KotobaBlockStorage storage) {
 		plugin.getServer().getWorlds().stream()
 			.forEach(world -> world.getEntities().stream().filter(Holograms::isHologramArmorStand).filter(e -> storage.isIn(e.getLocation())).forEach(e -> e.remove()));
+	}
+
+
+	private static boolean isHologramArmorStand(Entity entity) {
+		if(entity instanceof ArmorStand) {
+			ArmorStand stand = (ArmorStand) entity;
+			if(stand.hasGravity() == false && stand.isVisible() == false && stand.isCustomNameVisible() == true) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 

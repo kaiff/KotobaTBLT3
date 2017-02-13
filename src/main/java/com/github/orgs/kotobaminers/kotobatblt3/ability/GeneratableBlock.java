@@ -13,7 +13,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.util.Vector;
 
 import com.github.orgs.kotobaminers.kotobatblt3.kotobatblt3.Setting;
-import com.github.orgs.kotobaminers.kotobatblt3.utility.Utility;
+import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTUtility;
 
 public enum GeneratableBlock {
 	BLOCK(
@@ -38,7 +38,7 @@ public enum GeneratableBlock {
 		void perform(PlayerInteractEvent event) {
 			Player player = event.getPlayer();
 			player.setVelocity(new Vector(0, 0.8, 0));
-			Utility.playJumpEffect(player);
+			TBLTUtility.playJumpEffect(player);
 		}
 	},
 

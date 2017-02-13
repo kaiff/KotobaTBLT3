@@ -1,10 +1,10 @@
-package com.github.orgs.kotobaminers.kotobatblt3.quest;
+package com.github.orgs.kotobaminers.kotobatblt3.game;
 
 import org.bukkit.entity.Player;
 
 import com.github.orgs.kotobaminers.kotobaapi.ability.ItemStackAbilityInterface;
-import com.github.orgs.kotobaminers.kotobaapi.quest.KotobaQuest;
-import com.github.orgs.kotobaminers.kotobatblt3.game.TBLTData;
+import com.github.orgs.kotobaminers.kotobaapi.game.KotobaQuest;
+import com.github.orgs.kotobaminers.kotobatblt3.database.TBLTData;
 
 public class AbilityUseQuest extends KotobaQuest {
 

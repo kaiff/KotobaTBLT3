@@ -1,4 +1,4 @@
-package com.github.orgs.kotobaminers.kotobaapi.quest;
+package com.github.orgs.kotobaminers.kotobaapi.game;
 
 import org.bukkit.entity.Player;
 

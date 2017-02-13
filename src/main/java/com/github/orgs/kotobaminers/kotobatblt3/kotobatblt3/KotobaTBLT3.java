@@ -6,9 +6,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.github.orgs.kotobaminers.kotobatblt3.ability.ClickAbilityListener;
 import com.github.orgs.kotobaminers.kotobatblt3.ability.GeneratableBlockListener;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaListener;
-import com.github.orgs.kotobaminers.kotobatblt3.gui.TBLTPlayerGUIListener;
-import com.github.orgs.kotobaminers.kotobatblt3.gui.TBLTIconListGUIListener;
 import com.github.orgs.kotobaminers.kotobatblt3.kotobatblt3.TBLTCommandExecutor.PlayerCommand;
+import com.github.orgs.kotobaminers.kotobatblt3.userinterface.TBLTIconListGUIListener;
+import com.github.orgs.kotobaminers.kotobatblt3.userinterface.TBLTPlayerGUIListener;
 
 
 public class KotobaTBLT3 extends JavaPlugin {

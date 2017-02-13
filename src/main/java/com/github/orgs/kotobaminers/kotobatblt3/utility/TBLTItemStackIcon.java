@@ -76,6 +76,15 @@ public enum TBLTItemStackIcon implements KotobaItemStackIcon {
 	),
 
 
+	CHEST_HOLOGRAMS(
+			Material.TRAPPED_CHEST,
+			(short) 0,
+			"Chest Holograms",
+			Arrays.asList("Write Books"),
+			IconFindType.SIMILAR
+	),
+
+
 	GREEN_GEM(
 			Material.EMERALD_BLOCK,
 			(short) 0,

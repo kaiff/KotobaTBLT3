@@ -23,7 +23,7 @@ import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaEffect;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStackIcon;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaMap;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTItemStackIcon;
-import com.github.orgs.kotobaminers.kotobatblt3.utility.Utility;
+import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTUtility;
 
 public enum ClickEntityAbility implements ClickEntityAbilityInterface {
 	MIRROR_IMAGE(
@@ -34,7 +34,7 @@ public enum ClickEntityAbility implements ClickEntityAbilityInterface {
 		public boolean interact(PlayerInteractEntityEvent event) {
 			if(event.getRightClicked() instanceof Player) {
 				Player clicked = (Player) event.getRightClicked();
-				if(!Utility.isTBLTPlayer(clicked)) return false;
+				if(!TBLTUtility.isTBLTPlayer(clicked)) return false;
 				Location from = clicked.getLocation();
 
 				List<Block> targets = clicked.getLastTwoTargetBlocks(new HashSet<Material>(Arrays.asList(Material.AIR)), 4);
@@ -100,7 +100,7 @@ public enum ClickEntityAbility implements ClickEntityAbilityInterface {
 		public boolean interact(PlayerInteractEntityEvent event) {
 			if(event.getRightClicked() instanceof Player) {
 				Player player = (Player) event.getRightClicked();
-				if(Utility.isTBLTPlayer(player)) {
+				if(TBLTUtility.isTBLTPlayer(player)) {
 					player.leaveVehicle();
 					Minecart cart = (Minecart) player.getWorld().spawnEntity(player.getLocation(), EntityType.MINECART);
 					cart.setPassenger(player);
@@ -123,7 +123,7 @@ public enum ClickEntityAbility implements ClickEntityAbilityInterface {
 			if(!entity.isOnGround()) return false;
 
 			entity.setVelocity(new Vector(0, 0.4, 0));
-			Utility.playJumpEffect(entity);
+			TBLTUtility.playJumpEffect(entity);
 			entity.getLocation().getWorld().playEffect(entity.getLocation(), Effect.POTION_BREAK, 0);
 			return true;
 		}
@@ -150,7 +150,7 @@ public enum ClickEntityAbility implements ClickEntityAbilityInterface {
 			clicked.setVelocity(velocity);
 
 			KotobaEffect.MAGIC_MIDIUM.playEffect(clicked.getLocation());
-			Utility.playJumpEffect(clicked);
+			TBLTUtility.playJumpEffect(clicked);
 
 			return true;
 		}

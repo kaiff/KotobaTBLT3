@@ -15,15 +15,15 @@ import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.util.Vector;
 
 import com.github.orgs.kotobaminers.kotobaapi.block.KotobaBlockData;
-import com.github.orgs.kotobaminers.kotobaapi.block.KotobaPortalInterface;
+import com.github.orgs.kotobaminers.kotobaapi.block.KotobaPortal;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaEffect;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStackIcon;
-import com.github.orgs.kotobaminers.kotobatblt3.ability.ChestKey;
-import com.github.orgs.kotobaminers.kotobatblt3.ability.ChestReader;
+import com.github.orgs.kotobaminers.kotobatblt3.utility.ChestKey;
+import com.github.orgs.kotobaminers.kotobatblt3.utility.ChestReader;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTItemStackIcon;
-import com.github.orgs.kotobaminers.kotobatblt3.utility.Utility;
+import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTUtility;
 
-public enum ChestPortal implements KotobaPortalInterface {
+public enum ChestPortal implements KotobaPortal {
 	GEM_PORTAL(
 		TBLTItemStackIcon.GEM_PORTAL_KEY_3x3,
 		Material.ENDER_PORTAL,
@@ -37,10 +37,10 @@ public enum ChestPortal implements KotobaPortalInterface {
 				.ifPresent(a -> {
 					List<Player> inPortal = Bukkit.getOnlinePlayers().stream()
 						.filter(p -> p.getLocation().getBlock().getType() == Material.ENDER_PORTAL)
-						.filter(p -> Utility.isTBLTPlayer(p))
+						.filter(p -> TBLTUtility.isTBLTPlayer(p))
 						.collect(Collectors.toList());
 					List<Player> inArena = Bukkit.getOnlinePlayers().stream()
-							.filter(p -> Utility.isTBLTPlayer(p))
+							.filter(p -> TBLTUtility.isTBLTPlayer(p))
 							.collect(Collectors.toList());
 
 					if(isSinglePortal(from) || (1 < inPortal.size()) && inPortal.size() == inArena.size()) {
@@ -113,7 +113,7 @@ public enum ChestPortal implements KotobaPortalInterface {
 				.map(a -> (TBLTArena) a)
 				.ifPresent(a -> {
 					List<Player> inArena = Bukkit.getOnlinePlayers().stream()
-						.filter(p -> Utility.isTBLTPlayer(p))
+						.filter(p -> TBLTUtility.isTBLTPlayer(p))
 						.filter(p -> a.isIn(p.getLocation()))
 						.collect(Collectors.toList());
 					List<Player> inPortal = inArena.stream()

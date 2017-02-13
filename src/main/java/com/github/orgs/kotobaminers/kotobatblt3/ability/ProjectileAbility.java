@@ -30,7 +30,7 @@ import com.github.orgs.kotobaminers.kotobatblt3.block.EditableBlock;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaMap;
 import com.github.orgs.kotobaminers.kotobatblt3.kotobatblt3.Setting;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTItemStackIcon;
-import com.github.orgs.kotobaminers.kotobatblt3.utility.Utility;
+import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTUtility;
 
 public enum ProjectileAbility implements ProjectileAbilityInterface {
 
@@ -51,7 +51,7 @@ public enum ProjectileAbility implements ProjectileAbilityInterface {
 					.filter(e -> e.getResistance() <= 1)
 					.map(b -> b.getMaterial())
 					.collect(Collectors.toList());
-			Utility.getSpherePositions(center, 3)
+			TBLTUtility.getSpherePositions(center, 3)
 			.stream()
 			.map(l -> l.getWorld().getBlockAt(l))
 			.filter(b -> materials.contains(b.getType()))
@@ -89,7 +89,7 @@ public enum ProjectileAbility implements ProjectileAbilityInterface {
 					.filter(p -> p.getLocation().distance(projectile.getLocation()) < 3)
 					.forEach(p -> {
 						p.setVelocity(shooter.getLocation().subtract(p.getLocation()).toVector().normalize().multiply(new Vector(2,0,2)).add(new Vector(0,0.5,0)));
-						Utility.playJumpEffect(p);
+						TBLTUtility.playJumpEffect(p);
 					});
 				Bukkit.getOnlinePlayers().stream()
 					.forEach(p -> System.out.println(p.getName() + p.getLocation().distance(projectile.getLocation())));
@@ -120,7 +120,7 @@ public enum ProjectileAbility implements ProjectileAbilityInterface {
 			KotobaEffect.MAGIC_MIDIUM.playSound(location);
 			Location center = projectile.getWorld().getBlockAt(location).getLocation();
 			List<Material> materials = Arrays.asList(Material.WATER, Material.STATIONARY_WATER);
-			Utility.getSpherePositions(center, 3)
+			TBLTUtility.getSpherePositions(center, 3)
 			.stream()
 			.map(l -> l.getWorld().getBlockAt(l))
 			.filter(b -> materials.contains(b.getType()))
@@ -155,7 +155,7 @@ public enum ProjectileAbility implements ProjectileAbilityInterface {
 				.filter(e -> e.getResistance() <= 1)
 				.map(b -> b.getMaterial())
 				.collect(Collectors.toList());
-			Utility.getSpherePositions(center, 3)
+			TBLTUtility.getSpherePositions(center, 3)
 				.stream()
 				.map(l -> l.getWorld().getBlockAt(l))
 				.filter(b -> materials.contains(b.getType()))
@@ -185,7 +185,7 @@ public enum ProjectileAbility implements ProjectileAbilityInterface {
 		}
 		@Override
 		public void onHit(ProjectileHitEvent event) {
-			Utility.getSpherePositions(event.getEntity().getLocation().getBlock().getLocation(), 2)
+			TBLTUtility.getSpherePositions(event.getEntity().getLocation().getBlock().getLocation(), 2)
 				.stream()
 				.map(l -> l.getWorld().getBlockAt(l))
 				.filter(b -> b.getType() == Material.DEAD_BUSH)
@@ -212,7 +212,7 @@ public enum ProjectileAbility implements ProjectileAbilityInterface {
 		}
 		@Override
 		public void onHit(ProjectileHitEvent event) {
-			Utility.getSpherePositions(event.getEntity().getLocation().getBlock().getLocation(), 2)
+			TBLTUtility.getSpherePositions(event.getEntity().getLocation().getBlock().getLocation(), 2)
 			.stream()
 			.map(l -> l.getWorld().getBlockAt(l))
 			.filter(b -> EditableBlock.find(b.getType()).filter(e -> e.getResistance() <= 2).isPresent())
@@ -250,8 +250,8 @@ public enum ProjectileAbility implements ProjectileAbilityInterface {
 				if(GeneratableBlock.BLOCK.canGenerate(location)) {
 					GeneratableBlock.BLOCK.generate(location);
 					GeneratableBlock.BLOCK.delete(location, duration);
-					Utility.scheduleBlockEffect(player, duration, location);
-					Utility.stopPlayer(player, duration);
+					TBLTUtility.scheduleBlockEffect(player, duration, location);
+					TBLTUtility.stopPlayer(player, duration);
 					KotobaUtility.playCountDown(Setting.getPlugin(), Arrays.asList(player), duration);
 				} else {
 					KotobaSound.FAILED.play(player.getLocation());
@@ -287,8 +287,8 @@ public enum ProjectileAbility implements ProjectileAbilityInterface {
 				if(GeneratableBlock.WEB.canGenerate(location)) {
 					GeneratableBlock.WEB.generate(location);
 					GeneratableBlock.WEB.delete(location, duration);
-					Utility.scheduleBlockEffect(player, duration, location);
-					Utility.stopPlayer(player, duration);
+					TBLTUtility.scheduleBlockEffect(player, duration, location);
+					TBLTUtility.stopPlayer(player, duration);
 					KotobaUtility.playCountDown(Setting.getPlugin(), Arrays.asList(player), duration);
 				} else {
 					KotobaSound.FAILED.play(player.getLocation());
@@ -317,8 +317,8 @@ public enum ProjectileAbility implements ProjectileAbilityInterface {
 				if(GeneratableBlock.JUMPER.canGenerate(location)) {
 					GeneratableBlock.JUMPER.generate(location);
 					GeneratableBlock.JUMPER.delete(location, duration);
-					Utility.scheduleBlockEffect(player, duration, location);
-					Utility.stopPlayer(player, duration);
+					TBLTUtility.scheduleBlockEffect(player, duration, location);
+					TBLTUtility.stopPlayer(player, duration);
 					KotobaUtility.playCountDown(Setting.getPlugin(), Arrays.asList(player), duration);
 				} else {
 					KotobaSound.FAILED.play(player.getLocation());

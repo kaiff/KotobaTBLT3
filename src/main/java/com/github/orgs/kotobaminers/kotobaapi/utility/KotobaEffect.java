@@ -10,7 +10,7 @@ import org.bukkit.inventory.ItemStack;
 import com.github.orgs.kotobaminers.kotobatblt3.block.EditableBlock;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaMap;
 import com.github.orgs.kotobaminers.kotobatblt3.kotobatblt3.Setting;
-import com.github.orgs.kotobaminers.kotobatblt3.utility.Utility;
+import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTUtility;
 
 public enum KotobaEffect {
 	MUTE() {
@@ -34,7 +34,7 @@ public enum KotobaEffect {
 		public void playEffect(Location location) {
 			Effect effect = Effect.valueOf("WITCH_MAGIC");
 			for(int i = 0; i < 10; i++) {
-				location.getWorld().playEffect(Utility.getRandomLocation(location, 2), effect, 0);
+				location.getWorld().playEffect(TBLTUtility.getRandomLocation(location, 2), effect, 0);
 			}
 		}
 	},
@@ -66,7 +66,7 @@ public enum KotobaEffect {
 		public void playEffect(Location location) {
 			Effect effect = Effect.valueOf("HAPPY_VILLAGER");
 			for(int i = 0; i < 10; i++) {
-				location.getWorld().playEffect(Utility.getRandomLocation(location, 1), effect, i);
+				location.getWorld().playEffect(TBLTUtility.getRandomLocation(location, 1), effect, i);
 			}
 		}
 	},
@@ -79,7 +79,7 @@ public enum KotobaEffect {
 		@Override
 		public void playEffect(Location location) {
 			Effect effect = Effect.valueOf("HAPPY_VILLAGER");
-			location.getWorld().playEffect(Utility.getRandomLocation(location, 1), effect, 0);
+			location.getWorld().playEffect(TBLTUtility.getRandomLocation(location, 1), effect, 0);
 		}
 	},
 
@@ -123,7 +123,7 @@ public enum KotobaEffect {
 		@Override
 		public void playEffect(Location location) {
 			location.getWorld().playEffect(location, Effect.valueOf("EXPLOSION_LARGE"), 0);
-			Utility.getSpherePositions(location, 3)
+			TBLTUtility.getSpherePositions(location, 3)
 				.stream()
 				.map(l -> l.getWorld().getBlockAt(l))
 				.filter(b -> EditableBlock.find(b.getType()).filter(e -> e.getResistance() <= 1).isPresent())
