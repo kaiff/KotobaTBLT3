@@ -6,7 +6,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -42,30 +41,6 @@ public interface InteractiveChestFinder extends KotobaConfigChestFinder {
 
 
 	InteractType getTargetType();
-
-
-	enum InteractType {
-		AIR {
-			@Override
-			Optional<Block> getTargetBlock(PlayerInteractEvent event) {
-				Block block = event.getClickedBlock().getRelative(event.getBlockFace());
-				if(block.getType() == Material.AIR) {
-					return Optional.of(block);
-				}
-				return Optional.empty();
-			}
-		},
-		BLOCK {
-			@Override
-			Optional<Block> getTargetBlock(PlayerInteractEvent event) {
-				return Optional.ofNullable(event.getClickedBlock());
-			}
-		},
-		;
-
-		abstract Optional<Block> getTargetBlock(PlayerInteractEvent event);
-
-	}
 
 
 }

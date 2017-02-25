@@ -24,7 +24,6 @@ import com.github.orgs.kotobaminers.kotobatblt3.ability.ClickBlockChestAbility;
 
 		MAGICIAN(
 			new LinkedHashMap<ClickBlockAbilityInterface, Integer>() {{
-				put(ClickBlockChestAbility.SUMMON_SERVANT_1, 1);
 				put(ClickBlockAbility.REWIND_TIME, 1);
 				put(ClickBlockAbility.CLAIRVOYANCE, 1);
 				put(ClickBlockChestAbility.SEE_MEMORY, 1);
@@ -35,7 +34,6 @@ import com.github.orgs.kotobaminers.kotobatblt3.ability.ClickBlockChestAbility;
 
 		ENGINEER(
 			new LinkedHashMap<ClickBlockAbilityInterface, Integer>() {{
-				put(ClickBlockChestAbility.SUMMON_SERVANT_2, 1);
 				put(ClickBlockChestAbility.INVESTIGATE, 1);
 				put(ClickBlockAbility.LOCK_PICKING, 1);
 			}},

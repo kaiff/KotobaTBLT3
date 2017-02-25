@@ -58,7 +58,7 @@ public class ChestReader {
 	}
 
 
-	private static Optional<Map<Vector, Material>> findPattern3By3(Chest chest) {
+	public static Optional<Map<Vector, Material>> findPattern3By3(Chest chest) {
 		boolean is3x3 = Stream.of(chest.getInventory().getContents())
 			.filter(i -> i != null)
 			.anyMatch(i -> ChestKey.GEM_PORTAL_KEY_3X3.getIcon().isIconItemStack(i));
@@ -67,31 +67,29 @@ public class ChestReader {
 
 		Map<Vector, Material> pattern = new HashMap<Vector, Material>();
 		Map<Vector, Integer> index = new HashMap<Vector, Integer>() {{
-			put(new Vector(-1,0,1), 3);
-			put(new Vector(0,0,1), 4);
-			put(new Vector(1,0,1), 5);
+			put(new Vector(-1,0,-1), 3);
+			put(new Vector(0,0,-1), 4);
+			put(new Vector(1,0,-1), 5);
 			put(new Vector(-1,0,0), 12);
 			put(new Vector(0,0,0), 13);
 			put(new Vector(1,0,0), 14);
-			put(new Vector(-1,0,-1), 21);
-			put(new Vector(0,0,-1), 22);
-			put(new Vector(1,0,-1), 23);
+			put(new Vector(-1,0,1), 21);
+			put(new Vector(0,0,1), 22);
+			put(new Vector(1,0,1), 23);
 		}};
 
 		Inventory inventory = chest.getInventory();
 		index.entrySet().stream()
 			.forEach(e -> {
 				ItemStack item = inventory.getItem(e.getValue());
-				if(item != null) {
-					pattern.put(e.getKey(), item.getType());
+				if(item == null) {
+					item = new ItemStack(Material.AIR);
 				}
+				pattern.put(e.getKey(), item.getType());
 			});
 
-		if(pattern.size() == index.size()) {
-			return Optional.of(pattern);
-		}
+		return Optional.of(pattern);
 
-		return Optional.empty();
 	}
 
 

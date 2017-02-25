@@ -1,6 +1,5 @@
 package com.github.orgs.kotobaminers.kotobatblt3.ability;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -16,21 +15,21 @@ public class PlayerInteractiveManager {
 
 
 	public static List<PlayerBlockInteractive> getBlockInteractive() {
-		return Arrays.asList(
+		return Stream.of(
 			Stream.of(ClickBlockAbility.values()),
 			Stream.of(ClickBlockChestAbility.values()),
 			Stream.of(ProjectileAbility.values()),
 			Stream.of(InteractiveStructure.values())
-		).stream()
+		)
 			.flatMap(a -> a)
 			.collect(Collectors.toList());
 	}
 
 
 	public static List<PlayerEntityInteractive> getEntityInteractive() {
-		return Arrays.asList(
+		return Stream.of(
 			Stream.of(ClickEntityAbility.values())
-		).stream()
+		)
 			.flatMap(a -> a)
 			.collect(Collectors.toList());
 	}

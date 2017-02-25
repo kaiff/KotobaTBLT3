@@ -27,7 +27,7 @@ import net.citizensnpcs.trait.LookClose;
 public enum UniqueNPC implements UniqueNPCInterface {
 
 
-	CAT(EntityType.OCELOT, "Chiro") {
+	CAT_1(EntityType.OCELOT, "Chiro") {
 		@Override
 		public void setStatus(NPC npc) {
 			LookClose lookClose = new LookClose();
@@ -53,7 +53,33 @@ public enum UniqueNPC implements UniqueNPCInterface {
 	},
 
 
-	SLIME(EntityType.SLIME, "Sticky") {
+	CAT_2(EntityType.OCELOT, "Meous") {
+		@Override
+		public void setStatus(NPC npc) {
+			LookClose lookClose = new LookClose();
+			lookClose.lookClose(true);
+			npc.addTrait(lookClose);
+
+			if(npc.getEntity() instanceof Ocelot) {
+				Ocelot ocelot = (Ocelot) npc.getEntity();
+				ocelot.setCatType(Type.SIAMESE_CAT);
+			}
+		}
+
+		@Override
+		public void playDespawnSound(Location location) {
+			location.getWorld().playSound(location, Sound.CAT_MEOW, 1, 1);
+		}
+
+		@Override
+		public void playSpawnSound(Location location) {
+			location.getWorld().playSound(location, Sound.CAT_MEOW, 1, 1);
+		}
+
+	},
+
+
+	SLIME_1(EntityType.SLIME, "Sticky") {
 		@Override
 		public void setStatus(NPC npc) {
 			if(npc.getEntity() instanceof Slime) {
@@ -77,6 +103,33 @@ public enum UniqueNPC implements UniqueNPCInterface {
 
 	},
 
+
+	SLIME_2(EntityType.SLIME, "Chubby") {
+		@Override
+		public void setStatus(NPC npc) {
+			if(npc.getEntity() instanceof Slime) {
+				Slime slime = (Slime) npc.getEntity();
+				slime.setSize(1);
+			}
+			LookClose lookClose = new LookClose();
+			lookClose.lookClose(true);
+			npc.addTrait(lookClose);
+		}
+
+		@Override
+		public void playDespawnSound(Location location) {
+			location.getWorld().playSound(location, Sound.SLIME_ATTACK, 1, 1);
+		}
+
+		@Override
+		public void playSpawnSound(Location location) {
+			location.getWorld().playSound(location, Sound.SLIME_ATTACK, 1, 1);
+		}
+
+	},
+
+
+
 	;
 
 
@@ -94,7 +147,6 @@ public enum UniqueNPC implements UniqueNPCInterface {
 	public void become(NPC npc) {
 		npc.setBukkitEntityType(type);
 		npc.setName(name);
-		setStatus(npc);
 	}
 
 	@Override

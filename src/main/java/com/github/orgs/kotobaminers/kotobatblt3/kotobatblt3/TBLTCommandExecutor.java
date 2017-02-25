@@ -25,10 +25,8 @@ import com.github.orgs.kotobaminers.kotobaapi.citizens.KotobaCitizensManager;
 import com.github.orgs.kotobaminers.kotobaapi.kotobaapi.CommandEnumInterface;
 import com.github.orgs.kotobaminers.kotobaapi.kotobaapi.PermissionEnumInterface;
 import com.github.orgs.kotobaminers.kotobaapi.userinterface.Holograms;
-import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaStructureUtility;
 import com.github.orgs.kotobaminers.kotobatblt3.block.BlockReplacer;
 import com.github.orgs.kotobaminers.kotobatblt3.block.BlockReplacerMap;
-import com.github.orgs.kotobaminers.kotobatblt3.block.InteractiveStructure;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArena;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaMap;
 import com.github.orgs.kotobaminers.kotobatblt3.citizens.UniqueNPC;
@@ -75,9 +73,6 @@ public class TBLTCommandExecutor implements CommandExecutor {
 		TEST(Arrays.asList(Arrays.asList("test")), "", "Command Test", PermissionEnum.OP) {
 			@Override
 			public boolean perform(Player player , String[] args) {
-				KotobaStructureUtility.getRotations(InteractiveStructure.ONE_TIME_GATE.getStructure())
-					.forEach(m -> m.keySet().forEach(v -> player.getLocation().clone().add(v).getBlock().setType(Material.GLASS)));;
-
 				return true;
 			}
 		},
@@ -235,7 +230,7 @@ public class TBLTCommandExecutor implements CommandExecutor {
 			}
 		},
 
-		EDIT_SERVANT(Arrays.asList(Arrays.asList("edit", "e"), Arrays.asList("servant", "s")), "<" + String.join(",", Stream.of(UniqueNPC.values()).map(UniqueNPC::name).collect(Collectors.toList())) +">", "Change as servant", PermissionEnum.OP) {
+		EDIT_SERVANT(Arrays.asList(Arrays.asList("edit", "e"), Arrays.asList("servant", "s")), "<" + String.join(", ", Stream.of(UniqueNPC.values()).map(UniqueNPC::name).collect(Collectors.toList())) +">", "Change as servant", PermissionEnum.OP) {
 			@Override
 			public boolean perform(Player player , String[] args) {
 				PlayerData data = new PlayerDatabase().getOrDefault(player.getUniqueId());

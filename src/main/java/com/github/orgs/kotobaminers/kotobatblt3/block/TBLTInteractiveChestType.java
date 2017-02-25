@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.bukkit.util.Vector;
 
+import com.github.orgs.kotobaminers.kotobaapi.block.InteractType;
 import com.github.orgs.kotobaminers.kotobaapi.block.InteractiveChestFinder;
 
 public enum TBLTInteractiveChestType implements InteractiveChestFinder {

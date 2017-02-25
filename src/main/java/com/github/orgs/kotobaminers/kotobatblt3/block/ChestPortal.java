@@ -87,11 +87,20 @@ public enum ChestPortal implements KotobaPortal {
 				.map(vec -> center.clone().add(vec))
 				.collect(Collectors.toList());
 
-			if(locations.stream().allMatch(l -> l.getBlock().getType() != Material.AIR)) {
-				KotobaEffect.EXPLODE_SMALL.playSound(center);
-				locations.forEach(l -> {
-					KotobaEffect.EXPLODE_SMALL.playEffect(l);
-					new KotobaBlockData(l, Material.AIR, 0).placeBlock();
+			if(center.getBlock().getState() instanceof Chest) {
+				Chest chest = (Chest) center.getBlock().getState();
+				ChestReader.findPattern3By3(chest).ifPresent(map -> {
+					long items = map.values().stream().filter(m -> m != Material.AIR).count();
+					long gems = getPositions().stream()
+						.filter(v -> center.clone().add(v).getBlock().getType() != Material.AIR)
+						.count();
+					if(items <= gems) {
+						KotobaEffect.EXPLODE_SMALL.playSound(center);
+						locations.forEach(l -> {
+							KotobaEffect.EXPLODE_SMALL.playEffect(l);
+							new KotobaBlockData(l, Material.AIR, 0).placeBlock();
+						});
+					}
 				});
 			}
 

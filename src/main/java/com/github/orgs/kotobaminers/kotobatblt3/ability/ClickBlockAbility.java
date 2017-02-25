@@ -29,6 +29,7 @@ import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStackIcon;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaUtility;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArena;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaMap;
+import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTInteractiveChestType;
 import com.github.orgs.kotobaminers.kotobatblt3.kotobatblt3.Setting;
 import com.github.orgs.kotobaminers.kotobatblt3.userinterface.TBLTPlayerGUI;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.ChestKey;
@@ -46,19 +47,21 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 			@Override
 			public boolean perform(PlayerInteractEvent event) {
 				Block block = event.getClickedBlock();
-				List<ItemStack> gems = Stream.of(TBLTItemStackIcon.GREEN_GEM, TBLTItemStackIcon.RED_GEM)
-					.filter(i -> block.getType() == i.getMaterial())
-					.map(i -> i.create(1))
-					.collect(Collectors.toList());
-				if(0 < gems.size()) {
-					new KotobaBlockData(block.getLocation(), Material.AIR, 0).placeBlock();
-					KotobaEffect.MAGIC_MIDIUM.playEffect(block.getLocation());
-					KotobaEffect.MAGIC_MIDIUM.playSound(block.getLocation());
-					gems.forEach(g -> event.getPlayer().getInventory().addItem(g));
-					return true;
-				}
+				gems.stream()
+					.filter(g -> block.getType() == g.getIcon().getMaterial())
+					.forEach(g -> {
+						new KotobaBlockData(block.getLocation(), Material.AIR, 0).placeBlock();
+						KotobaEffect.MAGIC_MIDIUM.playEffect(block.getLocation());
+						KotobaEffect.MAGIC_MIDIUM.playSound(block.getLocation());
+						event.getPlayer().getInventory().addItem(g.getIcon().create(1));
+						TBLTInteractiveChestType.BASE.findChests(block.getLocation()).stream()
+							.flatMap(c -> TBLTSwitch.findPoweredChests(c, g).stream())
+							.forEach(c -> SwitchableChestManager.find(c).stream().forEach(s -> s.turnOff(c)));
+					});
 				return false;
 			}
+
+			private List<Gems> gems = Arrays.asList(Gems.GREEN_GEM, Gems.BLUE_GEM);
 		},
 
 

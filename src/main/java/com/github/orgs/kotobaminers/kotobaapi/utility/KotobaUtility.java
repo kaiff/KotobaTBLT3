@@ -83,6 +83,26 @@ public class KotobaUtility {
 		return blocks;
 	}
 
+
+	public static List<Block> getBlocks(Location origin, int radius) {
+		List<Block> blocks = new ArrayList<>();
+		int oX = origin.getBlockX();
+		int oY = origin.getBlockY();
+		int oZ = origin.getBlockZ();
+		Vector oV = new Vector(oX, oY, oZ);
+		for (int x = oX - radius; x <= oX + radius; x++) {
+			for (int y = oY - radius; y <= oY + radius; y++) {
+				for (int z = oZ - radius; z <= oZ + radius; z++) {
+					if(new Vector(x, y, z).distance(oV) <= radius) {
+						blocks.add(origin.getWorld().getBlockAt(x, y, z));
+					}
+				}
+			}
+		}
+		return blocks;
+	}
+
+
 	public static List<Block> getSelectBlocks(Player player) {
 		WorldEditPlugin worldEdit = (WorldEditPlugin) Bukkit.getServer().getPluginManager().getPlugin("WorldEdit");
 		if (worldEdit == null) {

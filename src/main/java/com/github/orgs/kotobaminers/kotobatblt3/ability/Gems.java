@@ -2,7 +2,6 @@ package com.github.orgs.kotobaminers.kotobatblt3.ability;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
 
 import com.github.orgs.kotobaminers.kotobaapi.block.KotobaBlockData;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaEffect;
@@ -12,22 +11,21 @@ import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTItemStackIcon;
 public enum Gems {
 
 
-	GREEN_GEM(TBLTItemStackIcon.GREEN_GEM) {},
-	BLUE_GEM(TBLTItemStackIcon.BLUE_GEM) {},
-	RED_GEM(TBLTItemStackIcon.RED_GEM) {},
+	GREEN_GEM(TBLTItemStackIcon.GREEN_GEM, Material.WOOL, (short) 5),
+	BLUE_GEM(TBLTItemStackIcon.BLUE_GEM, Material.WOOL, (short) 11),
+	RED_GEM(TBLTItemStackIcon.RED_GEM, Material.WOOL, (short) 14),
 	;
 
 
 	private KotobaItemStackIcon icon;
+	private Material switchMaterial;
+	private short switchData;
 
 
-	private Gems(KotobaItemStackIcon icon) {
+	private Gems(KotobaItemStackIcon icon, Material switchMaterial, short switchData) {
 		this.icon = icon;
-	}
-
-
-	public KotobaItemStackIcon getIcon() {
-		return icon;
+		this.switchMaterial = switchMaterial;
+		this.switchData = switchData;
 	}
 
 
@@ -42,8 +40,18 @@ public enum Gems {
 	}
 
 
-	public ItemStack create(int amount) {
-		return icon.create(amount);
+	public Material getSwitchMaterial() {
+		return switchMaterial;
+	}
+
+
+	public short getSwitchData() {
+		return switchData;
+	};
+
+
+	public KotobaItemStackIcon getIcon() {
+		return icon;
 	}
 
 

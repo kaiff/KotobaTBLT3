@@ -49,11 +49,20 @@ public enum TBLTItemStackIcon implements KotobaItemStackIcon {
 	),
 
 
-	CHOOS_ONE_KEY(
+	CHOOSE_ONE_KEY(
 			Material.ENCHANTMENT_TABLE,
 			(short) 0,
 			"Structure Key",
 			Arrays.asList("Choose One"),
+			IconFindType.SIMILAR
+	),
+
+
+	SUMMON_SERVENT_KEY(
+			Material.EGG,
+			(short) 0,
+			"Structure Key",
+			Arrays.asList("Summon Servents"),
 			IconFindType.SIMILAR
 	),
 
@@ -67,11 +76,47 @@ public enum TBLTItemStackIcon implements KotobaItemStackIcon {
 	),
 
 
+	ANY_MATCH(
+			Material.GLASS,
+			(short) 0,
+			"Any Match",
+			Arrays.asList("Player Gate's Option"),
+			IconFindType.SIMILAR
+	),
+
+
 	GEM_PORTAL_KEY_3x3(
 			Material.TRAPPED_CHEST,
 			(short) 0,
 			"Portal Key",
 			Arrays.asList("Gem 3x3"),
+			IconFindType.SIMILAR
+	),
+
+
+	SWITCH_KEY(
+			Material.LEVER,
+			(short) 0,
+			"Switch Key",
+			null,
+			IconFindType.SIMILAR
+	),
+
+
+	SWITCH_REVERSE(
+			Material.LEVER,
+			(short) 0,
+			"Switch Reverse",
+			null,
+			IconFindType.SIMILAR
+	),
+
+
+	SWITCHABLE_GATE_1x3(
+			Material.LEVER,
+			(short) 0,
+			"Switchable Structure",
+			Arrays.asList("Gate 1x3"),
 			IconFindType.SIMILAR
 	),
 
@@ -187,7 +232,8 @@ public enum TBLTItemStackIcon implements KotobaItemStackIcon {
 			"Investigate",
 			Arrays.asList("Investigate"),
 			IconFindType.SIMILAR
-	) ,
+	),
+
 	;
 
 
