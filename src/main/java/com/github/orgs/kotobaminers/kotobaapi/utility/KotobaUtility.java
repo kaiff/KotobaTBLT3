@@ -147,7 +147,8 @@ public class KotobaUtility {
 		return skull;
 	}
 
-	public static Location getBase(Entity entity) {
+
+	public static Location getEntityBase(Entity entity) {
 		if(entity instanceof LivingEntity) {
 			LivingEntity le = (LivingEntity) entity;
 			return le.getEyeLocation();

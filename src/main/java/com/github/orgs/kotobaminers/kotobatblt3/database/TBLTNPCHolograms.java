@@ -40,7 +40,7 @@ public class TBLTNPCHolograms extends Holograms {
 			.map(Sentence::getNPC)
 			.collect(Collectors.toSet())
 			.stream()
-			.forEach(id -> KotobaCitizensManager.findNPC(id).ifPresent(n -> new TBLTNPCHolograms().removeNear(KotobaUtility.getBase(n.getEntity())))
+			.forEach(id -> KotobaCitizensManager.findNPC(id).ifPresent(n -> new TBLTNPCHolograms().removeNear(KotobaUtility.getEntityBase(n.getEntity())))
 		);
 	}
 
@@ -73,7 +73,7 @@ public class TBLTNPCHolograms extends Holograms {
 			.map(sentence -> {
 				removeConversationHolograms(sentence.getConversation());
 
-				Location base = KotobaCitizensManager.findNPC(sentence.getNPC()).map(n -> KotobaUtility.getBase(n.getEntity())).orElse(null);
+				Location base = KotobaCitizensManager.findNPC(sentence.getNPC()).map(n -> KotobaUtility.getEntityBase(n.getEntity())).orElse(null);
 				if(base == null) return false;
 
 				boolean success = new TBLTNPCHolograms().display(getLines(sentence), base);
