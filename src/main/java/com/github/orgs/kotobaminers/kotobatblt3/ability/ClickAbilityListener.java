@@ -21,6 +21,7 @@ import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaSound;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArena;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaMap;
 import com.github.orgs.kotobaminers.kotobatblt3.database.TBLTData;
+import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTCooldown;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTUtility;
 
 public class ClickAbilityListener implements Listener {
@@ -31,6 +32,7 @@ public class ClickAbilityListener implements Listener {
 		List<Action> clicks = Arrays.asList(Action.LEFT_CLICK_AIR, Action.LEFT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR, Action.RIGHT_CLICK_BLOCK);
 		if(!clicks.contains(event.getAction())) return;
 
+		if(TBLTCooldown.INTERACTIVE.isCooldown(player.getUniqueId())) return;
 		if(!TBLTUtility.isTBLTPlayer(player)) return;
 
 		List<PlayerBlockInteractive> interactives = PlayerInteractiveManager.find(event);
@@ -41,6 +43,8 @@ public class ClickAbilityListener implements Listener {
 			List<Boolean> success = interactives.stream().map(a -> a.interact(event)).collect(Collectors.toList());
 			if(!success.contains(true)) {
 				playFailureEffect(player.getLocation());
+			} else {
+				TBLTCooldown.INTERACTIVE.updateCooldown(player.getUniqueId());
 			}
 		}
 	}

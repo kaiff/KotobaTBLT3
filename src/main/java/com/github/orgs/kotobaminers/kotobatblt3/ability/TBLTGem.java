@@ -2,13 +2,14 @@ package com.github.orgs.kotobaminers.kotobatblt3.ability;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 
 import com.github.orgs.kotobaminers.kotobaapi.block.KotobaBlockData;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaEffect;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStackIcon;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTItemStackIcon;
 
-public enum Gems {
+public enum TBLTGem {
 
 
 	GREEN_GEM(TBLTItemStackIcon.GREEN_GEM, Material.WOOL, (short) 5),
@@ -18,14 +19,14 @@ public enum Gems {
 
 
 	private KotobaItemStackIcon icon;
-	private Material switchMaterial;
-	private short switchData;
+	private Material wireMaterial;
+	private short wireData;
 
 
-	private Gems(KotobaItemStackIcon icon, Material switchMaterial, short switchData) {
+	private TBLTGem(KotobaItemStackIcon icon, Material switchMaterial, short wireData) {
 		this.icon = icon;
-		this.switchMaterial = switchMaterial;
-		this.switchData = switchData;
+		this.wireMaterial = switchMaterial;
+		this.wireData = wireData;
 	}
 
 
@@ -40,13 +41,22 @@ public enum Gems {
 	}
 
 
+	@SuppressWarnings("deprecation")
+	public boolean isWire(Block block) {
+		if(block.getData() == wireData && block.getType() == wireMaterial) {
+			return true;
+		}
+		return false;
+	}
+
+
 	public Material getSwitchMaterial() {
-		return switchMaterial;
+		return wireMaterial;
 	}
 
 
 	public short getSwitchData() {
-		return switchData;
+		return wireData;
 	};
 
 

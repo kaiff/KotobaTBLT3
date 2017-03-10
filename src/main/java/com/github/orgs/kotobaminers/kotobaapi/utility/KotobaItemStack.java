@@ -58,13 +58,6 @@ public class KotobaItemStack extends ItemStack {
 		return null;
 	}
 
-	public static ItemStack create(ItemStack itemStack) {
-		ItemStack kotobaItem = new KotobaItemStack(MaterialConverter.toItemMaterial(itemStack.getType()), itemStack.getAmount(), itemStack.getDurability());
-		ItemMeta itemMeta = itemStack.getItemMeta();
-		kotobaItem.setItemMeta(itemMeta);
-		return kotobaItem;
-	}
-
 	public static void consume(Inventory inventory, ItemStack item, int amount) {
 		if(item.getAmount() - amount < 1) {
 			item.setAmount(-1);//Magic value

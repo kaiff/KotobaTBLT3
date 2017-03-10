@@ -1,4 +1,4 @@
-package com.github.orgs.kotobaminers.kotobatblt3.ability;
+package com.github.orgs.kotobaminers.kotobatblt3.block;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -10,7 +10,8 @@ import org.bukkit.inventory.ItemStack;
 public class SwitchableChestManager {
 	public static List<SwitchableChest> getSwitchableChests() {
 		return Stream.of(
-			Stream.of(SwitchableStructure.values())
+			Stream.of(SwitchableStructure.values()),
+			Stream.of(new ReplacerSwitchChest())
 		)
 			.flatMap(a -> a)
 			.collect(Collectors.toList());

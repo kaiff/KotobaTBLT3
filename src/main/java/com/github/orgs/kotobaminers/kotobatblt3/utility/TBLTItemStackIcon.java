@@ -1,5 +1,6 @@
 package com.github.orgs.kotobaminers.kotobatblt3.utility;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -109,6 +110,33 @@ public enum TBLTItemStackIcon implements KotobaItemStackIcon {
 			"Switch Reverse",
 			null,
 			IconFindType.SIMILAR
+	),
+
+
+	SWITCH_REPLACER_ON(
+			Material.LEVER,
+			(short) 0,
+			"Replacer Switch",
+			Arrays.asList("On"),
+			IconFindType.SIMILAR
+	),
+
+
+	SWITCH_REPLACER_OFF(
+			Material.LEVER,
+			(short) 0,
+			"Replacer Switch",
+			Arrays.asList("Off"),
+			IconFindType.SIMILAR
+	),
+
+
+	SWITCH_MATERIAL(
+			Material.GLASS,
+			(short) 0,
+			"Replacer Switch",
+			new ArrayList<>(),
+			IconFindType.EXCEPT_LORE
 	),
 
 

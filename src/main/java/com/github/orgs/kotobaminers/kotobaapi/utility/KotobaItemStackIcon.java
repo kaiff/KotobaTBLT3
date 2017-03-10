@@ -63,7 +63,7 @@ public interface KotobaItemStackIcon {
 
 				boolean type = itemStack1.getType() == itemStack2.getType();
 				boolean data= itemStack1.getDurability() == itemStack2.getDurability();
-				boolean name = itemMeta1.getDisplayName() == itemMeta2.getDisplayName();
+				boolean name = itemMeta1.getDisplayName().equalsIgnoreCase(itemMeta2.getDisplayName());
 
 				return type && data && name;
 			}

@@ -1,6 +1,7 @@
 package com.github.orgs.kotobaminers.kotobatblt3.ability;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -15,10 +16,11 @@ public class TBLTSwitch {
 
 
 	private static final int RANGE = 16;
+	private static final List<BlockFace> FACES = Arrays.asList(BlockFace.UP, BlockFace.DOWN, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST);
 
 
 	@SuppressWarnings("deprecation")
-	private static List<Block> findPowered(Chest origin, Gems gem) {
+	private static List<Block> findPowered(Chest origin, TBLTGem gem) {
 		List<Block> powered = new ArrayList<>();
 		List<Block> heads = new ArrayList<>();
 		heads.add(origin.getBlock());
@@ -41,9 +43,9 @@ public class TBLTSwitch {
 		return powered;
 	}
 
-	public static List<Chest> findPoweredChests(Chest origin, Gems gem) {
+	public static List<Chest> findPoweredChests(Chest origin, TBLTGem gem) {
 		return findPowered(origin, gem).stream()
-			.map(b -> b.getRelative(BlockFace.DOWN))
+			.flatMap(b -> FACES.stream().map(f -> b.getRelative(f)))
 			.filter(b -> b.getState() instanceof Chest)
 			.map(b -> (Chest) b.getState())
 			.collect(Collectors.toList());

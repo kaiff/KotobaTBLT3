@@ -1,4 +1,4 @@
-package com.github.orgs.kotobaminers.kotobatblt3.ability;
+package com.github.orgs.kotobaminers.kotobatblt3.block;
 
 import java.util.HashMap;
 import java.util.List;

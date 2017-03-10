@@ -10,6 +10,7 @@ import java.util.stream.Stream;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -25,8 +26,10 @@ import com.github.orgs.kotobaminers.kotobaapi.citizens.KotobaCitizensManager;
 import com.github.orgs.kotobaminers.kotobaapi.kotobaapi.CommandEnumInterface;
 import com.github.orgs.kotobaminers.kotobaapi.kotobaapi.PermissionEnumInterface;
 import com.github.orgs.kotobaminers.kotobaapi.userinterface.Holograms;
+import com.github.orgs.kotobaminers.kotobatblt3.ability.TBLTGem;
 import com.github.orgs.kotobaminers.kotobatblt3.block.BlockReplacer;
 import com.github.orgs.kotobaminers.kotobatblt3.block.BlockReplacerMap;
+import com.github.orgs.kotobaminers.kotobatblt3.block.ReplacerSwitchChest;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArena;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaMap;
 import com.github.orgs.kotobaminers.kotobatblt3.citizens.UniqueNPC;
@@ -38,7 +41,6 @@ import com.github.orgs.kotobaminers.kotobatblt3.game.TBLTJob;
 import com.github.orgs.kotobaminers.kotobatblt3.userinterface.IconCreatorUtility;
 import com.github.orgs.kotobaminers.kotobatblt3.userinterface.TBLTIconListGUI;
 import com.github.orgs.kotobaminers.kotobatblt3.userinterface.TBLTPlayerGUI;
-import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTItemStackIcon;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTUtility;
 
 public class TBLTCommandExecutor implements CommandExecutor {
@@ -98,8 +100,7 @@ public class TBLTCommandExecutor implements CommandExecutor {
 		ITEM(Arrays.asList(Arrays.asList("item")), "", "Get Items", PermissionEnum.OP) {
 			@Override
 			public boolean perform(Player player , String[] args) {
-				Stream.of(TBLTItemStackIcon.values())
-					.forEach(i -> player.getWorld().dropItem(player.getLocation(), i.create(1)));
+				player.openInventory(TBLTIconListGUI.ITEM.createInventory(1));
 				return true;
 			}
 		},
@@ -119,16 +120,6 @@ public class TBLTCommandExecutor implements CommandExecutor {
 				return true;
 			}
 		},
-
-
-//		ABILITY(Arrays.asList(Arrays.asList("ability")), "", "Get Abilities", PermissionEnum.OP) {
-//			@Override
-//			public boolean perform(Player player , String[] args) {
-//				Inventory inventory = player.getInventory();
-//				PlayerInteractiveManager.getAbilities().forEach(a -> inventory.addItem(a.getIcon().create(64)));
-//				return true;
-//			}
-//		},
 
 
 		HOLOGRAM_REMOVE(Arrays.asList(Arrays.asList("hologram"), Arrays.asList("remove")), "", "Remove All Holograms", PermissionEnum.OP) {
@@ -273,6 +264,53 @@ public class TBLTCommandExecutor implements CommandExecutor {
 					return true;
 				}
 			}
+		},
+
+
+		SWITCH_REPLACER(Arrays.asList(Arrays.asList("switch", "s"), Arrays.asList("replacer", "r")), "", "Switch Replacer", PermissionEnum.OP) {
+			@Override
+			public boolean perform(Player player, String[] args) {
+				List<String> options = takeOptions(args);
+				if(1 < options.size()) {
+					return DIRECTIONS.stream()
+						.filter(d -> d.name().equalsIgnoreCase(options.get(0)))
+						.findAny()
+						.map(d ->
+							GEMS.stream().filter(g -> g.name().equalsIgnoreCase(options.get(1)))
+								.findAny()
+								.map(g -> {
+									if(2 < options.size()) {
+										if(options.get(2).equalsIgnoreCase("on")) {
+											if(3 < options.size()) {
+												if(options.get(3).equalsIgnoreCase("air")) {
+													new ReplacerSwitchChest().placeChestsOnAir(player, d, g);
+													return true;
+												}
+											}
+										} else if(options.get(2).equalsIgnoreCase("off")) {
+											if(3 < options.size()) {
+												if(options.get(3).equalsIgnoreCase("air")) {
+													new ReplacerSwitchChest().placeChestsOffAir(player, d, g);
+													return true;
+												}
+											} else {
+												new ReplacerSwitchChest().placeChestsOff(player, d, g);
+												return true;
+											}
+										}
+									}
+									new ReplacerSwitchChest().placeChestsOn(player, d, g);
+									return true;
+								}).orElse(false)
+						)
+						.orElse(false);
+				}
+				return false;
+			}
+
+			private final List<BlockFace> DIRECTIONS = Arrays.asList(BlockFace.UP, BlockFace.DOWN, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST);
+			private final List<TBLTGem> GEMS = Arrays.asList(TBLTGem.GREEN_GEM, TBLTGem.RED_GEM, TBLTGem.BLUE_GEM);
+
 		},
 
 

@@ -20,8 +20,34 @@ import com.github.orgs.kotobaminers.kotobatblt3.block.BlockReplacer;
 import com.github.orgs.kotobaminers.kotobatblt3.block.BlockReplacerMap;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArena;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaMap;
+import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTItemStackIcon;
 
 public enum TBLTIconListGUI implements IconListGUI {
+	ITEM("Items ") {
+		@Override
+		public List<ItemStack> getIcons() {
+			return Stream.of(TBLTItemStackIcon.values())
+				.map(i -> i.create(1))
+				.collect(Collectors.toList());
+		}
+
+		@Override
+		public void onIconLeftClickEvent(InventoryClickEvent event) {
+			onIconClickEvent(event);
+		}
+
+		@Override
+		public void onIconRightClickEvent(InventoryClickEvent event) {
+			onIconClickEvent(event);
+		}
+
+		private void onIconClickEvent(InventoryClickEvent event) {
+			Stream.of(TBLTItemStackIcon.values())
+				.filter(i -> i.isIconItemStack(event.getCurrentItem()))
+				.forEach(i -> event.getWhoClicked().getInventory().addItem(i.create(1)));
+		}
+	},
+
 	ARENA("Arenas ") {
 		@Override
 		public List<ItemStack> getIcons() {

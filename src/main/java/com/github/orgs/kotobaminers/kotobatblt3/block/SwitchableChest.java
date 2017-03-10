@@ -1,4 +1,4 @@
-package com.github.orgs.kotobaminers.kotobatblt3.ability;
+package com.github.orgs.kotobaminers.kotobatblt3.block;
 
 import java.util.stream.Stream;
 
@@ -17,6 +17,4 @@ public interface SwitchableChest {
 			.filter(i -> i != null)
 			.anyMatch(i -> TBLTItemStackIcon.SWITCH_REVERSE.isIconItemStack(i));
 	}
-
 }
-
