@@ -8,19 +8,19 @@ import org.bukkit.util.Vector;
 import com.github.orgs.kotobaminers.kotobaapi.block.InteractType;
 import com.github.orgs.kotobaminers.kotobaapi.block.InteractiveChestFinder;
 
-public enum TBLTInteractiveChestType implements InteractiveChestFinder {
+public enum TBLTInteractiveChestFinder implements InteractiveChestFinder {
 
 
 	VERTICAL(
 			Arrays.asList(new Vector(0, 2, 0)),
-			InteractType.BLOCK,
+			InteractType.CLICKED,
 			false
 		),
 
 
 	BASE(
 			Arrays.asList(new Vector(0, 4, 0)),
-			InteractType.AIR,
+			InteractType.RELATIVE,
 			false
 		),
 
@@ -37,11 +37,24 @@ public enum TBLTInteractiveChestType implements InteractiveChestFinder {
 				new Vector(-1, 2, 0),
 				new Vector(-1, 2, -1)
 			),
-			InteractType.AIR,
+			InteractType.RELATIVE,
 			false
 		),
 
 
+	ONE_BY_FOUR(
+			Arrays.asList(
+					new Vector(0,2,0),
+					new Vector(0,3,0),
+					new Vector(0,4,0),
+					new Vector(0,5,0)
+			),
+			InteractType.CLICKED,
+			false
+		),
+
+
+	@Deprecated
 	TWO_BY_SIX(
 			Arrays.asList(
 					new Vector(0,2,0),
@@ -59,7 +72,7 @@ public enum TBLTInteractiveChestType implements InteractiveChestFinder {
 					new Vector(0,8,0),
 					new Vector(1,8,0)
 			),
-			InteractType.BLOCK,
+			InteractType.CLICKED,
 			true
 		),
 	;
@@ -70,7 +83,7 @@ public enum TBLTInteractiveChestType implements InteractiveChestFinder {
 	private boolean hasRotations;
 
 
-	private TBLTInteractiveChestType(List<Vector> positions, InteractType type, boolean hasRotations) {
+	private TBLTInteractiveChestFinder(List<Vector> positions, InteractType type, boolean hasRotations) {
 		this.positions = positions;
 		this.type = type;
 		this.hasRotations = hasRotations;
@@ -83,7 +96,7 @@ public enum TBLTInteractiveChestType implements InteractiveChestFinder {
 	}
 
 	@Override
-	public InteractType getTargetType() {
+	public InteractType getInteractType() {
 		return type;
 	}
 

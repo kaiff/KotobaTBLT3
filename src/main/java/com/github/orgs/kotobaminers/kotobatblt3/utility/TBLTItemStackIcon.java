@@ -14,6 +14,7 @@ import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStackIcon;
 public enum TBLTItemStackIcon implements KotobaItemStackIcon {
 
 
+	//Ability
 	TEST(
 			Material.APPLE,
 			(short) 0,
@@ -41,6 +42,34 @@ public enum TBLTItemStackIcon implements KotobaItemStackIcon {
 	),
 
 
+	//Chest Option
+	TRIGGER_ITEM_ALL_MATCH(
+			Material.FLINT_AND_STEEL,
+			(short) 0,
+			"Trigger Item Setting",
+			Arrays.asList("You need all the items to activate this chest in the row"),
+			IconFindType.SIMILAR
+	),
+
+
+	INTERACT_EFFECT(
+			Material.FLINT_AND_STEEL,
+			(short) 0,
+			"Chest Effect",
+			new ArrayList<>(),
+			IconFindType.SIMILAR
+	),
+
+
+	ITEM_GATE_KEY(
+			Material.GLASS,
+			(short) 0,
+			"Structure Key",
+			Arrays.asList("Player Gate"),
+			IconFindType.SIMILAR
+	),
+
+
 	ONE_TIME_GATE_KEY(
 			Material.GLASS,
 			(short) 0,
@@ -64,24 +93,6 @@ public enum TBLTItemStackIcon implements KotobaItemStackIcon {
 			(short) 0,
 			"Structure Key",
 			Arrays.asList("Summon Servents"),
-			IconFindType.SIMILAR
-	),
-
-
-	PLAYER_GATE_KEY(
-			Material.GLASS,
-			(short) 0,
-			"Structure Key",
-			Arrays.asList("Player Gate"),
-			IconFindType.SIMILAR
-	),
-
-
-	ANY_MATCH(
-			Material.GLASS,
-			(short) 0,
-			"Any Match",
-			Arrays.asList("Player Gate's Option"),
 			IconFindType.SIMILAR
 	),
 
@@ -203,7 +214,7 @@ public enum TBLTItemStackIcon implements KotobaItemStackIcon {
 			(short) 0,
 			"Single portal key",
 			null,
-			IconFindType.EXCEPT_LORE
+			IconFindType.SIMILAR
 		),
 
 	QUEST_LIST(
@@ -221,7 +232,7 @@ public enum TBLTItemStackIcon implements KotobaItemStackIcon {
 			"A written prediction",
 			null,
 			IconFindType.EXCEPT_LORE
-			),
+	),
 
 	PREDICTION(
 			Material.ENCHANTED_BOOK,

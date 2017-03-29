@@ -31,10 +31,9 @@ import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaUtility;
 import com.github.orgs.kotobaminers.kotobatblt3.block.SwitchableChestManager;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArena;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaMap;
-import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTInteractiveChestType;
+import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTInteractiveChestFinder;
 import com.github.orgs.kotobaminers.kotobatblt3.kotobatblt3.Setting;
 import com.github.orgs.kotobaminers.kotobatblt3.userinterface.TBLTPlayerGUI;
-import com.github.orgs.kotobaminers.kotobatblt3.utility.ChestKey;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTItemStackIcon;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTUtility;
 
@@ -74,7 +73,7 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 						KotobaEffect.MAGIC_MIDIUM.playEffect(block.getLocation());
 						KotobaEffect.MAGIC_MIDIUM.playSound(block.getLocation());
 						event.getPlayer().getInventory().addItem(g.getIcon().create(1));
-						TBLTInteractiveChestType.BASE.findChests(block.getLocation()).stream()
+						TBLTInteractiveChestFinder.BASE.findChests(block.getLocation()).stream()
 							.flatMap(c -> TBLTSwitch.findPoweredChests(c, g).stream())
 							.forEach(c -> SwitchableChestManager.find(c).stream().forEach(s -> s.turnOff(c)));
 						return true;
@@ -93,18 +92,34 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 			@Override
 			public boolean perform(PlayerInteractEvent event) {
 				Block block = event.getClickedBlock();
-				gems.stream()
+				return gems.stream()
 					.filter(g -> block.getType() == g.getIcon().getMaterial())
-					.forEach(g -> {
+					.findFirst()
+					.map(g -> {
+						Inventory inventory = event.getPlayer().getInventory();
+
 						new KotobaBlockData(block.getLocation(), Material.AIR, 0).placeBlock();
+
+						gems.stream()
+							.filter(g2 ->
+								Stream.of(inventory.getContents())
+									.filter(item -> item != null)
+									.anyMatch(item -> g2.getIcon().isIconItemStack(item)))
+							.forEach(g2 -> {
+								new KotobaBlockData(block.getLocation(), g2.getIcon().getMaterial(), 0).placeBlock();
+								Stream.of(inventory.getContents())
+									.filter(c -> c != null)
+									.filter(c -> g2.getIcon().isIconItemStack(c))
+									.forEach(c -> inventory.remove(c));
+							});
 						KotobaEffect.MAGIC_MIDIUM.playEffect(block.getLocation());
 						KotobaEffect.MAGIC_MIDIUM.playSound(block.getLocation());
 						event.getPlayer().getInventory().addItem(g.getIcon().create(1));
-						TBLTInteractiveChestType.BASE.findChests(block.getLocation()).stream()
+						TBLTInteractiveChestFinder.BASE.findChests(block.getLocation()).stream()
 							.flatMap(c -> TBLTSwitch.findPoweredChests(c, g).stream())
 							.forEach(c -> SwitchableChestManager.find(c).stream().forEach(s -> s.turnOff(c)));
-					});
-				return false;
+						return true;
+					}).orElse(false);
 			}
 		},
 
@@ -132,7 +147,7 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 			ItemStack prediction = new TBLTArenaMap().findUnique(player.getLocation())
 				.map(a -> (TBLTArena) a)
 				.map(a -> {
-					ItemStack base = ChestKey.PREDICTION.getIcon().create(1);
+					ItemStack base = TBLTItemStackIcon.PREDICTION.create(1);
 					BookMeta baseMeta = (BookMeta) base.getItemMeta();
 					List<String> pages = ((BookMeta) a.getPredictionWrittenBook().getItemMeta()).getPages();
 					baseMeta.setPages(pages);
@@ -143,7 +158,7 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 			if(prediction == null) return false;
 			List<ItemStack> currentPrediction = Stream.of(player.getInventory().getContents())
 				.filter(i -> i != null)
-				.filter(i -> ChestKey.PREDICTION.getIcon().isIconItemStack(i))
+				.filter(i -> TBLTItemStackIcon.PREDICTION.isIconItemStack(i))
 				.collect(Collectors.toList());
 			int currentPage = currentPrediction.stream()
 					.map(i -> ((BookMeta) i.getItemMeta()).getPageCount())

@@ -12,7 +12,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStack;
 import com.github.orgs.kotobaminers.kotobatblt3.block.BlockReplacer;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArena;
-import com.github.orgs.kotobaminers.kotobatblt3.utility.ChestKey;
+import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTItemStackIcon;
 
 public class IconCreatorUtility {
 	public static List<ItemStack> getIcons(TBLTArena arena) {
@@ -23,7 +23,7 @@ public class IconCreatorUtility {
 		Location center = arena.getCenter();
 		ItemStack teleport = TBLTIcon.TELEPORT.createItemStack(Arrays.asList(arena.getWorld().getName(), String.valueOf(center.getBlockX()) + "," + String.valueOf(center.getBlockY()) + "," + String.valueOf(center.getBlockZ())));
 
-		ItemStack warp = ChestKey.PORTAL_CRYSTAL.getIcon().create(1);
+		ItemStack warp = TBLTItemStackIcon.PORTAL_CRYSTAL.create(1);
 		ItemMeta warpMeta = warp.getItemMeta();
 		warpMeta.setLore(Arrays.asList(arena.getName()));
 		warp.setItemMeta(warpMeta);

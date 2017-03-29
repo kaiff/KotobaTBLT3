@@ -53,6 +53,7 @@ public interface ClickBlockAbilityInterface extends ItemStackAbilityInterface, P
 		return false;
 	}
 
+
 	default boolean canPerformLocation(Player player) {
 		boolean onGround = ((Entity) player).isOnGround();
 		boolean atLadder = player.getLocation().getBlock().getType() == Material.LADDER;

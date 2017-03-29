@@ -8,7 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
 import com.github.orgs.kotobaminers.kotobaapi.userinterface.GUIIcon;
-import com.github.orgs.kotobaminers.kotobatblt3.utility.ChestKey;
+import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTItemStackIcon;
 
 public enum TBLTIcon implements GUIIcon {
 	INFORMATION(Material.BOOK, 1, (short) 0, "Information", null) {
@@ -69,7 +69,7 @@ public enum TBLTIcon implements GUIIcon {
 		}
 	},
 
-	WARP_CRYSTAL(Material.NETHER_STAR, 1, (short) 0, ChestKey.PORTAL_CRYSTAL.getIcon().getName(), null) {
+	WARP_CRYSTAL(Material.NETHER_STAR, 1, (short) 0, TBLTItemStackIcon.PORTAL_CRYSTAL.getName(), null) {
 		@Override
 		public void onClickEvent(InventoryClickEvent event) {
 			event.getWhoClicked().getInventory().addItem(event.getCurrentItem());

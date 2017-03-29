@@ -19,6 +19,13 @@ import com.github.orgs.kotobaminers.kotobatblt3.game.TBLTJob;
 public enum TBLTPlayerGUI implements ChestGUI {
 
 
+	YOU_NEED("You need...", ChestSize.MINIMUM) {
+		@Override
+		public void onInventoryClick(InventoryClickEvent event) {
+		}
+	},
+
+
 	RESOURCES("Resources", ChestSize.MINIMUM) {
 		@Override
 		public void onInventoryClick(InventoryClickEvent event) {

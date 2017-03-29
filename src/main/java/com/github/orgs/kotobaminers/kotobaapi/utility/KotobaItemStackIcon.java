@@ -45,6 +45,7 @@ public interface KotobaItemStackIcon {
 		return item;
 	}
 
+
 	IconFindType getFindType();
 	enum IconFindType {
 		SIMILAR {

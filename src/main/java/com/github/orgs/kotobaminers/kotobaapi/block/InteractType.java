@@ -7,7 +7,7 @@ import org.bukkit.block.Block;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 public enum InteractType {
-	AIR {
+	RELATIVE {
 		@Override
 		public Optional<Block> getTargetBlock(PlayerInteractEvent event) {
 			Block block = event.getClickedBlock().getRelative(event.getBlockFace());
@@ -17,7 +17,7 @@ public enum InteractType {
 			return Optional.empty();
 		}
 	},
-	BLOCK {
+	CLICKED {
 		@Override
 		public Optional<Block> getTargetBlock(PlayerInteractEvent event) {
 			return Optional.ofNullable(event.getClickedBlock());

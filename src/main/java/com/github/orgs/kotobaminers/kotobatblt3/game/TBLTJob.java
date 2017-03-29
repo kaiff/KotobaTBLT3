@@ -17,28 +17,24 @@ import org.bukkit.inventory.meta.ItemMeta;
 import com.github.orgs.kotobaminers.kotobaapi.ability.ClickBlockAbilityInterface;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStack;
 import com.github.orgs.kotobaminers.kotobatblt3.ability.ClickBlockAbility;
-import com.github.orgs.kotobaminers.kotobatblt3.ability.ClickBlockChestAbility;
 
 
 	public enum TBLTJob {
 
 		MAGICIAN(
 			new LinkedHashMap<ClickBlockAbilityInterface, Integer>() {{
-				put(ClickBlockAbility.REWIND_TIME, 1);
-				put(ClickBlockAbility.CLAIRVOYANCE, 1);
-				put(ClickBlockChestAbility.SEE_MEMORY, 1);
+				put(ClickBlockAbility.MAGIC_WAND, 1);
 			}},
 			true,
-			KotobaItemStack.create(Material.EMERALD, (short) 0, 1 ,"Magician", null)
+			KotobaItemStack.create(Material.REDSTONE_TORCH_ON, (short) 0, 1 ,"Mage", null)
 		),
 
 		ENGINEER(
 			new LinkedHashMap<ClickBlockAbilityInterface, Integer>() {{
-				put(ClickBlockChestAbility.INVESTIGATE, 1);
-				put(ClickBlockAbility.LOCK_PICKING, 1);
+				put(ClickBlockAbility.MAGIC_SPADE, 1);
 			}},
 			true,
-			KotobaItemStack.create(Material.GOLD_PICKAXE, (short) 0, 1, "Engineer", null)
+			KotobaItemStack.create(Material.DIAMOND_SPADE, (short) 0, 1, "Engineer", null)
 		),
 		RETURN_TO_DEFAULT(
 			new LinkedHashMap<ClickBlockAbilityInterface, Integer>() {{
@@ -48,9 +44,11 @@ import com.github.orgs.kotobaminers.kotobatblt3.ability.ClickBlockChestAbility;
 		),
 		;
 
+
 		private Map<ClickBlockAbilityInterface, Integer> abilities;
 		private boolean actual;
 		private ItemStack icon;
+
 
 		private TBLTJob(Map<ClickBlockAbilityInterface, Integer> abilities, boolean actual, ItemStack icon) {
 			this.abilities = abilities;
@@ -58,15 +56,18 @@ import com.github.orgs.kotobaminers.kotobatblt3.ability.ClickBlockChestAbility;
 			this.icon = icon;
 		}
 
+
 		public static Optional<TBLTJob> find(String name) {
 			return Stream.of(TBLTJob.values())
 				.filter(job -> job.name().equalsIgnoreCase(name))
 				.findAny();
 		}
 
+
 		private Map<ClickBlockAbilityInterface, Integer> getAbilities() {
 			return abilities;
 		}
+
 
 		public void setInventory(Player player) {
 			player.getInventory().clear();

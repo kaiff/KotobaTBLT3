@@ -9,7 +9,6 @@ import java.util.stream.Stream;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.ItemStack;
 
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStackIcon;
 
@@ -28,19 +27,12 @@ public interface InteractiveChestFinder extends KotobaConfigChestFinder {
 	}
 
 
-	default List<ItemStack> findOptions(PlayerInteractEvent event, List<KotobaItemStackIcon> exceptions) {
-		return findTargetBlock(event)
-			.map(b -> findOptions(b.getLocation(), exceptions))
-			.orElse(new ArrayList<>());
-	}
-
-
 	default Optional<Block> findTargetBlock(PlayerInteractEvent event) {
-		return getTargetType().getTargetBlock(event);
+		return getInteractType().getTargetBlock(event);
 	}
 
 
-	InteractType getTargetType();
+	InteractType getInteractType();
 
 
 }

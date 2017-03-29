@@ -14,6 +14,7 @@ public enum KotobaSound {
 	CLICK(Sound.CLICK, 1, 1),
 	SHEAR(Sound.SHEEP_SHEAR, 1, 1),
 	WARP(Sound.ENDERMAN_TELEPORT, 1, 1),
+	FIZZ(Sound.FIZZ, 1, 1),
 	;
 
 	private float volume;

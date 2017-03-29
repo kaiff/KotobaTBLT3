@@ -1,5 +1,6 @@
 package com.github.orgs.kotobaminers.kotobatblt3.ability;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -12,6 +13,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
+import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -30,45 +32,47 @@ import com.github.orgs.kotobaminers.kotobatblt3.block.ChestPortal;
 import com.github.orgs.kotobaminers.kotobatblt3.block.SwitchableChestManager;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArena;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaMap;
-import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTInteractiveChestType;
+import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTInteractiveChestFinder;
 import com.github.orgs.kotobaminers.kotobatblt3.userinterface.TBLTPlayerGUI;
+import com.github.orgs.kotobaminers.kotobatblt3.utility.ChestReader;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.RepeatingEffect;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.RepeatingEffectHolder;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTItemStackIcon;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTUtility;
 
-public enum ClickBlockChestAbility implements ClickBlockAbilityInterface, RepeatingEffectHolder {
+public enum ClickBlockChestAbility implements ClickBlockAbilityInterface, RepeatingEffectHolder, InteractiveChestFinderHolder {
 
 
 	GREEN_GEM_PORTAL(
 			TBLTItemStackIcon.GREEN_GEM,
 			1,
-			TBLTInteractiveChestType.THREE_BY_THREE,
+			TBLTInteractiveChestFinder.THREE_BY_THREE,
 			KotobaEffect.TWINCLE_SMALL,
 			KotobaEffect.MUTE
 			) {
 		@Override
-		public boolean performActually(PlayerInteractEvent event) {
-			getChestType().findTargetBlock(event)
+		public boolean interactWithChests(PlayerInteractEvent event) {
+			getChestFinder().findTargetBlock(event)
 			.ifPresent(b -> {
 				TBLTGem.GREEN_GEM.place(b.getLocation());
 				ChestPortal.GEM_PORTAL.findCenters(b.getLocation()).forEach(c -> ChestPortal.GEM_PORTAL.tryOpen(c));
 			});
 			return true;
 		}
+
 	},
 
 
 	BLUE_GEM_PORTAL(
 			TBLTItemStackIcon.BLUE_GEM,
 			1,
-			TBLTInteractiveChestType.THREE_BY_THREE,
+			TBLTInteractiveChestFinder.THREE_BY_THREE,
 			KotobaEffect.TWINCLE_SMALL,
 			KotobaEffect.MUTE
 		) {
 		@Override
-		public boolean performActually(PlayerInteractEvent event) {
-			Optional<Block> findTargetBlock = getChestType().findTargetBlock(event);
+		public boolean interactWithChests(PlayerInteractEvent event) {
+			Optional<Block> findTargetBlock = getChestFinder().findTargetBlock(event);
 			findTargetBlock
 				.ifPresent(b -> {
 					TBLTGem.BLUE_GEM.place(b.getLocation());
@@ -82,13 +86,13 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface, Repeat
 	RED_GEM_PORTAL(
 			TBLTItemStackIcon.RED_GEM,
 			1,
-			TBLTInteractiveChestType.THREE_BY_THREE,
+			TBLTInteractiveChestFinder.THREE_BY_THREE,
 			KotobaEffect.TWINCLE_SMALL,
 			KotobaEffect.MUTE
 		) {
 		@Override
-		public boolean performActually(PlayerInteractEvent event) {
-			getChestType().findTargetBlock(event)
+		public boolean interactWithChests(PlayerInteractEvent event) {
+			getChestFinder().findTargetBlock(event)
 				.ifPresent(b -> {
 					TBLTGem.RED_GEM.place(b.getLocation());
 					ChestPortal.GEM_PORTAL.findCenters(b.getLocation()).forEach(c -> ChestPortal.GEM_PORTAL.tryOpen(c));
@@ -101,18 +105,18 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface, Repeat
 	GREEN_GEM_BASE(
 		TBLTItemStackIcon.GREEN_GEM,
 		1,
-		TBLTInteractiveChestType.BASE,
+		TBLTInteractiveChestFinder.BASE,
 		KotobaEffect.TWINCLE_SMALL,
 		KotobaEffect.MUTE
 	) {
 		private final TBLTGem gem = TBLTGem.GREEN_GEM;
 
 		@Override
-		public boolean performActually(PlayerInteractEvent event) {
-			getChestType().findTargetBlock(event)
+		public boolean interactWithChests(PlayerInteractEvent event) {
+			getChestFinder().findTargetBlock(event)
 			.ifPresent(b -> {
 				gem.place(b.getLocation());
-				getChestType().findChests(b.getLocation()).stream()
+				getChestFinder().findChests(b.getLocation()).stream()
 					.flatMap(c -> TBLTSwitch.findPoweredChests(c, gem).stream())
 					.forEach(c -> SwitchableChestManager.find(c).stream().forEach(s -> s.turnOn(c)));
 			});
@@ -125,18 +129,18 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface, Repeat
 	RED_GEM_BASE(
 			TBLTItemStackIcon.RED_GEM,
 			1,
-			TBLTInteractiveChestType.BASE,
+			TBLTInteractiveChestFinder.BASE,
 			KotobaEffect.TWINCLE_SMALL,
 			KotobaEffect.MUTE
 		) {
 			private final TBLTGem gem = TBLTGem.RED_GEM;
 
 			@Override
-			public boolean performActually(PlayerInteractEvent event) {
-				getChestType().findTargetBlock(event)
+			public boolean interactWithChests(PlayerInteractEvent event) {
+				getChestFinder().findTargetBlock(event)
 				.ifPresent(b -> {
 					gem.place(b.getLocation());
-					getChestType().findChests(b.getLocation()).stream()
+					getChestFinder().findChests(b.getLocation()).stream()
 					.flatMap(c -> TBLTSwitch.findPoweredChests(c, gem).stream())
 					.forEach(c -> SwitchableChestManager.find(c).stream().forEach(s -> s.turnOn(c)));
 				});
@@ -149,18 +153,18 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface, Repeat
 	BLUE_GEM_BASE(
 			TBLTItemStackIcon.BLUE_GEM,
 			1,
-			TBLTInteractiveChestType.BASE,
+			TBLTInteractiveChestFinder.BASE,
 			KotobaEffect.TWINCLE_SMALL,
 			KotobaEffect.MUTE
 		) {
 			private final TBLTGem gem = TBLTGem.BLUE_GEM;
 
 			@Override
-			public boolean performActually(PlayerInteractEvent event) {
-				getChestType().findTargetBlock(event)
+			public boolean interactWithChests(PlayerInteractEvent event) {
+				getChestFinder().findTargetBlock(event)
 				.ifPresent(b -> {
 					gem.place(b.getLocation());
-					getChestType().findChests(b.getLocation()).stream()
+					getChestFinder().findChests(b.getLocation()).stream()
 					.flatMap(c -> TBLTSwitch.findPoweredChests(c, gem).stream())
 					.forEach(c -> SwitchableChestManager.find(c).stream().forEach(s -> s.turnOn(c)));
 				});
@@ -173,14 +177,17 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface, Repeat
 	SEE_MEMORY(
 		TBLTItemStackIcon.DUMMY,
 		0,
-		TBLTInteractiveChestType.VERTICAL,
+		TBLTInteractiveChestFinder.VERTICAL,
 		KotobaEffect.TWINCLE_MIDIUM,
 		KotobaEffect.MUTE
 	) {
 		@Override
-		public boolean performActually(PlayerInteractEvent event) {
+		public boolean interactWithChests(PlayerInteractEvent event) {
 			Block block = event.getClickedBlock();
-			List<BookMeta> metas = getChestType().findOptions(event, Arrays.asList(getIcon())).stream()
+			List<ItemStack> options = getChestFinder().findChests(event, getIcon()).stream()
+				.flatMap(c -> ChestReader.findOptions(c, getIcon(), new ArrayList<>()).stream())
+				.collect(Collectors.toList());
+			List<BookMeta> metas = options.stream()
 				.filter(i -> i.getType() == Material.BOOK_AND_QUILL)
 				.map(i -> (BookMeta) i.getItemMeta())
 				.filter(meta -> 0 < meta.getPageCount())
@@ -246,17 +253,17 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface, Repeat
 	INVESTIGATE(
 		TBLTItemStackIcon.INVESTIGATE,
 		0,
-		TBLTInteractiveChestType.VERTICAL,
+		TBLTInteractiveChestFinder.VERTICAL,
 		KotobaEffect.TWINCLE_MIDIUM,
 		KotobaEffect.MUTE
 	) {
 		@Override
-		public boolean performActually(PlayerInteractEvent event) {
-			List<ItemStack> options = getChestType().findOptions(event, Arrays.asList(getIcon())).stream()
-				.filter(i -> i.getType() != Material.BOOK_AND_QUILL)
-				.collect(Collectors.toList());
+		public boolean interactWithChests(PlayerInteractEvent event) {
+			List<ItemStack> options = getChestFinder().findChests(event, getIcon()).stream()
+					.flatMap(c -> ChestReader.findOptions(c, getIcon(), new ArrayList<>()).stream())
+					.collect(Collectors.toList());
 
-			List<ItemStack> informations = getChestType().findOptions(event, Arrays.asList(getIcon())).stream()
+			List<ItemStack> informations = options.stream()
 				.filter(i -> i.getType() == Material.BOOK_AND_QUILL)
 				.map(i -> (BookMeta) i.getItemMeta())
 				.map(meta -> KotobaUtility.toStringListFromBookMeta(meta))
@@ -287,7 +294,7 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface, Repeat
 
 	private KotobaItemStackIcon icon;
 	private int consume;
-	private TBLTInteractiveChestType chestType;
+	private TBLTInteractiveChestFinder chestType;
 	private int period = 5;
 	private KotobaEffect effect;
 	private KotobaEffect sound;
@@ -296,7 +303,7 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface, Repeat
 	private ClickBlockChestAbility(
 		KotobaItemStackIcon icon,
 		int consume,
-		TBLTInteractiveChestType chest,
+		TBLTInteractiveChestFinder chest,
 		KotobaEffect effect,
 		KotobaEffect sound
 	) {
@@ -308,12 +315,9 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface, Repeat
 	}
 
 
-	abstract boolean performActually(PlayerInteractEvent event);
-
-
 	@Override
 	public List<RepeatingEffect> createPeriodicEffects(Location origin) {
-		return getChestType().getPositions().stream()
+		return getChestFinder().getPositions().stream()
 			.map(vec -> RepeatingEffect.create(period, effect, sound, true, origin.clone().add(vec)))
 			.collect(Collectors.toList());
 	}
@@ -321,9 +325,18 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface, Repeat
 
 	@Override
 	public boolean perform(PlayerInteractEvent event) {
-		if(0 < getChestType().findChests(event, getIcon()).size()) {
-			stopRepeatingEffects(event.getClickedBlock().getLocation().clone());
-			return performActually(event);
+		List<Chest> chests = getChestFinder().findChests(event, getIcon());
+		if(0 < chests.size()) {
+			if(chests.stream().allMatch(c -> ChestReader.hasTriggersItem(c, event.getPlayer()))) {
+				stopRepeatingEffects(event.getClickedBlock().getLocation().clone());
+				return interactWithChests(event);
+			} else {
+				TBLTPlayerGUI.YOU_NEED.create(
+					chests.stream()
+						.flatMap(c -> ChestReader.findTriggersItem(c).stream())
+						.collect(Collectors.toList())
+				).ifPresent(i -> event.getPlayer().openInventory(i));
+			}
 		}
 		return false;
 	}
@@ -336,7 +349,8 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface, Repeat
 	}
 
 
-	public TBLTInteractiveChestType getChestType() {
+	@Override
+	public TBLTInteractiveChestFinder getChestFinder() {
 		return chestType;
 	}
 

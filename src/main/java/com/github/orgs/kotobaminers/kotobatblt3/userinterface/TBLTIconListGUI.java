@@ -26,8 +26,10 @@ public enum TBLTIconListGUI implements IconListGUI {
 	ITEM("Items ") {
 		@Override
 		public List<ItemStack> getIcons() {
-			return Stream.of(TBLTItemStackIcon.values())
-				.map(i -> i.create(1))
+			return Stream.of(
+					Stream.of(TBLTItemStackIcon.values()).map(i -> i.create(1)),
+					Stream.of(InteractEffect.values()).map(i -> i.create(1))
+				).flatMap(i -> i)
 				.collect(Collectors.toList());
 		}
 
@@ -42,10 +44,9 @@ public enum TBLTIconListGUI implements IconListGUI {
 		}
 
 		private void onIconClickEvent(InventoryClickEvent event) {
-			Stream.of(TBLTItemStackIcon.values())
-				.filter(i -> i.isIconItemStack(event.getCurrentItem()))
-				.forEach(i -> event.getWhoClicked().getInventory().addItem(i.create(1)));
+			event.getWhoClicked().getInventory().addItem(event.getCurrentItem());
 		}
+
 	},
 
 	ARENA("Arenas ") {

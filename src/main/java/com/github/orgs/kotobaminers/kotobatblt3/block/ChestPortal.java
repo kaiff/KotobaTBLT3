@@ -1,7 +1,6 @@
 package com.github.orgs.kotobaminers.kotobatblt3.block;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -18,7 +17,6 @@ import com.github.orgs.kotobaminers.kotobaapi.block.KotobaBlockData;
 import com.github.orgs.kotobaminers.kotobaapi.block.KotobaPortal;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaEffect;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStackIcon;
-import com.github.orgs.kotobaminers.kotobatblt3.utility.ChestKey;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.ChestReader;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTItemStackIcon;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTUtility;
@@ -27,7 +25,7 @@ public enum ChestPortal implements KotobaPortal {
 	GEM_PORTAL(
 		TBLTItemStackIcon.GEM_PORTAL_KEY_3x3,
 		Material.ENDER_PORTAL,
-		TBLTInteractiveChestType.THREE_BY_THREE
+		TBLTInteractiveChestFinder.THREE_BY_THREE
 	) {
 
 		@Override
@@ -45,15 +43,8 @@ public enum ChestPortal implements KotobaPortal {
 
 					if(isSinglePortal(from) || (1 < inPortal.size()) && inPortal.size() == inArena.size()) {
 						if(inPortal.stream().allMatch(p -> from.distance(p.getLocation()) < 4)) {
-							Optional<Player> crystalOwner = inPortal.stream()
-								.filter(p ->
-									Stream.of(p.getInventory().getContents())
-										.filter(i -> i != null)
-										.anyMatch(i -> ChestKey.PORTAL_CRYSTAL.getIcon().isIconItemStack(i)))
-								.findFirst();
-							if(crystalOwner.isPresent() || isSinglePortal(from)) {
-								List<Boolean> success = findChests(from).stream()
-									.flatMap(c -> Stream.of(c.getInventory().getContents()).filter(i -> i != null).filter(i -> ChestKey.PORTAL_CRYSTAL.getIcon().isIconItemStack(i)))
+							List<Boolean> success = findChests(from).stream()
+									.flatMap(c -> Stream.of(c.getInventory().getContents()).filter(i -> i != null).filter(i -> TBLTItemStackIcon.PORTAL_CRYSTAL.isIconItemStack(i)))
 									.filter(i -> i.getItemMeta().getLore() != null)
 									.filter(i -> 0 < i.getItemMeta().getLore().size())
 									.map(i -> i.getItemMeta().getLore().get(0))
@@ -62,9 +53,8 @@ public enum ChestPortal implements KotobaPortal {
 										to.ifPresent(to2 -> inPortal.stream().forEach(p2 -> ((TBLTArena) to2).startSpawn(p2)));
 										return true;
 									}).collect(Collectors.toList());
-								if(success.contains(true)) {
-									a.load();
-								}
+							if(success.contains(true)) {
+								a.load();
 							}
 						}
 					}
@@ -113,7 +103,7 @@ public enum ChestPortal implements KotobaPortal {
 	CHECK_POINT_PORTAL(
 		TBLTItemStackIcon.DUMMY,
 		Material.ENDER_PORTAL,
-		TBLTInteractiveChestType.VERTICAL
+		TBLTInteractiveChestFinder.VERTICAL
 	) {
 		@Override
 		public boolean enterPortal(PlayerPortalEvent event) {
@@ -161,10 +151,10 @@ public enum ChestPortal implements KotobaPortal {
 
 	private KotobaItemStackIcon icon;
 	private Material portal;
-	protected TBLTInteractiveChestType chest;
+	protected TBLTInteractiveChestFinder chest;
 
 
-	private ChestPortal(KotobaItemStackIcon icon, Material portal, TBLTInteractiveChestType chest) {
+	private ChestPortal(KotobaItemStackIcon icon, Material portal, TBLTInteractiveChestFinder chest) {
 		this.icon = icon;
 		this.portal = portal;
 		this.chest = chest;
@@ -184,7 +174,7 @@ public enum ChestPortal implements KotobaPortal {
 
 	protected boolean isSinglePortal(Location location) {
 		long singleKeyNumber = findChests(location).stream()
-			.flatMap(c -> Stream.of(c.getInventory().getContents()).filter(i -> i != null).filter(i -> ChestKey.SINGLE_PORTAL.getIcon().isIconItemStack(i)))
+			.flatMap(c -> Stream.of(c.getInventory().getContents()).filter(i -> i != null).filter(i -> TBLTItemStackIcon.SINGLE_PORTAL.isIconItemStack(i)))
 			.count();
 		if(0 < singleKeyNumber) {
 			return true;

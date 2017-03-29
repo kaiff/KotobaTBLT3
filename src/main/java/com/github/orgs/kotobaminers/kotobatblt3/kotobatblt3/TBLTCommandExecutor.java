@@ -377,7 +377,7 @@ public class TBLTCommandExecutor implements CommandExecutor {
 			}
 		},
 
-		ARENA_SET_WALLS(Arrays.asList(Arrays.asList("arena", "a"), Arrays.asList("setwallshere", "swh")), "", "Set Walls", PermissionEnum.OP) {
+		ARENA_SET_WALLS(Arrays.asList(Arrays.asList("arena", "a"), Arrays.asList("setwallshere", "swh")), "<Material>", "Set Walls", PermissionEnum.OP) {
 			@Override
 			public boolean perform(Player player , String[] args) {
 				List<String> options = takeOptions(args);
