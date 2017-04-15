@@ -35,7 +35,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.Potion;
 
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaEffect;
-import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStack;
 import com.github.orgs.kotobaminers.kotobatblt3.ability.ProjectileAbility;
 import com.github.orgs.kotobaminers.kotobatblt3.userinterface.TBLTPlayerGUI;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTUtility;
@@ -43,36 +42,19 @@ import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTUtility;
 public class TBLTArenaListener implements Listener {
 
 
-	@EventHandler
-	void onPlayerInteractStructure(PlayerInteractEvent event) {
+//	@EventHandler
+//	void onBlockReplacerPlayerInteract(PlayerInteractEvent event) {
 //		Player player = event.getPlayer();
 //		Block block = event.getClickedBlock();
 //		if(block == null) return;
-//		ItemStack itemStack = player.getItemInHand();
-//		if(itemStack == null) return;
-//		if(itemStack.getType() != Material.AIR) return;
-//
-//		PlayerInteractiveManager.find(event).stream()
-//			.filter(i -> i instanceof InteractiveStructure)
-//			.map(i -> (InteractiveStructure) i)
-//			.forEach(i -> i.interact(event));
-
-	}
-
-
-	@EventHandler
-	void onBlockReplacerPlayerInteract(PlayerInteractEvent event) {
-		Player player = event.getPlayer();
-		Block block = event.getClickedBlock();
-		if(block == null) return;
-		if(TBLTUtility.isTBLTPlayer(player)) {
-			new BlockReplacerMap().findUnique(block.getLocation())
-				.ifPresent(replacer -> {
-					boolean success = ((BlockReplacer) replacer).replace(player, block);
-					if(success) KotobaItemStack.consume(player.getInventory(), player.getItemInHand(), 1);
-				});
-		}
-	}
+//		if(TBLTUtility.isTBLTPlayer(player)) {
+//			new BlockReplacerMap().findUnique(block.getLocation())
+//				.ifPresent(replacer -> {
+//					boolean success = ((BlockReplacer) replacer).replace(player, block);
+//					if(success) KotobaItemStack.consume(player.getInventory(), player.getItemInHand(), 1);
+//				});
+//		}
+//	}
 
 
 	@EventHandler

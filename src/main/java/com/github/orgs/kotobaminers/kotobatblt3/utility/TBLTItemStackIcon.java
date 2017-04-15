@@ -88,6 +88,15 @@ public enum TBLTItemStackIcon implements KotobaItemStackIcon {
 	),
 
 
+	UPDATE_BOOK_KEY(
+			Material.ENCHANTMENT_TABLE,
+			(short) 0,
+			"Structure Key",
+			Arrays.asList("Update Book"),
+			IconFindType.SIMILAR
+	),
+
+
 	SUMMON_SERVENT_KEY(
 			Material.EGG,
 			(short) 0,
@@ -201,11 +210,19 @@ public enum TBLTItemStackIcon implements KotobaItemStackIcon {
 			IconFindType.SIMILAR
 	),
 
-	PORTAL_CRYSTAL(
+	PORTAL_NEXT_CRYSTAL(
 			Material.NETHER_STAR,
 			(short) 0,
 			"Portal Crystal",
-			Arrays.asList("This special item is used to open the time travel portal to your next location.", "Click the portal to open it."),
+			Arrays.asList("This special item is used to open the time travel portal to your next location."),
+			IconFindType.EXCEPT_LORE
+	),
+
+	PORTAL_ELEVATOR_CRYSTAL(
+			Material.NETHER_STAR,
+			(short) 0,
+			"Portal Elevator Crystal",
+			Arrays.asList("Elevator Crystal"),
 			IconFindType.EXCEPT_LORE
 	),
 
@@ -272,7 +289,6 @@ public enum TBLTItemStackIcon implements KotobaItemStackIcon {
 			Arrays.asList("Investigate"),
 			IconFindType.SIMILAR
 	),
-
 	;
 
 

@@ -174,7 +174,7 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface, Repeat
 		},
 
 
-	SEE_MEMORY(
+	UPDATE_BOOK(
 		TBLTItemStackIcon.DUMMY,
 		0,
 		TBLTInteractiveChestFinder.VERTICAL,

@@ -257,5 +257,11 @@ public class KotobaUtility {
 		double sine = Math.sin(rad);
 		return new Vector((cosine * currentX - sine * currentZ), vector.getY(), (sine * currentX + cosine * currentZ));
 	}
+
+
+	public static Location getBlockCenter(Block block) {
+		return block.getLocation().clone().add(0.5, 0.5, 0.5);
+	}
+
 }
 

@@ -22,6 +22,7 @@ public abstract class KotobaBlockStorageMap {
 		getMap().remove(storage.getName());
 	}
 
+
 	public Optional<KotobaBlockStorage> findUnique(String name) {
 		return Optional.ofNullable(getMap().get(name));
 	}
@@ -35,6 +36,13 @@ public abstract class KotobaBlockStorageMap {
 		}
 		return Optional.empty();
 	}
+
+	public List<KotobaBlockStorage> find(Location location) {
+		return getMap().values().stream()
+			.filter(storage -> storage.isIn(location))
+			.collect(Collectors.toList());
+	}
+
 
 	public boolean isInAny(Location location) {
 		return getMap().values()

@@ -8,15 +8,18 @@ import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.util.Vector;
 
 import com.github.orgs.kotobaminers.kotobaapi.block.KotobaBlockData;
+import com.github.orgs.kotobaminers.kotobaapi.block.KotobaBlockStorage;
 import com.github.orgs.kotobaminers.kotobaapi.block.KotobaPortal;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaEffect;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStackIcon;
+import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaUtility;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.ChestReader;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTItemStackIcon;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTUtility;
@@ -43,8 +46,15 @@ public enum ChestPortal implements KotobaPortal {
 
 					if(isSinglePortal(from) || (1 < inPortal.size()) && inPortal.size() == inArena.size()) {
 						if(inPortal.stream().allMatch(p -> from.distance(p.getLocation()) < 4)) {
+							findChests(from).stream()
+								.flatMap(c -> inPortal.stream().map(p -> tryWarp(p, c, a)))
+								.collect(Collectors.toList());
+
 							List<Boolean> success = findChests(from).stream()
-									.flatMap(c -> Stream.of(c.getInventory().getContents()).filter(i -> i != null).filter(i -> TBLTItemStackIcon.PORTAL_CRYSTAL.isIconItemStack(i)))
+									.flatMap(c -> Stream.of(c.getInventory().getContents())
+										.filter(i -> i != null)
+										.filter(i -> TBLTItemStackIcon.PORTAL_NEXT_CRYSTAL.isIconItemStack(i))
+									)
 									.filter(i -> i.getItemMeta().getLore() != null)
 									.filter(i -> 0 < i.getItemMeta().getLore().size())
 									.map(i -> i.getItemMeta().getLore().get(0))
@@ -61,6 +71,62 @@ public enum ChestPortal implements KotobaPortal {
 				});
 			return true;
 		}
+
+		private boolean tryWarp(Player player, Chest chest, KotobaBlockStorage arena) {
+			List<Boolean> next = Stream.of(chest.getInventory().getContents())
+				.filter(i -> i != null)
+				.filter(i -> TBLTItemStackIcon.PORTAL_NEXT_CRYSTAL.isIconItemStack(i))
+				.filter(i -> i.getItemMeta().getLore() != null)
+				.filter(i -> 0 < i.getItemMeta().getLore().size())
+				.map(i -> i.getItemMeta().getLore().get(0))
+				.map(name -> new TBLTArenaMap().findUnique(name))
+				.map(to -> {
+					to.ifPresent(to2 -> ((TBLTArena) to2).startSpawn(player));
+					return true;
+				})
+				.collect(Collectors.toList());
+			if(next.contains(true)) {
+				return true;
+			} else {
+				Stream.of(chest.getInventory().getContents())
+					.filter(i -> i != null)
+					.filter(i -> TBLTItemStackIcon.PORTAL_ELEVATOR_CRYSTAL.isIconItemStack(i))
+					.findAny()
+					.map(i -> {
+						Stream.iterate(-ELEVATOR_RANGE, j -> j + 1)
+							.limit(2 * ELEVATOR_RANGE - 1)
+							.filter(j -> j != 0)
+							.flatMap(j -> Stream.of(
+								chest.getLocation().clone().add(j, 0, 0),
+								chest.getLocation().clone().add(0, j, 0),
+								chest.getLocation().clone().add(0, 0, j))
+							)
+							.filter(l -> arena.isIn(l))
+							.map(l -> l.getBlock().getState())
+							.filter(s -> s instanceof Chest)
+							.map(s -> (Chest) s)
+							.filter(c -> Stream.of(c.getInventory().getContents())
+								.filter(content -> content != null)
+								.anyMatch(content -> TBLTItemStackIcon.PORTAL_ELEVATOR_CRYSTAL.isIconItemStack(content))
+							)
+							.findAny()
+							.map(c -> KotobaUtility.getBlockCenter(c.getBlock()).add(0, 2, 0))
+							.map(l -> {
+								player.teleport(l);
+								KotobaEffect.ENDER_SIGNAL.playEffect(l);
+								l.getWorld().playSound(l, Sound.PORTAL_TRIGGER, 1, 1);
+								return true;
+								}
+							)
+							;
+						return true;
+					})
+					;
+			}
+			return false;
+		}
+
+		private static final int ELEVATOR_RANGE = 10;
 
 
 		@Override
@@ -86,10 +152,17 @@ public enum ChestPortal implements KotobaPortal {
 						.count();
 					if(items <= gems) {
 						KotobaEffect.EXPLODE_SMALL.playSound(center);
-						locations.forEach(l -> {
-							KotobaEffect.EXPLODE_SMALL.playEffect(l);
-							new KotobaBlockData(l, Material.AIR, 0).placeBlock();
-						});
+
+						new TBLTArenaMap().findUnique(center)
+							.map(s -> (TBLTArena) s)
+							.ifPresent(a -> {
+								locations.forEach(l -> {
+									KotobaEffect.EXPLODE_SMALL.playEffect(l);
+									new KotobaBlockData(l, Material.AIR, 0).placeBlock();
+								});
+								a.load();
+								a.getTBLTPlayers().forEach(p -> a.continueFromCurrent(p));
+							});
 					}
 				});
 			}

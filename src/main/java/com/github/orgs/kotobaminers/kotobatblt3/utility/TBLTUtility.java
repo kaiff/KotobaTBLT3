@@ -20,6 +20,8 @@ import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaMap;
 import com.github.orgs.kotobaminers.kotobatblt3.kotobatblt3.Setting;
 
 public class TBLTUtility {
+	//TODO: Integrate with KotobaUtility
+
 	public static Location getRandomLocation(Location location, double radius) {
 		Random random = new Random();
 		double x = (random.nextDouble() - 0.5) * radius * 2;

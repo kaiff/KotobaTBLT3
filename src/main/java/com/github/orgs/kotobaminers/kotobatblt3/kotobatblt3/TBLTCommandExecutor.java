@@ -267,7 +267,7 @@ public class TBLTCommandExecutor implements CommandExecutor {
 		},
 
 
-		SWITCH_REPLACER(Arrays.asList(Arrays.asList("switch", "s"), Arrays.asList("replacer", "r")), "", "Switch Replacer", PermissionEnum.OP) {
+		SWITCH_REPLACER(Arrays.asList(Arrays.asList("switch", "s"), Arrays.asList("replacer", "r")), "<DIRECTION> <GEM> <ON|OFF> (AIR)", "Switch Replacer", PermissionEnum.OP) {
 			@Override
 			public boolean perform(Player player, String[] args) {
 				List<String> options = takeOptions(args);
@@ -351,16 +351,30 @@ public class TBLTCommandExecutor implements CommandExecutor {
 			}
 		},
 
+		ARENA_UPDATE_RELOAD_HERE(Arrays.asList(Arrays.asList("arena", "a"), Arrays.asList("updatereloadhere", "urh")), "", "Update and reload an arena where you are", PermissionEnum.OP) {
+			@Override
+			public boolean perform(Player player, String[] args) {
+				return new TBLTArenaMap().findUnique(player.getLocation())
+					.map(arena -> {
+						arena.save();
+						arena.load();
+						return true;
+					}).orElse(false);
+			}
+		},
+
 		ARENA_REMOVE_HERE(Arrays.asList(Arrays.asList("arena", "a"), Arrays.asList("removehere")), "", "Remove arena where you are", PermissionEnum.OP) {
 		@Override
 		public boolean perform(Player player, String[] args) {
 			TBLTArenaMap arenas = new TBLTArenaMap();
-			return arenas.findUnique(player.getLocation())
-				.map(arena -> {
-					arenas.remove(arena);
-					arena.delete();
+			List<Boolean> success = new TBLTArenaMap().find(player.getLocation()).stream()
+				.map(a -> {
+					arenas.remove(a);
+					a.delete();
 					return true;
-				}).orElse(false);
+				})
+				.collect(Collectors.toList());
+			return success.contains(true);
 			}
 		},
 

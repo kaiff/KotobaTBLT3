@@ -309,10 +309,10 @@ public class ReplacerSwitchChest implements SwitchableChest {
 
 
 	private Material getChestMaterial(Location location) {
-		if((location.getBlockX() + location.getBlockZ()) % 2 == 1) {
-			return Material.TRAPPED_CHEST;
-		} else {
+		if((location.getBlockX() + location.getBlockZ()) % 2 == 0) {
 			return Material.CHEST;
+		} else {
+			return Material.TRAPPED_CHEST;
 		}
 	}
 

@@ -54,10 +54,10 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 					.filter(g -> block.getType() == g.getIcon().getMaterial())
 					.findFirst()
 					.map(g -> {
-						Inventory inventory = event.getPlayer().getInventory();
-
 						new KotobaBlockData(block.getLocation(), Material.AIR, 0).placeBlock();
+						event.getPlayer().getInventory().addItem(g.getIcon().create(1));
 
+						Inventory inventory = event.getPlayer().getInventory();
 						gems.stream()
 							.filter(g2 ->
 								Stream.of(inventory.getContents())
@@ -70,13 +70,15 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 									.filter(c -> g2.getIcon().isIconItemStack(c))
 									.forEach(c -> inventory.remove(c));
 							});
-						KotobaEffect.MAGIC_MIDIUM.playEffect(block.getLocation());
-						KotobaEffect.MAGIC_MIDIUM.playSound(block.getLocation());
-						event.getPlayer().getInventory().addItem(g.getIcon().create(1));
+
 						TBLTInteractiveChestFinder.BASE.findChests(block.getLocation()).stream()
 							.flatMap(c -> TBLTSwitch.findPoweredChests(c, g).stream())
 							.forEach(c -> SwitchableChestManager.find(c).stream().forEach(s -> s.turnOff(c)));
+
+						KotobaEffect.MAGIC_MIDIUM.playEffect(block.getLocation());
+						KotobaEffect.MAGIC_MIDIUM.playSound(block.getLocation());
 						return true;
+
 					}).orElse(false);
 			}
 		},

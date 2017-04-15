@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -16,12 +17,15 @@ import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.util.Vector;
 
 import com.github.orgs.kotobaminers.kotobaapi.block.KotobaBlockData;
 import com.github.orgs.kotobaminers.kotobaapi.block.KotobaStructure;
 import com.github.orgs.kotobaminers.kotobaapi.block.PlayerBlockInteractive;
+import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaBook;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaEffect;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStackIcon;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaStructureUtility;
@@ -136,6 +140,71 @@ public enum InteractiveStructure implements KotobaStructure, PlayerBlockInteract
 						event.getPlayer().openInventory(i);
 					});
 				return true;
+			}
+		},
+
+
+	UPDATE_BOOK(
+			TBLTItemStackIcon.UPDATE_BOOK_KEY,
+			new HashMap<Vector, Material>() {{
+				put(new Vector(0,2,0), Material.ENCHANTMENT_TABLE);
+			}},
+			TBLTInteractiveChestFinder.VERTICAL,
+			false
+		) {
+			@Override
+			public boolean interactWithChests(PlayerInteractEvent event) {
+				Block block = event.getClickedBlock();
+				List<ItemStack> options = getChestFinder().findChests(event, getIcon()).stream()
+					.flatMap(c -> ChestReader.findOptions(c, getIcon(), new ArrayList<>()).stream())
+					.collect(Collectors.toList());
+				List<BookMeta> metas = options.stream()
+					.filter(i -> i.getType() == Material.BOOK_AND_QUILL)
+					.map(i -> (BookMeta) i.getItemMeta())
+					.filter(meta -> 0 < meta.getPageCount())
+					.collect(Collectors.toList());
+				if(0 < metas.size()) {
+					event.setCancelled(true);
+
+					Player player = event.getPlayer();
+					new TBLTArenaMap().findUnique(player.getLocation())
+						.ifPresent(arena -> {
+							KotobaEffect.ENDER_SIGNAL.playEffect(block.getLocation());
+							removeMemoryBook(player.getInventory());
+							metas.forEach(m -> giveOpenURLBook(player, m));
+						});
+				}
+				return true;
+			}
+
+			private static final String MEMORY = "Memory";
+			private static final String TEXT = "Memory";
+
+			private boolean isMemoryBook(ItemStack item) {
+				if(item.getType() == KotobaBook.MATERIAL) {
+					BookMeta meta = (BookMeta) item.getItemMeta();
+					String title = meta.getTitle();
+					if(title.equalsIgnoreCase(MEMORY)) {
+						return true;
+					}
+				}
+				return false;
+			}
+
+			private void removeMemoryBook(Inventory inventory) {
+				Stream.of(inventory.getContents())
+					.filter(i -> i != null)
+					.filter(i -> isMemoryBook(i))
+					.forEach(i -> inventory.remove(i));
+			}
+
+			private void giveOpenURLBook(Player player, BookMeta meta) {
+				String url = ChatColor.stripColor(meta.getPage(1));
+				KotobaBook book = new KotobaBook();
+				book.setAuthor(player.getName());
+				book.setTitle(MEMORY);
+				book.giveOpenURLBook(player, TEXT, url);
+				player.getWorld().playSound(player.getLocation(), Sound.SPIDER_WALK, 1f, 0.5f);
 			}
 		},
 
