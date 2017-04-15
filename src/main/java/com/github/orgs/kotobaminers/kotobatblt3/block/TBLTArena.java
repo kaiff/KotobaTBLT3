@@ -3,10 +3,8 @@ package com.github.orgs.kotobaminers.kotobatblt3.block;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -35,7 +33,6 @@ import com.github.orgs.kotobaminers.kotobatblt3.database.TBLTData;
 import com.github.orgs.kotobaminers.kotobatblt3.game.TBLTJob;
 import com.github.orgs.kotobaminers.kotobatblt3.kotobatblt3.Setting;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.ChestReader;
-import com.github.orgs.kotobaminers.kotobatblt3.utility.RepeatingEffect;
 
 import net.md_5.bungee.api.ChatColor;
 
@@ -49,7 +46,7 @@ public class TBLTArena extends KotobaBlockStorage {
 
 	private List<Location> checkPoints = new ArrayList<>();
 	private Location currentPoint = null;
-	private Set<RepeatingEffect> repeatingEffects = new HashSet<>();
+//	private Set<RepeatingEffect> repeatingEffects = new HashSet<>();
 	private ItemStack predictionItem = KotobaItemStack.create(Material.BOOK_AND_QUILL, (short) 0, 1, "Prediction", new ArrayList<String>());
 
 
@@ -145,15 +142,15 @@ public class TBLTArena extends KotobaBlockStorage {
 
 
 		//Set RepeatingEffects
-		this.repeatingEffects.stream().forEach(e -> e.setRepeat(false));
-		this.repeatingEffects = new HashSet<>();
+//		this.repeatingEffects.stream().forEach(e -> e.setRepeat(false));
+//		this.repeatingEffects = new HashSet<>();
 
-		List<RepeatingEffect> effects = chests.stream()
-			.flatMap(c -> ChestReader.findRepeatingEffects(c).stream())
-			.collect(Collectors.toList());
-
-		this.repeatingEffects.addAll(effects);
-		this.repeatingEffects.forEach(RepeatingEffect::startRepeating);
+//		List<RepeatingEffect> effects = chests.stream()
+//			.flatMap(c -> ChestReader.findRepeatingEffects(c).stream())
+//			.collect(Collectors.toList());
+//
+//		this.repeatingEffects.addAll(effects);
+//		this.repeatingEffects.forEach(RepeatingEffect::startRepeating);
 
 
 		//Set Holograms
@@ -171,10 +168,11 @@ public class TBLTArena extends KotobaBlockStorage {
 	}
 
 
+	@Deprecated
 	public void stopRepeatingEffects(Location blockLocation) {
-		this.repeatingEffects.stream()
-			.filter(e -> e.getBlockLocation().clone().distance(blockLocation.clone()) == 0)
-			.forEach(e -> e.setRepeat(false));
+//		this.repeatingEffects.stream()
+//			.filter(e -> e.getBlockLocation().clone().distance(blockLocation.clone()) == 0)
+//			.forEach(e -> e.setRepeat(false));
 	}
 
 	@Override

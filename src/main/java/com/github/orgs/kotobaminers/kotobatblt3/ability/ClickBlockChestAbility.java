@@ -33,7 +33,9 @@ import com.github.orgs.kotobaminers.kotobatblt3.block.SwitchableChestManager;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArena;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaMap;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTInteractiveChestFinder;
+import com.github.orgs.kotobaminers.kotobatblt3.userinterface.InteractEffect;
 import com.github.orgs.kotobaminers.kotobatblt3.userinterface.TBLTPlayerGUI;
+import com.github.orgs.kotobaminers.kotobatblt3.utility.ChestChecker;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.ChestReader;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.RepeatingEffect;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.RepeatingEffectHolder;
@@ -326,22 +328,20 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface, Repeat
 	@Override
 	public boolean perform(PlayerInteractEvent event) {
 		List<Chest> chests = getChestFinder().findChests(event, getIcon());
+		chests = chests.stream()
+			.filter(c -> ChestChecker.checkTriggers(c, event.getPlayer()))
+			.collect(Collectors.toList());
+
+		chests.forEach(c -> InteractEffect.playEffect(c, event));
 		if(0 < chests.size()) {
-			if(chests.stream().allMatch(c -> ChestReader.hasTriggersItem(c, event.getPlayer()))) {
-				stopRepeatingEffects(event.getClickedBlock().getLocation().clone());
-				return interactWithChests(event);
-			} else {
-				TBLTPlayerGUI.YOU_NEED.create(
-					chests.stream()
-						.flatMap(c -> ChestReader.findTriggersItem(c).stream())
-						.collect(Collectors.toList())
-				).ifPresent(i -> event.getPlayer().openInventory(i));
-			}
+			return interactWithChests(event);
 		}
+
 		return false;
 	}
 
 
+	@Deprecated
 	private void stopRepeatingEffects(Location blockLocation) {
 		new TBLTArenaMap().findUnique(blockLocation.clone())
 			.map(storage -> (TBLTArena) storage)

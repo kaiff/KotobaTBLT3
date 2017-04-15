@@ -68,10 +68,10 @@ public class ChestReader {
 			.map(i -> ChestReader.findItemsInRow(chest, i))
 			.filter(list ->
 				list.stream()
-					.anyMatch(i -> TBLTItemStackIcon.TRIGGER_ITEM_ALL_MATCH.isIconItemStack(i))
+					.anyMatch(i -> TBLTItemStackIcon.TRIGGER_ITEM_AT_LEAST.isIconItemStack(i))
 			)
 			.flatMap(list -> list.stream())
-			.filter(i -> !TBLTItemStackIcon.TRIGGER_ITEM_ALL_MATCH.isIconItemStack(i))
+			.filter(i -> !TBLTItemStackIcon.TRIGGER_ITEM_AT_LEAST.isIconItemStack(i))
 			.collect(Collectors.toList());
 	}
 
@@ -95,6 +95,7 @@ public class ChestReader {
 	}
 
 
+	@Deprecated
 	public static List<RepeatingEffect> findRepeatingEffects(Chest chest) {
 		return Stream.of(chest.getInventory().getContents())
 			.filter(i -> i != null)

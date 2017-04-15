@@ -17,7 +17,6 @@ import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.util.Vector;
@@ -57,20 +56,6 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 						new KotobaBlockData(block.getLocation(), Material.AIR, 0).placeBlock();
 						event.getPlayer().getInventory().addItem(g.getIcon().create(1));
 
-						Inventory inventory = event.getPlayer().getInventory();
-						gems.stream()
-							.filter(g2 ->
-								Stream.of(inventory.getContents())
-									.filter(item -> item != null)
-									.anyMatch(item -> g2.getIcon().isIconItemStack(item)))
-							.forEach(g2 -> {
-								new KotobaBlockData(block.getLocation(), g2.getIcon().getMaterial(), 0).placeBlock();
-								Stream.of(inventory.getContents())
-									.filter(c -> c != null)
-									.filter(c -> g2.getIcon().isIconItemStack(c))
-									.forEach(c -> inventory.remove(c));
-							});
-
 						TBLTInteractiveChestFinder.BASE.findChests(block.getLocation()).stream()
 							.flatMap(c -> TBLTSwitch.findPoweredChests(c, g).stream())
 							.forEach(c -> SwitchableChestManager.find(c).stream().forEach(s -> s.turnOff(c)));
@@ -98,29 +83,17 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 					.filter(g -> block.getType() == g.getIcon().getMaterial())
 					.findFirst()
 					.map(g -> {
-						Inventory inventory = event.getPlayer().getInventory();
-
 						new KotobaBlockData(block.getLocation(), Material.AIR, 0).placeBlock();
+						event.getPlayer().getInventory().addItem(g.getIcon().create(1));
 
-						gems.stream()
-							.filter(g2 ->
-								Stream.of(inventory.getContents())
-									.filter(item -> item != null)
-									.anyMatch(item -> g2.getIcon().isIconItemStack(item)))
-							.forEach(g2 -> {
-								new KotobaBlockData(block.getLocation(), g2.getIcon().getMaterial(), 0).placeBlock();
-								Stream.of(inventory.getContents())
-									.filter(c -> c != null)
-									.filter(c -> g2.getIcon().isIconItemStack(c))
-									.forEach(c -> inventory.remove(c));
-							});
 						KotobaEffect.MAGIC_MIDIUM.playEffect(block.getLocation());
 						KotobaEffect.MAGIC_MIDIUM.playSound(block.getLocation());
-						event.getPlayer().getInventory().addItem(g.getIcon().create(1));
+
 						TBLTInteractiveChestFinder.BASE.findChests(block.getLocation()).stream()
 							.flatMap(c -> TBLTSwitch.findPoweredChests(c, g).stream())
 							.forEach(c -> SwitchableChestManager.find(c).stream().forEach(s -> s.turnOff(c)));
 						return true;
+
 					}).orElse(false);
 			}
 		},

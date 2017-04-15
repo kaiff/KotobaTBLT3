@@ -34,6 +34,7 @@ import com.github.orgs.kotobaminers.kotobatblt3.citizens.UniqueNPC;
 import com.github.orgs.kotobaminers.kotobatblt3.database.TBLTData;
 import com.github.orgs.kotobaminers.kotobatblt3.userinterface.InteractEffect;
 import com.github.orgs.kotobaminers.kotobatblt3.userinterface.TBLTPlayerGUI;
+import com.github.orgs.kotobaminers.kotobatblt3.utility.ChestChecker;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.ChestReader;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.RepeatingEffect;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.RepeatingEffectHolder;
@@ -60,9 +61,6 @@ public enum InteractiveStructure implements KotobaStructure, PlayerBlockInteract
 			if(0 == KotobaStructureUtility.findOrigins(getStructure(), event.getClickedBlock().getLocation(), hasRotations()).size()) return false;
 
 			Player player = event.getPlayer();
-			List<Chest> chests = getChestFinder().findChests(event, getIcon());
-
-			if(!chests.stream().allMatch(c -> ChestReader.hasTriggersItem(c, player))) return false;
 
 			if(event.getClickedBlock().getType() == Material.STAINED_GLASS_PANE) {
 				Block opposite = event.getClickedBlock().getRelative(event.getBlockFace().getOppositeFace());
@@ -317,17 +315,27 @@ public enum InteractiveStructure implements KotobaStructure, PlayerBlockInteract
 	@Override
 	public boolean interact(PlayerInteractEvent event) {
 		List<Chest> chests = getChestFinder().findChests(event, getIcon());
-		if(chests.stream().allMatch(c -> ChestReader.hasTriggersItem(c, event.getPlayer()))) {
-			chests.forEach(c -> InteractEffect.playEffect(c, event));
+		chests = chests.stream()
+			.filter(c -> ChestChecker.checkTriggers(c, event.getPlayer()))
+			.collect(Collectors.toList());
+
+		chests.forEach(c -> InteractEffect.playEffect(c, event));
+		if(0 < chests.size()) {
 			return interactWithChests(event);
-		} else {
-			TBLTPlayerGUI.YOU_NEED.create(
-				chests.stream()
-					.flatMap(c -> ChestReader.findTriggersItem(c).stream())
-					.collect(Collectors.toList())
-			).ifPresent(i -> event.getPlayer().openInventory(i));
 		}
+
 		return false;
+
+//		if(chests.stream().allMatch(c -> ChestReader.hasTriggersItem(c, event.getPlayer()))) {
+//			chests.forEach(c -> InteractEffect.playEffect(c, event));
+//			return interactWithChests(event);
+//		} else {
+//			TBLTPlayerGUI.YOU_NEED.create(
+//				chests.stream()
+//					.flatMap(c -> ChestReader.findTriggersItem(c).stream())
+//					.collect(Collectors.toList())
+//			).ifPresent(i -> event.getPlayer().openInventory(i));
+//		}
 	}
 
 	@Override

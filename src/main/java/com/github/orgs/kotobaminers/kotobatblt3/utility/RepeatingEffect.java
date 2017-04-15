@@ -6,6 +6,8 @@ import org.bukkit.Location;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaEffect;
 import com.github.orgs.kotobaminers.kotobatblt3.kotobatblt3.Setting;
 
+
+@Deprecated
 public class RepeatingEffect {
 
 

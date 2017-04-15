@@ -43,11 +43,20 @@ public enum TBLTItemStackIcon implements KotobaItemStackIcon {
 
 
 	//Chest Option
-	TRIGGER_ITEM_ALL_MATCH(
+	TRIGGER_ITEM_AT_LEAST(
 			Material.FLINT_AND_STEEL,
 			(short) 0,
 			"Trigger Item Setting",
 			Arrays.asList("You need all the items to activate this chest in the row"),
+			IconFindType.SIMILAR
+	),
+
+
+	TRIGGER_ITEM_SAME_AMOUNT(
+			Material.FLINT_AND_STEEL,
+			(short) 0,
+			"Trigger Item Setting",
+			Arrays.asList("Same Amount Required"),
 			IconFindType.SIMILAR
 	),
 
