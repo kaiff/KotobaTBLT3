@@ -14,7 +14,7 @@ import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStackIcon;
 public enum TBLTItemStackIcon implements KotobaItemStackIcon {
 
 
-	//Ability
+	//DUMMY
 	TEST(
 			Material.APPLE,
 			(short) 0,
@@ -24,6 +24,7 @@ public enum TBLTItemStackIcon implements KotobaItemStackIcon {
 	),
 
 
+	//Ability
 	MAGIC_WAND(
 			Material.REDSTONE_TORCH_ON,
 			(short) 0,
