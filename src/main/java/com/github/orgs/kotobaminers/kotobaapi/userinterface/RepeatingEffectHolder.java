@@ -1,4 +1,4 @@
-package com.github.orgs.kotobaminers.kotobatblt3.utility;
+package com.github.orgs.kotobaminers.kotobaapi.userinterface;
 
 import java.util.List;
 

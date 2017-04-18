@@ -1,5 +1,7 @@
 package com.github.orgs.kotobaminers.kotobatblt3.block;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -9,6 +11,7 @@ import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerPortalEvent;
@@ -36,18 +39,17 @@ public enum ChestPortal implements KotobaPortal {
 			Location from = event.getFrom();
 			new TBLTArenaMap().findUnique(from)
 				.ifPresent(a -> {
-					List<Player> inPortal = Bukkit.getOnlinePlayers().stream()
-						.filter(p -> p.getLocation().getBlock().getType() == Material.ENDER_PORTAL)
-						.filter(p -> TBLTUtility.isTBLTPlayer(p))
-						.collect(Collectors.toList());
 					List<Player> inArena = Bukkit.getOnlinePlayers().stream()
 							.filter(p -> TBLTUtility.isTBLTPlayer(p))
 							.collect(Collectors.toList());
+					List<Player> inSamePortal = inArena.stream()
+						.filter(p -> getPortalLocations(from).stream().anyMatch(l -> p.getLocation().getBlock().getLocation().distance(l) == 0))
+						.collect(Collectors.toList());
 
-					if(isSinglePortal(from) || (1 < inPortal.size()) && inPortal.size() == inArena.size()) {
-						if(inPortal.stream().allMatch(p -> from.distance(p.getLocation()) < 4)) {
+					if(isSinglePortal(from) || (1 < inSamePortal.size()) && inSamePortal.size() == inArena.size()) {
+						if(inSamePortal.stream().allMatch(p -> from.distance(p.getLocation()) < 4)) {
 							findChests(from).stream()
-								.flatMap(c -> inPortal.stream().map(p -> tryWarp(p, c, a)))
+								.flatMap(c -> inSamePortal.stream().map(p -> tryWarp(p, c, a)))
 								.collect(Collectors.toList());
 
 							List<Boolean> success = findChests(from).stream()
@@ -60,7 +62,7 @@ public enum ChestPortal implements KotobaPortal {
 									.map(i -> i.getItemMeta().getLore().get(0))
 									.map(name -> new TBLTArenaMap().findUnique(name))
 									.map(to -> {
-										to.ifPresent(to2 -> inPortal.stream().forEach(p2 -> ((TBLTArena) to2).startSpawn(p2)));
+										to.ifPresent(to2 -> inSamePortal.stream().forEach(p2 -> ((TBLTArena) to2).startSpawn(p2)));
 										return true;
 									}).collect(Collectors.toList());
 							if(success.contains(true)) {
@@ -70,6 +72,45 @@ public enum ChestPortal implements KotobaPortal {
 					}
 				});
 			return true;
+		}
+
+		private List<Location> getPortalLocations(Location from) {
+			if(from.getBlock().getType() == Material.ENDER_PORTAL) {
+				int range = 2;
+				List<Location> search = new ArrayList<>();
+				List<BlockFace> faces = Arrays.asList(BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST);
+				for(BlockFace face : faces) {
+					Location current = from.clone();
+					for(int i = 0; i < range; i++) {
+						current = current.getBlock().getRelative(face).getLocation();
+						if(current.getBlock().getType() == Material.ENDER_PORTAL) {
+							search.add(current);
+						} else {
+							break;
+						}
+					}
+				}
+
+				int minX = search.stream()
+					.mapToInt(l -> l.getBlockX())
+					.min()
+					.getAsInt();
+				int minZ = search.stream()
+					.mapToInt(l -> l.getBlockZ())
+					.min()
+					.getAsInt();
+				int y = from.getBlockY();
+
+				return Stream.iterate(minX, x -> x + 1)
+					.limit(range)
+					.flatMap(x ->
+						Stream.iterate(minZ, z -> z + 1)
+						.limit(range)
+						.map(z -> new Location(from.getWorld(), x, y, z))
+					).collect(Collectors.toList());
+
+			}
+			return new ArrayList<>();
 		}
 
 		private boolean tryWarp(Player player, Chest chest, KotobaBlockStorage arena) {

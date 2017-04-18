@@ -22,6 +22,7 @@ import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.github.orgs.kotobaminers.develop.TBLTTest;
+import com.github.orgs.kotobaminers.kotobaapi.block.KotobaStructure;
 import com.github.orgs.kotobaminers.kotobaapi.citizens.KotobaCitizensManager;
 import com.github.orgs.kotobaminers.kotobaapi.kotobaapi.CommandEnumInterface;
 import com.github.orgs.kotobaminers.kotobaapi.kotobaapi.PermissionEnumInterface;
@@ -29,6 +30,7 @@ import com.github.orgs.kotobaminers.kotobaapi.userinterface.Holograms;
 import com.github.orgs.kotobaminers.kotobatblt3.ability.TBLTGem;
 import com.github.orgs.kotobaminers.kotobatblt3.block.BlockReplacer;
 import com.github.orgs.kotobaminers.kotobatblt3.block.BlockReplacerMap;
+import com.github.orgs.kotobaminers.kotobatblt3.block.InteractiveStructure;
 import com.github.orgs.kotobaminers.kotobatblt3.block.ReplacerSwitchChest;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArena;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaMap;
@@ -512,6 +514,32 @@ public class TBLTCommandExecutor implements CommandExecutor {
 						TBLTPlayerGUI.ARENA.create(IconCreatorUtility.getIcons((TBLTArena) arena)).ifPresent(player::openInventory);;
 						return true;
 					}).orElse(false);
+			}
+		},
+
+
+		STRUCTURE_GENERATE(Arrays.asList(Arrays.asList("structure"), Arrays.asList("generate", "g")), "<STRUCTURE>", "Generate a structure", PermissionEnum.OP) {
+
+			private final List<KotobaStructure> STRUCTURES = Stream.of(Stream.of(InteractiveStructure.values())).flatMap(s -> s).collect(Collectors.toList());
+
+			@Override
+			public boolean perform(Player player , String[] args) {
+				List<String> options = takeOptions(args);
+				if(0 < options.size()) {
+					Boolean success = STRUCTURES.stream()
+						.filter(s -> s.getName().equalsIgnoreCase(options.get(0)))
+						.findFirst()
+						.map(s -> {
+							s.generate(player);
+							return true;
+						}).orElse(false);
+					if(!success) {
+						String message = "Structures: " + String.join(", ", STRUCTURES.stream().map(s -> s.getName()).collect(Collectors.toList()));
+						player.sendMessage(message);
+					}
+					return success;
+				}
+				return false;
 			}
 		},
 

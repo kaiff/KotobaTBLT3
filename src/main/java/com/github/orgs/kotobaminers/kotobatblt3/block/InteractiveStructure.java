@@ -25,6 +25,8 @@ import org.bukkit.util.Vector;
 import com.github.orgs.kotobaminers.kotobaapi.block.KotobaBlockData;
 import com.github.orgs.kotobaminers.kotobaapi.block.KotobaStructure;
 import com.github.orgs.kotobaminers.kotobaapi.block.PlayerBlockInteractive;
+import com.github.orgs.kotobaminers.kotobaapi.userinterface.RepeatingEffect;
+import com.github.orgs.kotobaminers.kotobaapi.userinterface.RepeatingEffectHolder;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaBook;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaEffect;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStackIcon;
@@ -36,8 +38,6 @@ import com.github.orgs.kotobaminers.kotobatblt3.userinterface.InteractEffect;
 import com.github.orgs.kotobaminers.kotobatblt3.userinterface.TBLTPlayerGUI;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.ChestChecker;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.ChestReader;
-import com.github.orgs.kotobaminers.kotobatblt3.utility.RepeatingEffect;
-import com.github.orgs.kotobaminers.kotobatblt3.utility.RepeatingEffectHolder;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTItemStackIcon;
 
 import net.citizensnpcs.api.npc.NPC;
@@ -161,49 +161,71 @@ public enum InteractiveStructure implements KotobaStructure, PlayerBlockInteract
 					.map(i -> (BookMeta) i.getItemMeta())
 					.filter(meta -> 0 < meta.getPageCount())
 					.collect(Collectors.toList());
+
 				if(0 < metas.size()) {
 					event.setCancelled(true);
 
 					Player player = event.getPlayer();
 					new TBLTArenaMap().findUnique(player.getLocation())
 						.ifPresent(arena -> {
-							KotobaEffect.ENDER_SIGNAL.playEffect(block.getLocation());
-							removeMemoryBook(player.getInventory());
-							metas.forEach(m -> giveOpenURLBook(player, m));
+							removeMagicBook(player.getInventory());
+							boolean success = giveBooks(player, metas, options);
+							if(success) {
+								KotobaEffect.ENDER_SIGNAL.playEffect(block.getLocation());
+								player.getWorld().playSound(player.getLocation(), Sound.SPIDER_WALK, 1f, 0.5f);
+							}
 						});
 				}
 				return true;
 			}
 
-			private static final String MEMORY = "Memory";
-			private static final String TEXT = "Memory";
+			private static final String TITLE = "Magic Book";
+			private static final String TEXT = "PastRecords";
 
-			private boolean isMemoryBook(ItemStack item) {
+			private boolean isMagicBook(ItemStack item) {
 				if(item.getType() == KotobaBook.MATERIAL) {
 					BookMeta meta = (BookMeta) item.getItemMeta();
 					String title = meta.getTitle();
-					if(title.equalsIgnoreCase(MEMORY)) {
+					if(title.equalsIgnoreCase(TITLE)) {
 						return true;
 					}
 				}
 				return false;
 			}
 
-			private void removeMemoryBook(Inventory inventory) {
+			private void removeMagicBook(Inventory inventory) {
 				Stream.of(inventory.getContents())
 					.filter(i -> i != null)
-					.filter(i -> isMemoryBook(i))
+					.filter(i -> isMagicBook(i))
 					.forEach(i -> inventory.remove(i));
 			}
 
-			private void giveOpenURLBook(Player player, BookMeta meta) {
-				String url = ChatColor.stripColor(meta.getPage(1));
-				KotobaBook book = new KotobaBook();
-				book.setAuthor(player.getName());
-				book.setTitle(MEMORY);
-				book.giveOpenURLBook(player, TEXT, url);
-				player.getWorld().playSound(player.getLocation(), Sound.SPIDER_WALK, 1f, 0.5f);
+			private boolean giveBooks(Player player, List<BookMeta> metas, List<ItemStack> options) {
+				List<TBLTItemStackIcon> keys = options.stream()
+					.filter(i -> TBLTItemStackIcon.SENTENCE_BOOK_OPTION.isIconItemStack(i) || TBLTItemStackIcon.URL_BOOK_OPTION.isIconItemStack(i))
+					.flatMap(i -> Stream.of(TBLTItemStackIcon.values()).filter(icon -> icon.isIconItemStack(i)))
+					.collect(Collectors.toList());
+
+				if(0 < keys.size()) {
+					List<KotobaBook> books = metas.stream().map(meta -> {
+						KotobaBook book = new KotobaBook(meta);
+						book.setAuthor(player.getName());
+						book.setTitle(TITLE);
+						return book;
+					}).collect(Collectors.toList());
+					keys.stream()
+						.filter(o -> o == TBLTItemStackIcon.SENTENCE_BOOK_OPTION)
+						.findAny()
+						.ifPresent(o -> books.forEach(book -> player.getInventory().addItem(book.createRawBook())));
+					keys.stream()
+						.filter(o -> o == TBLTItemStackIcon.URL_BOOK_OPTION)
+						.findAny()
+						.ifPresent(o -> books.stream().forEach(book -> book.giveOpenURLBook(player, TEXT, ChatColor.stripColor(book.getMeta().getPage(1)))));
+					return true;
+				}
+				return false;
 			}
+
 		},
 
 
@@ -319,8 +341,8 @@ public enum InteractiveStructure implements KotobaStructure, PlayerBlockInteract
 			.filter(c -> ChestChecker.checkTriggers(c, event.getPlayer()))
 			.collect(Collectors.toList());
 
-		chests.forEach(c -> InteractEffect.playEffect(c, event));
 		if(0 < chests.size()) {
+			chests.forEach(c -> InteractEffect.playEffect(c, event));
 			return interactWithChests(event);
 		}
 
@@ -376,6 +398,12 @@ public enum InteractiveStructure implements KotobaStructure, PlayerBlockInteract
 	@Override
 	public KotobaEffect getSound() {
 		return KotobaEffect.MUTE;
+	}
+
+
+	@Override
+	public String getName() {
+		return name();
 	}
 
 

@@ -8,9 +8,8 @@ import org.bukkit.block.Chest;
 import org.bukkit.inventory.ItemStack;
 
 public class SwitchableChestManager {
-	public static List<SwitchableChest> getSwitchableChests() {
+	private static List<SwitchableChest> getSwitchableChests() {
 		return Stream.of(
-			Stream.of(SwitchableStructure.values()),
 			Stream.of(new ReplacerSwitchChest())
 		)
 			.flatMap(a -> a)

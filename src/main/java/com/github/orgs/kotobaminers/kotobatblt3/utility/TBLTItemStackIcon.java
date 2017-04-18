@@ -106,6 +106,24 @@ public enum TBLTItemStackIcon implements KotobaItemStackIcon {
 	),
 
 
+	URL_BOOK_OPTION(
+			Material.BOOK,
+			(short) 0,
+			"Book Option",
+			Arrays.asList("URL Book"),
+			IconFindType.SIMILAR
+	),
+
+
+	SENTENCE_BOOK_OPTION(
+			Material.BOOK,
+			(short) 0,
+			"Book Option",
+			Arrays.asList("Sentence Book"),
+			IconFindType.SIMILAR
+	),
+
+
 	SUMMON_SERVENT_KEY(
 			Material.EGG,
 			(short) 0,
@@ -128,15 +146,6 @@ public enum TBLTItemStackIcon implements KotobaItemStackIcon {
 			Material.LEVER,
 			(short) 0,
 			"Switch Key",
-			null,
-			IconFindType.SIMILAR
-	),
-
-
-	SWITCH_REVERSE(
-			Material.LEVER,
-			(short) 0,
-			"Switch Reverse",
 			null,
 			IconFindType.SIMILAR
 	),

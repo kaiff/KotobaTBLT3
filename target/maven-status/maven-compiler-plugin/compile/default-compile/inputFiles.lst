@@ -5,7 +5,6 @@ C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminer
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\block\KotobaPortal.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\block\SwitchableChest.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\sentence\ConversationGUIIcon.java
-C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\utility\RepeatingEffectHolderManager.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\block\KotobaYamlConfiguration.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\game\TBLTJob.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\game\TBLTQuestType.java
@@ -14,13 +13,13 @@ C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminer
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\citizens\UniqueNPC.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\utility\KotobaStructureUtility.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\database\TBLTNPCHolograms.java
+C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\userinterface\RepeatingEffectHolderManager.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\block\InteractiveStructure.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\develop\TBLTTest.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\kotobaapi\CommandEnumInterface.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\block\KotobaBlockStorage.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\database\DatabaseManager.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\ability\PlayerInteractiveManager.java
-C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\block\SwitchableStructure.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\database\TBLTConversationEditor.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\kotobatblt3\Setting.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\userinterface\Toggler.java
@@ -35,13 +34,13 @@ C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminer
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\userinterface\ChestGUI.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\userinterface\TBLTIconListGUI.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\ability\ItemStackIconHolder.java
+C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\userinterface\RepeatingEffectHolder.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\userinterface\IconListGUI.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\database\TBLTConversationEditorMap.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\ability\Drone.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\kotobaapi\KotobaAPI.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\block\InteractiveChestFinder.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\ability\InteractiveChestFinderHolder.java
-C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\utility\RepeatingEffectHolder.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\database\PlayerDatabase.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\userinterface\InteractEffect.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\citizens\KotobaCitizensManager.java
@@ -55,6 +54,7 @@ C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminer
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\utility\KotobaBook.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\database\PlayerData.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\kotobaapi\PotionEnumInterface.java
+C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\userinterface\RepeatingEffect.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\ability\ItemStackConsumer.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\ability\GeneratableBlockListener.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\kotobaapi\MessageEnumInterface.java
@@ -77,7 +77,6 @@ C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminer
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\kotobaapi\PermissionEnumInterface.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\block\ReplacerSwitchChest.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\block\TBLTArenaListener.java
-C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\utility\RepeatingEffect.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\block\ChestPortal.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\userinterface\TBLTPlayerGUIListener.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\kotobatblt3\TBLTCommandExecutor.java

@@ -18,8 +18,10 @@ import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.util.Vector;
 
 import com.github.orgs.kotobaminers.kotobaapi.userinterface.Holograms;
+import com.github.orgs.kotobaminers.kotobaapi.userinterface.RepeatingEffect;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStackIcon;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaUtility;
+import com.github.orgs.kotobaminers.kotobatblt3.userinterface.RepeatingEffectHolderManager;
 
 public class ChestReader {
 

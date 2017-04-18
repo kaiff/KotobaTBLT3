@@ -91,7 +91,7 @@ public enum ChestChecker {
 					.anyMatch(i -> icon.isIconItemStack(i))
 			)
 			.flatMap(list -> list.stream())
-			.filter(i -> !TBLTItemStackIcon.TRIGGER_ITEM_AT_LEAST.isIconItemStack(i))
+			.filter(i -> Stream.of(ChestChecker.values()).map(checker -> checker.icon).noneMatch(icon -> icon.isIconItemStack(i)))
 			.collect(Collectors.toList());
 	}
 

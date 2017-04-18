@@ -9,7 +9,6 @@ import java.util.stream.Stream;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
@@ -30,19 +29,16 @@ import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStackIcon;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaUtility;
 import com.github.orgs.kotobaminers.kotobatblt3.block.ChestPortal;
 import com.github.orgs.kotobaminers.kotobatblt3.block.SwitchableChestManager;
-import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArena;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaMap;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTInteractiveChestFinder;
 import com.github.orgs.kotobaminers.kotobatblt3.userinterface.InteractEffect;
 import com.github.orgs.kotobaminers.kotobatblt3.userinterface.TBLTPlayerGUI;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.ChestChecker;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.ChestReader;
-import com.github.orgs.kotobaminers.kotobatblt3.utility.RepeatingEffect;
-import com.github.orgs.kotobaminers.kotobatblt3.utility.RepeatingEffectHolder;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTItemStackIcon;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTUtility;
 
-public enum ClickBlockChestAbility implements ClickBlockAbilityInterface, RepeatingEffectHolder, InteractiveChestFinderHolder {
+public enum ClickBlockChestAbility implements ClickBlockAbilityInterface, InteractiveChestFinderHolder {
 
 
 	GREEN_GEM_PORTAL(
@@ -297,9 +293,6 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface, Repeat
 	private KotobaItemStackIcon icon;
 	private int consume;
 	private TBLTInteractiveChestFinder chestType;
-	private int period = 5;
-	private KotobaEffect effect;
-	private KotobaEffect sound;
 
 
 	private ClickBlockChestAbility(
@@ -312,16 +305,6 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface, Repeat
 		this.icon = icon;
 		this.consume = consume;
 		this.chestType = chest;
-		this.effect = effect;
-		this.sound = sound;
-	}
-
-
-	@Override
-	public List<RepeatingEffect> createPeriodicEffects(Location origin) {
-		return getChestFinder().getPositions().stream()
-			.map(vec -> RepeatingEffect.create(period, effect, sound, true, origin.clone().add(vec)))
-			.collect(Collectors.toList());
 	}
 
 
@@ -338,14 +321,6 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface, Repeat
 		}
 
 		return false;
-	}
-
-
-	@Deprecated
-	private void stopRepeatingEffects(Location blockLocation) {
-		new TBLTArenaMap().findUnique(blockLocation.clone())
-			.map(storage -> (TBLTArena) storage)
-			.ifPresent(arena -> arena.stopRepeatingEffects(blockLocation.clone()));
 	}
 
 
@@ -368,22 +343,6 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface, Repeat
 	@Override
 	public int getConsumption() {
 		return consume;
-	}
-
-
-	@Override
-	public int getPeriod() {
-		return period;
-	}
-
-	@Override
-	public KotobaEffect getEffect() {
-		return effect;
-	}
-
-	@Override
-	public KotobaEffect getSound() {
-		return sound;
 	}
 
 

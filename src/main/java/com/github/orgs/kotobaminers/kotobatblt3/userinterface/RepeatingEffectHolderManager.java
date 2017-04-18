@@ -1,18 +1,21 @@
-package com.github.orgs.kotobaminers.kotobatblt3.utility;
+package com.github.orgs.kotobaminers.kotobatblt3.userinterface;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.github.orgs.kotobaminers.kotobatblt3.ability.ClickBlockChestAbility;
-import com.github.orgs.kotobaminers.kotobatblt3.block.InteractiveStructure;
+import com.github.orgs.kotobaminers.kotobaapi.userinterface.RepeatingEffectHolder;
+import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTItemStackIcon;
 
 public class RepeatingEffectHolderManager {
 
 
+	private static final List<RepeatingEffectHolder> HOLDERS = Arrays.asList();
+
+
 	private static List<RepeatingEffectHolder> getHolders() {
-		return Arrays.asList(ClickBlockChestAbility.values(), InteractiveStructure.values()).stream()
+		return HOLDERS.stream()
 			.flatMap(holders -> Stream.of(holders))
 			.collect(Collectors.toList());
 	}
