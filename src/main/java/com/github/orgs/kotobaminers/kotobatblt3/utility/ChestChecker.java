@@ -24,9 +24,9 @@ public enum ChestChecker {
 				.allMatch(item -> contents.stream().anyMatch(c -> c.isSimilar(item)));
 			if(!allMatch) {
 				TBLTPlayerGUI.YOU_NEED.create(items.stream().map(i -> {
-					ItemStack i2 = i.clone();
-					i2.setAmount(1);
-					return i2;
+						ItemStack i2 = i.clone();
+						i2.setAmount(1);
+						return i2;
 					})
 					.collect(Collectors.toList())
 				).ifPresent(i -> player.openInventory(i));
@@ -91,7 +91,7 @@ public enum ChestChecker {
 					.anyMatch(i -> icon.isIconItemStack(i))
 			)
 			.flatMap(list -> list.stream())
-			.filter(i -> Stream.of(ChestChecker.values()).map(checker -> checker.icon).noneMatch(icon -> icon.isIconItemStack(i)))
+			.filter(i -> Stream.of(ChestChecker.values()).map(checker -> checker.icon).none	Match(icon -> icon.isIconItemStack(i)))
 			.collect(Collectors.toList());
 	}
 
