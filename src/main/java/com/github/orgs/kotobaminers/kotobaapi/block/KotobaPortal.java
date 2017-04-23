@@ -26,6 +26,13 @@ public interface KotobaPortal {
 	}
 
 
+	default void fillPortal(Location center, Material filling) {
+		getPositions().stream()
+			.map(p -> center.clone().add(p))
+			.forEach(l -> new KotobaBlockData(l, filling, 0).placeBlock());
+	}
+
+
 	boolean canOpen(Location center);
 
 
@@ -35,7 +42,7 @@ public interface KotobaPortal {
 	void failOpen(Location center);
 
 
-	boolean enterPortal(PlayerPortalEvent event);
+	boolean goThroughPortal(PlayerPortalEvent event);
 
 
 }

@@ -2,15 +2,16 @@ package com.github.orgs.kotobaminers.kotobaapi.block;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -26,6 +27,8 @@ public abstract class KotobaBlockStorage extends KotobaYamlConfiguration {
 		SPAWN("SPAWN"),
 		BLOCKS("BLOCKS"),
 		CHESTS("CHESTS"),
+		TOP_CORNER("TOP_CORNER"),
+		BOTTOM_CORNER("BOTTOM_CORNER"),
 		;
 		private String path;
 		private Path(String path) {
@@ -97,15 +100,16 @@ public abstract class KotobaBlockStorage extends KotobaYamlConfiguration {
 			.findFirst()
 			.ifPresent(world -> {
 				String name = config.getString(Path.NAME.getPath());
-				List<Location> locations = KotobaYamlConfiguration.loadBlocksData(config, Path.BLOCKS.getPath(), Path.WORLD.getPath()).stream()
-					.map(KotobaBlockData::getLocation)
-					.collect(Collectors.toList());
-				int xMax = locations.stream().map(loc -> loc.getX()).max(Comparator.naturalOrder()).map(d -> d.intValue()).orElse(0);
-				int xMin = locations.stream().map(loc -> loc.getX()).min(Comparator.naturalOrder()).map(d -> d.intValue()).orElse(0);
-				int yMax = locations.stream().map(loc -> loc.getY()).max(Comparator.naturalOrder()).map(d -> d.intValue()).orElse(0);
-				int yMin = locations.stream().map(loc -> loc.getY()).min(Comparator.naturalOrder()).map(d -> d.intValue()).orElse(0);
-				int zMax = locations.stream().map(loc -> loc.getZ()).max(Comparator.naturalOrder()).map(d -> d.intValue()).orElse(0);
-				int zMin = locations.stream().map(block -> block.getZ()).min(Comparator.naturalOrder()).map(d -> d.intValue()).orElse(0);
+
+				Location topCorner = (Location) config.get(Path.TOP_CORNER.getPath());
+				Location bottomCorner = (Location) config.get(Path.BOTTOM_CORNER.getPath());
+
+				int xMax = topCorner.getBlockX();
+				int xMin = bottomCorner.getBlockX();
+				int yMax = topCorner.getBlockY();
+				int yMin = bottomCorner.getBlockY();
+				int zMax = topCorner.getBlockZ();
+				int zMin = bottomCorner.getBlockZ();
 
 				setData(name, world, xMax, yMax, zMax, xMin, yMin, zMin);
 				if(config.contains(Path.SPAWN.getPath())) {
@@ -118,7 +122,9 @@ public abstract class KotobaBlockStorage extends KotobaYamlConfiguration {
 
 
 	public List<KotobaBlockStorage> importAll() {
+		final String extension = ".yml";
 		return Stream.of(getDirectory().listFiles())
+			.filter(f -> f.getName().endsWith(extension))
 			.map(f -> f.getName().substring(0, f.getName().length()-".yml".length()))
 			.map(name -> create(name))
 			.map(storage -> storage.setDataFromConfig())
@@ -150,8 +156,10 @@ public abstract class KotobaBlockStorage extends KotobaYamlConfiguration {
 		config.set(Path.NAME.getPath(), getName());
 		config.set(Path.WORLD.getPath(), getWorld().getName());
 		if(getSpawn() != null) config.set(Path.SPAWN.getPath(), spawn);
+		config.set(Path.BOTTOM_CORNER.getPath(), new Location(world, xMin, yMin, zMin));
+		config.set(Path.TOP_CORNER.getPath(), new Location(world, xMax, yMax, zMax));
 
-		List<Block> blocks = getBlocks();
+		List<Block> blocks = getBlocksExceptForAir();
 		KotobaYamlConfiguration.setBlocks(blocks, config, Path.BLOCKS.getPath());
 
 		List<Chest> chests = blocks.stream()
@@ -175,7 +183,7 @@ public abstract class KotobaBlockStorage extends KotobaYamlConfiguration {
 		initialize();
 
 		List<KotobaBlockData> blocksData = KotobaYamlConfiguration.loadBlocksData(config, Path.BLOCKS.getPath(), Path.WORLD.getPath());
-
+		replaceAir();
 		KotobaBlockData.placeBlockSafe(blocksData);
 
 		KotobaYamlConfiguration.loadChests(config, Path.CHESTS.getPath(), Path.WORLD.getPath(), true);
@@ -184,12 +192,42 @@ public abstract class KotobaBlockStorage extends KotobaYamlConfiguration {
 	}
 
 
+	public void replaceAir() {
+		Location target = new Location(world, xMin, yMin, zMin);
+		KotobaBlockData block = new KotobaBlockData(target, Material.AIR, 0);
+		Stream.iterate(xMin, i -> i + 1)
+			.limit(xMax - xMin + 1)
+			.forEach(x -> {
+				target.setX(x);
+				Stream.iterate(yMin, i -> i + 1)
+					.limit(yMax - yMin + 1)
+					.forEach(y -> {
+						target.setY(y);
+						Stream.iterate(zMin, i -> i + 1)
+							.limit(zMax - zMin + 1)
+							.forEach(z -> {
+								target.setZ(z);
+								BlockState state = target.getBlock().getState();
+								if(state instanceof Chest) {
+									((Chest) state).getInventory().clear();
+								}
+								block.setLocation(target);
+								block.placeBlock();
+							});
+					});
+			});
+	}
+
+
 	protected abstract void loadFromWorld();
 	protected abstract void initialize();
 
 
-	public List<Block> getBlocks() {
-		return KotobaUtility.getBlocks(getWorld(), getXMax(), getYMax(), getZMax(), getXMin(), getYMin(), getZMin());
+	public List<Block> getBlocksExceptForAir() {
+		return KotobaUtility.getBlocks(getWorld(), getXMax(), getYMax(), getZMax(), getXMin(), getYMin(), getZMin())
+			.stream()
+			.filter(b -> b.getType() != Material.AIR)
+			.collect(Collectors.toList());
 	}
 
 	public Location getCenter() {
@@ -272,6 +310,10 @@ public abstract class KotobaBlockStorage extends KotobaYamlConfiguration {
 	@Override
 	public String getFileName() {
 		return name;
+	}
+	@Override
+	public void setFileName(String name) {
+		this.name = name;
 	}
 	public abstract File getDirectory();
 }

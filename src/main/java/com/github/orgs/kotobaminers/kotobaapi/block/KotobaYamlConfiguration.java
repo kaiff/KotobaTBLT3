@@ -27,10 +27,35 @@ public abstract class KotobaYamlConfiguration {
 	private static final String DELIMETER = ",";
 	public static final String EXTENSION = ".yml";
 	public abstract String getFileName();
+	public abstract void setFileName(String name);
 	public abstract File getDirectory();
 	public abstract void save();
 	public abstract void load();
 	public abstract void delete();
+
+
+	public boolean rename(String newName) {
+		Optional<File> oldFile = findFile();
+		File newFile = new File(getDirectory() + "/" + newName + EXTENSION);
+		boolean success = false;
+		if (!newFile.exists() && oldFile.isPresent()) {
+			success = oldFile.get().renameTo(newFile);
+			if(success) {
+				findFile().ifPresent(file -> file.delete());
+				setFileName(newName);
+			}
+		}
+		return success;
+	}
+
+
+	private Optional<File> findFile() {
+		File file = new File(getDirectory() + "/" + getFileName() + EXTENSION);
+		if(file.exists()) {
+			return Optional.of(file);
+		}
+		return Optional.empty();
+	}
 
 
 	public File getFileEvenCreate() {

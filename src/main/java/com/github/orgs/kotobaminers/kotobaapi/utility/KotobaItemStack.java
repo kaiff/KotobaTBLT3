@@ -24,13 +24,6 @@ public class KotobaItemStack extends ItemStack {
 			this.items = items;
 		}
 
-//		static Material toBlockMaterial(Material material) {
-//			return Stream.of(MaterialConverter.values())
-//				.filter(mc -> mc.items.contains(material))
-//				.findAny()
-//				.map(mc-> mc.blocks.get(0))
-//				.orElse(material);
-//		}
 		static Material toItemMaterial(Material material) {
 			return Stream.of(MaterialConverter.values())
 				.filter(mc -> mc.blocks.contains(material))

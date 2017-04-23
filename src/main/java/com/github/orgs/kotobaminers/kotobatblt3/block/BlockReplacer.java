@@ -39,7 +39,7 @@ public class BlockReplacer extends KotobaBlockStorage {
 		if(isReplaced) return false;
 		boolean success = false;
 		if(clicked.getType() == target && player.getItemInHand().getType() == trigger) {
-			success = getBlocks().stream()
+			success = getBlocksExceptForAir().stream()
 				.filter(block -> block.getType() == target)
 				.map(block -> {
 					KotobaEffect.MAGIC_SMALL.playEffect(block.getLocation());

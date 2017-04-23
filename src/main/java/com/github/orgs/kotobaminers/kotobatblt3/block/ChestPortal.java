@@ -1,7 +1,5 @@
 package com.github.orgs.kotobaminers.kotobatblt3.block;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -11,10 +9,10 @@ import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerPortalEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 import com.github.orgs.kotobaminers.kotobaapi.block.KotobaBlockData;
@@ -35,102 +33,61 @@ public enum ChestPortal implements KotobaPortal {
 	) {
 
 		@Override
-		public boolean enterPortal(PlayerPortalEvent event) {
+		public boolean goThroughPortal(PlayerPortalEvent event) {
 			Location from = event.getFrom();
 			new TBLTArenaMap().findUnique(from)
 				.ifPresent(a -> {
+					List<Chest> chests = findChests(from);
 					List<Player> inArena = Bukkit.getOnlinePlayers().stream()
 							.filter(p -> TBLTUtility.isTBLTPlayer(p))
 							.collect(Collectors.toList());
 					List<Player> inSamePortal = inArena.stream()
-						.filter(p -> getPortalLocations(from).stream().anyMatch(l -> p.getLocation().getBlock().getLocation().distance(l) == 0))
+						.filter(p ->
+							chests
+								.stream()
+								.flatMap(c ->
+									chest.getPositions()
+										.stream()
+										.map(pos -> c.getLocation().clone().add(pos)))
+								.anyMatch(l -> p.getLocation().getBlock().getLocation().distance(l) == 0)
+						)
 						.collect(Collectors.toList());
 
 					if(isSinglePortal(from) || (1 < inSamePortal.size()) && inSamePortal.size() == inArena.size()) {
 						if(inSamePortal.stream().allMatch(p -> from.distance(p.getLocation()) < 4)) {
-							findChests(from).stream()
-								.flatMap(c -> inSamePortal.stream().map(p -> tryWarp(p, c, a)))
-								.collect(Collectors.toList());
-
-							List<Boolean> success = findChests(from).stream()
-									.flatMap(c -> Stream.of(c.getInventory().getContents())
-										.filter(i -> i != null)
-										.filter(i -> TBLTItemStackIcon.PORTAL_NEXT_CRYSTAL.isIconItemStack(i))
-									)
-									.filter(i -> i.getItemMeta().getLore() != null)
-									.filter(i -> 0 < i.getItemMeta().getLore().size())
-									.map(i -> i.getItemMeta().getLore().get(0))
-									.map(name -> new TBLTArenaMap().findUnique(name))
-									.map(to -> {
-										to.ifPresent(to2 -> inSamePortal.stream().forEach(p2 -> ((TBLTArena) to2).startSpawn(p2)));
-										return true;
-									}).collect(Collectors.toList());
-							if(success.contains(true)) {
-								a.load();
-							}
+							chests.forEach(c -> {
+								fillPortal(c.getLocation(), Material.OBSIDIAN);
+								tryWarp(inSamePortal, c, a);
+							});
 						}
 					}
 				});
 			return true;
 		}
 
-		private List<Location> getPortalLocations(Location from) {
-			if(from.getBlock().getType() == Material.ENDER_PORTAL) {
-				int range = 2;
-				List<Location> search = new ArrayList<>();
-				List<BlockFace> faces = Arrays.asList(BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST);
-				for(BlockFace face : faces) {
-					Location current = from.clone();
-					for(int i = 0; i < range; i++) {
-						current = current.getBlock().getRelative(face).getLocation();
-						if(current.getBlock().getType() == Material.ENDER_PORTAL) {
-							search.add(current);
-						} else {
-							break;
-						}
-					}
-				}
 
-				int minX = search.stream()
-					.mapToInt(l -> l.getBlockX())
-					.min()
-					.getAsInt();
-				int minZ = search.stream()
-					.mapToInt(l -> l.getBlockZ())
-					.min()
-					.getAsInt();
-				int y = from.getBlockY();
-
-				return Stream.iterate(minX, x -> x + 1)
-					.limit(range)
-					.flatMap(x ->
-						Stream.iterate(minZ, z -> z + 1)
-						.limit(range)
-						.map(z -> new Location(from.getWorld(), x, y, z))
-					).collect(Collectors.toList());
-
-			}
-			return new ArrayList<>();
-		}
-
-		private boolean tryWarp(Player player, Chest chest, KotobaBlockStorage arena) {
-			List<Boolean> next = Stream.of(chest.getInventory().getContents())
+		private boolean tryWarp(List<Player> inPortal, Chest chest, KotobaBlockStorage arena) {
+			List<ItemStack> contents = Stream.of(chest.getInventory().getContents())
 				.filter(i -> i != null)
+				.collect(Collectors.toList());
+
+			List<Boolean> next = contents.stream()
 				.filter(i -> TBLTItemStackIcon.PORTAL_NEXT_CRYSTAL.isIconItemStack(i))
 				.filter(i -> i.getItemMeta().getLore() != null)
 				.filter(i -> 0 < i.getItemMeta().getLore().size())
 				.map(i -> i.getItemMeta().getLore().get(0))
 				.map(name -> new TBLTArenaMap().findUnique(name))
 				.map(to -> {
-					to.ifPresent(to2 -> ((TBLTArena) to2).startSpawn(player));
+					to.ifPresent(to2 -> ((TBLTArena) to2).join(inPortal));
+					arena.load();
 					return true;
 				})
 				.collect(Collectors.toList());
+
 			if(next.contains(true)) {
 				return true;
 			} else {
-				Stream.of(chest.getInventory().getContents())
-					.filter(i -> i != null)
+				contents.stream()
 					.filter(i -> TBLTItemStackIcon.PORTAL_ELEVATOR_CRYSTAL.isIconItemStack(i))
 					.findAny()
 					.map(i -> {
@@ -151,23 +108,25 @@ public enum ChestPortal implements KotobaPortal {
 								.anyMatch(content -> TBLTItemStackIcon.PORTAL_ELEVATOR_CRYSTAL.isIconItemStack(content))
 							)
 							.findAny()
-							.map(c -> KotobaUtility.getBlockCenter(c.getBlock()).add(0, 2, 0))
-							.map(l -> {
-								player.teleport(l);
-								KotobaEffect.ENDER_SIGNAL.playEffect(l);
-								l.getWorld().playSound(l, Sound.PORTAL_TRIGGER, 1, 1);
-								return true;
+							.map(c -> KotobaUtility.getBlockCenter(c.getBlock()).add(0, 3, 0))
+							.ifPresent(l -> {
+								inPortal.forEach(player -> {
+									player.teleport(l);
+									KotobaEffect.ENDER_SIGNAL.playEffect(l);
+									l.getWorld().playSound(l, Sound.PORTAL_TRIGGER, 1, 1);
+								});
 								}
-							)
-							;
+							);
 						return true;
 					})
 					;
 			}
+
+			//Failed(Probally settings are missing in the chest)
 			return false;
 		}
 
-		private static final int ELEVATOR_RANGE = 10;
+		private static final int ELEVATOR_RANGE = 16;
 
 
 		@Override
@@ -201,64 +160,12 @@ public enum ChestPortal implements KotobaPortal {
 									KotobaEffect.EXPLODE_SMALL.playEffect(l);
 									new KotobaBlockData(l, Material.AIR, 0).placeBlock();
 								});
-								a.load();
-								a.getTBLTPlayers().forEach(p -> a.continueFromCurrent(p));
+								a.restart();
 							});
 					}
 				});
 			}
-
 		}
-
-
-	},
-
-
-	CHECK_POINT_PORTAL(
-		TBLTItemStackIcon.DUMMY,
-		Material.ENDER_PORTAL,
-		TBLTInteractiveChestFinder.VERTICAL
-	) {
-		@Override
-		public boolean enterPortal(PlayerPortalEvent event) {
-			Location from = event.getFrom();
-			new TBLTArenaMap().findUnique(from)
-				.map(a -> (TBLTArena) a)
-				.ifPresent(a -> {
-					List<Player> inArena = Bukkit.getOnlinePlayers().stream()
-						.filter(p -> TBLTUtility.isTBLTPlayer(p))
-						.filter(p -> a.isIn(p.getLocation()))
-						.collect(Collectors.toList());
-					List<Player> inPortal = inArena.stream()
-						.filter(p -> p.getLocation().getBlock().getType() == Material.ENDER_PORTAL)
-						.collect(Collectors.toList());
-
-					if(isSinglePortal(from) || (1 < inPortal.size()) && inPortal.size() == inArena.size()) {
-						a.findNearestCheckPoint(from)
-							.filter(check -> 0 < a.getCurrentPoint().distance(check))
-							.ifPresent(check -> {
-								KotobaEffect.MAGIC_MIDIUM.playEffect(from);
-								KotobaEffect.MAGIC_MIDIUM.playSound(from);
-
-								a.load();
-
-								a.setCurrentPoint(check);
-								inArena.forEach(p -> a.continueFromCurrent(p));
-
-							});
-					}
-				});
-			return true;
-		}
-
-		@Override
-		public boolean canOpen(Location center) {
-			return true;
-		}
-		@Override
-		public void failOpen(Location center) {
-		}
-
 	},
 	;
 

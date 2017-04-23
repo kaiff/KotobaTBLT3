@@ -17,9 +17,6 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.BookMeta;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import com.github.orgs.kotobaminers.develop.TBLTTest;
 import com.github.orgs.kotobaminers.kotobaapi.block.KotobaStructure;
@@ -39,7 +36,7 @@ import com.github.orgs.kotobaminers.kotobatblt3.database.PlayerData;
 import com.github.orgs.kotobaminers.kotobatblt3.database.PlayerDatabase;
 import com.github.orgs.kotobaminers.kotobatblt3.database.SentenceDatabase;
 import com.github.orgs.kotobaminers.kotobatblt3.database.TBLTConversationEditorMap;
-import com.github.orgs.kotobaminers.kotobatblt3.game.TBLTJob;
+import com.github.orgs.kotobaminers.kotobatblt3.game.TBLTPlayer;
 import com.github.orgs.kotobaminers.kotobatblt3.userinterface.IconCreatorUtility;
 import com.github.orgs.kotobaminers.kotobatblt3.userinterface.TBLTIconListGUI;
 import com.github.orgs.kotobaminers.kotobatblt3.userinterface.TBLTPlayerGUI;
@@ -247,24 +244,19 @@ public class TBLTCommandExecutor implements CommandExecutor {
 		},
 
 
-		JOB_SELECT(Arrays.asList(Arrays.asList("job", "j"), Arrays.asList("select", "s")), "", "Select Job", PermissionEnum.OP) {
+		JOB_SELECT(Arrays.asList(Arrays.asList("job", "j"), Arrays.asList("select", "s")), "<NAME>", "Select Job", PermissionEnum.OP) {
 			@Override
 			public boolean perform(Player player, String[] args) {
 				List<String> options = takeOptions(args);
 				if(0 < options.size()) {
-					Optional<TBLTJob> job = TBLTJob.find(options.get(0));
-						if(job.isPresent()) {
-							job.ifPresent(j -> j.become(player));
-							return true;
-						} else {
-							return false;
-						}
-				} else {
-					player.getInventory().clear();
-					TBLTPlayerGUI.SELECT_JOB.create(TBLTJob.getAllJobs().stream().map(j -> j.getIcon()).collect(Collectors.toList()))
-					.ifPresent(gui -> player.openInventory(gui));
-					return true;
+					Optional<TBLTPlayer> job = TBLTPlayer.find(options.get(0));
+					if(job.isPresent()) {
+						job.ifPresent(j -> j.become(player));
+						return true;
+					}
 				}
+				player.sendMessage("Jobs: " + String.join(", ", Stream.of(TBLTPlayer.values()).map(p -> p.name()).collect(Collectors.toList())));
+				return false;
 			}
 		},
 
@@ -365,6 +357,25 @@ public class TBLTCommandExecutor implements CommandExecutor {
 			}
 		},
 
+		ARENA_RENAME_HERE(Arrays.asList(Arrays.asList("arena", "a"), Arrays.asList("renamehere")), "", "Rename an arena where you are", PermissionEnum.OP) {
+			@Override
+			public boolean perform(Player player, String[] args) {
+				List<String> options = takeOptions(args);
+				if(0 < options.size()) {
+					return new TBLTArenaMap().findUnique(player.getLocation())
+						.map(arena -> {
+							if(arena.rename(options.get(0))) {
+								arena.save();
+								arena.load();
+								return true;
+							}
+							return false;
+						}).orElse(false);
+					}
+				return false;
+				}
+		},
+
 		ARENA_REMOVE_HERE(Arrays.asList(Arrays.asList("arena", "a"), Arrays.asList("removehere")), "", "Remove arena where you are", PermissionEnum.OP) {
 		@Override
 		public boolean perform(Player player, String[] args) {
@@ -427,63 +438,6 @@ public class TBLTCommandExecutor implements CommandExecutor {
 			}
 		},
 
-		ARENA_CHECK_POINT_HERE(Arrays.asList(Arrays.asList("arena", "a"), Arrays.asList("checkpointhere", "cph")), "", "Add check point", PermissionEnum.OP) {
-			@Override
-			public boolean perform(Player player , String[] args) {
-				return new TBLTArenaMap().findUnique(player.getLocation())
-						.map(arena -> (TBLTArena) arena)
-						.map(arena -> {
-							arena.addCheckPoint(player.getLocation());
-							arena.save();
-							return true;
-						}).orElse(false);
-			}
-		},
-
-		ARENA_CHECK_POINT_REMOVE_HERE(Arrays.asList(Arrays.asList("arena", "a"), Arrays.asList("checkpointremovehere", "cprh")), "", "Remove nearest check point", PermissionEnum.OP) {
-			@Override
-			public boolean perform(Player player , String[] args) {
-				return new TBLTArenaMap().findUnique(player.getLocation())
-						.map(arena -> (TBLTArena) arena)
-						.map(arena -> {
-							arena.removeNearestCheckPoint(player.getLocation());
-							arena.save();
-							return true;
-						}).orElse(false);
-			}
-		},
-
-		ARENA_SET_PREDICTION_HERE(Arrays.asList(Arrays.asList("arena", "a"), Arrays.asList("setpredictionhere", "sph")), "", "Set prediction with book and quill", PermissionEnum.OP) {
-			@Override
-			public boolean perform(Player player , String[] args) {
-				ItemStack item = player.getItemInHand();
-				if(item.getItemMeta() instanceof ItemMeta) {
-					return new TBLTArenaMap().findUnique(player.getLocation())
-							.map(a -> {
-								((TBLTArena) a).setPredictionItem((BookMeta) item.getItemMeta());
-								a.save();
-								return true;
-							}).orElse(false);
-				}
-				return false;
-			}
-		},
-
-		ARENA_GET_PREDICTION_HERE(Arrays.asList(Arrays.asList("arena", "a"), Arrays.asList("getpredictionhere", "gph")), "", "Get prediction with book and quill", PermissionEnum.OP) {
-			@Override
-			public boolean perform(Player player , String[] args) {
-				return new TBLTArenaMap().findUnique(player.getLocation())
-						.map(a -> ((TBLTArena) a).getPredictionWrittenBook())
-						.map(i -> {
-							BookMeta meta = (BookMeta) i.getItemMeta();
-							ItemStack book = new ItemStack(Material.BOOK_AND_QUILL);
-							book.setItemMeta(meta);
-							player.getInventory().addItem(book);
-							return true;
-						}).orElse(false);
-			}
-		},
-
 
 		ARENA_JOIN_HERE(Arrays.asList(Arrays.asList("arena", "a"), Arrays.asList("joinhere", "jh")), "", "Join arena where you are", PermissionEnum.OP) {
 			@Override
@@ -491,8 +445,7 @@ public class TBLTCommandExecutor implements CommandExecutor {
 				return new TBLTArenaMap().findUnique(player.getLocation())
 					.map(arena -> (TBLTArena) arena)
 					.map(arena -> {
-						arena.startSpawn(player);
-						arena.load();
+						arena.join(Arrays.asList(player));
 						return true;
 					}).orElse(false);
 			}

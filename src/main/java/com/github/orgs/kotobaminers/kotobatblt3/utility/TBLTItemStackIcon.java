@@ -71,6 +71,15 @@ public enum TBLTItemStackIcon implements KotobaItemStackIcon {
 	),
 
 
+	STAND_KEY(
+			Material.GLASS,
+			(short) 0,
+			"Structure Key",
+			Arrays.asList("Stand"),
+			IconFindType.SIMILAR
+	),
+
+
 	ITEM_GATE_KEY(
 			Material.GLASS,
 			(short) 0,
@@ -308,6 +317,8 @@ public enum TBLTItemStackIcon implements KotobaItemStackIcon {
 			Arrays.asList("Investigate"),
 			IconFindType.SIMILAR
 	),
+
+
 	;
 
 

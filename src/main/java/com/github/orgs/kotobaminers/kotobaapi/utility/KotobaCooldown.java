@@ -18,7 +18,7 @@ public interface KotobaCooldown {
 
 	default boolean isCooldown(UUID uuid) {
 		if(getMap().containsKey(uuid)) {
-			if(new Date().getTime() - getMap().get(uuid).getTime() < 1000 * getDuration()) {
+			if(new Date().getTime() - getMap().get(uuid).getTime() < 50 * getDuration()) {
 				return true;
 			}
 		}

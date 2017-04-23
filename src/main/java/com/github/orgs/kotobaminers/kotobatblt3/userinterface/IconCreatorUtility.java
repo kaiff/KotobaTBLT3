@@ -3,7 +3,6 @@ package com.github.orgs.kotobaminers.kotobatblt3.userinterface;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
@@ -28,13 +27,7 @@ public class IconCreatorUtility {
 		warpMeta.setLore(Arrays.asList(arena.getName()));
 		warp.setItemMeta(warpMeta);
 
-		List<ItemStack> checkPoints =
-			arena.getCheckPoints().stream()
-				.map(loc -> TBLTIcon.CHECK_POINT.createItemStack(Arrays.asList(arena.getWorld().getName(), String.valueOf(loc.getBlockX()) + "," + String.valueOf(loc.getBlockY()) + "," + String.valueOf(loc.getBlockZ()))))
-				.collect(Collectors.toList());
-
 		icons.addAll(Arrays.asList(information, teleport, warp));
-		icons.addAll(checkPoints);
 
 		return icons;
 	}

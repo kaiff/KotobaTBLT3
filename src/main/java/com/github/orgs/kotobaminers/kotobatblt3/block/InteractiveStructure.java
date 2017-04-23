@@ -31,6 +31,7 @@ import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaBook;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaEffect;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStackIcon;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaStructureUtility;
+import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaUtility;
 import com.github.orgs.kotobaminers.kotobatblt3.ability.InteractiveChestFinderHolder;
 import com.github.orgs.kotobaminers.kotobatblt3.citizens.UniqueNPC;
 import com.github.orgs.kotobaminers.kotobatblt3.database.TBLTData;
@@ -45,6 +46,34 @@ import net.citizensnpcs.api.npc.NPC;
 public enum InteractiveStructure implements KotobaStructure, PlayerBlockInteractive, RepeatingEffectHolder, InteractiveChestFinderHolder {
 
 
+	STAND(
+			TBLTItemStackIcon.STAND_KEY,
+			new HashMap<Vector, Material>() {{
+				put(new Vector(0,2,0), Material.ANVIL);
+				put(new Vector(0,3,0), Material.GLOWSTONE);
+				put(new Vector(0,4,0), Material.AIR);
+				put(new Vector(0,5,0), Material.AIR);
+			}},
+			TBLTInteractiveChestFinder.ONE_BY_FOUR,
+			false
+		) {
+			@Override
+			public boolean interactWithChests(PlayerInteractEvent event) {
+				Player player = event.getPlayer();
+				Block clicked = event.getClickedBlock();
+				if(clicked.getType() != getStructure().get(new Vector(0,3,0))) return false;
+				getChestFinder().findChests(clicked.getLocation()).stream()
+					.map(c -> KotobaUtility.getBlockCenter(c.getBlock()).add(0, 4, 0))
+					.forEach(l -> {
+						l.setDirection(player.getLocation().getDirection());
+						player.teleport(l);
+						KotobaEffect.ENDER_SIGNAL.playEffect(l);
+						KotobaEffect.ENDER_SIGNAL.playSound(l);
+					});
+				return true;
+			}
+
+		},
 	ITEM_GATE(
 		TBLTItemStackIcon.ITEM_GATE_KEY,
 		new HashMap<Vector, Material>() {{

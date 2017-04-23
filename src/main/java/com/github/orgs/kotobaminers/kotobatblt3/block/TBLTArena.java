@@ -1,10 +1,8 @@
 package com.github.orgs.kotobaminers.kotobatblt3.block;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -14,23 +12,19 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Chest;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.BookMeta;
 
 import com.github.orgs.kotobaminers.kotobaapi.block.KotobaBlockData;
 import com.github.orgs.kotobaminers.kotobaapi.block.KotobaBlockStorage;
 import com.github.orgs.kotobaminers.kotobaapi.userinterface.Holograms;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaEffect;
-import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStack;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaTitle;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaTitle.TitleOption;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaUtility;
 import com.github.orgs.kotobaminers.kotobatblt3.citizens.UniqueNPC;
 import com.github.orgs.kotobaminers.kotobatblt3.database.TBLTData;
-import com.github.orgs.kotobaminers.kotobatblt3.game.TBLTJob;
+import com.github.orgs.kotobaminers.kotobatblt3.game.TBLTPlayer;
 import com.github.orgs.kotobaminers.kotobatblt3.kotobatblt3.Setting;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.ChestReader;
 
@@ -40,14 +34,6 @@ public class TBLTArena extends KotobaBlockStorage {
 
 
 	private static final File DIRECTORY = new File(Setting.getPlugin().getDataFolder().getAbsolutePath() + "/Arena/");
-	private static final String CHECK_POINT = "CheckPoint";
-	private static final String PREDICTION = "Prediction";
-
-
-	private List<Location> checkPoints = new ArrayList<>();
-	private Location currentPoint = null;
-//	private Set<RepeatingEffect> repeatingEffects = new HashSet<>();
-	private ItemStack predictionItem = KotobaItemStack.create(Material.BOOK_AND_QUILL, (short) 0, 1, "Prediction", new ArrayList<String>());
 
 
 	protected TBLTArena(String name) {
@@ -61,7 +47,7 @@ public class TBLTArena extends KotobaBlockStorage {
 
 
 	private void start(Player player, Location location) {
-		TBLTJob.initializeInventory(player);
+		TBLTPlayer.resetCurrentJob(player);
 		TBLTData.getOrDefault(player.getUniqueId()).initialize();
 		player.teleport(location);
 		KotobaEffect.ENDER_SIGNAL.playEffect(location);
@@ -71,59 +57,26 @@ public class TBLTArena extends KotobaBlockStorage {
 	}
 
 
-	public void startSpawn(Player player) {
-		currentPoint = null;//The current Check point is not initialized by restarting
-		initialize();
-		start(player, getSpawn());
+	public void restart() {
+		load();
+		getTBLTPlayers().forEach(p -> start(p, getSpawn()));
 	}
 
-	public void continueFromCurrent(Player player) {
-		start(player, getCurrentPoint());
-	}
 
-	public void addCheckPoint(Location location) {
-		checkPoints.add(location);
-	}
-
-	public Optional<Location> findNearestCheckPoint(Location location) {
-		return checkPoints.stream()
-			.sorted((loc1, loc2) -> (int) (loc1.distance(location) - loc2.distance(location)))
-			.findFirst();
-	}
-
-	public void removeNearestCheckPoint(Location location) {
-		Optional<Location> nearest = findNearestCheckPoint(location);
-		List<Location> points = nearest.map(loc -> checkPoints.stream()
-			.filter(point -> 0 != point.distance(loc)).collect(Collectors.toList()))
-			.orElse(checkPoints);
-		this.checkPoints = points;
+	public void join(List<Player> additional) {
+		load();
+		Stream.of(getTBLTPlayers(), additional)
+			.flatMap(p -> p.stream())
+			.forEach(p -> start(p, getSpawn()));
 	}
 
 
 	@Override
 	protected void saveOptions(YamlConfiguration config) {
-		if(checkPoints != null) {
-			Stream.iterate(0, i -> i + 1)
-				.limit(checkPoints.size())
-				.forEach(i -> config.set(CHECK_POINT + "." + i, checkPoints.get(i)));
-		}
-		config.set(PREDICTION, predictionItem);
 	}
 
 	@Override
 	protected void setOptions(YamlConfiguration config) {
-		if(config.isConfigurationSection(CHECK_POINT)) {
-			ConfigurationSection section = config.getConfigurationSection(CHECK_POINT);
-			List<Location> points = section.getKeys(false).stream()
-				.map(key -> (Location) config.get(CHECK_POINT + "." + key))
-				.collect(Collectors.toList());
-			this.checkPoints = points;
-		}
-
-		if(config.isItemStack(PREDICTION)) {
-			setPredictionItem((BookMeta) ((ItemStack) config.get(PREDICTION)).getItemMeta());
-		}
-
 	}
 
 	@Override
@@ -135,25 +88,12 @@ public class TBLTArena extends KotobaBlockStorage {
 
 	@Override
 	protected void loadFromWorld() {
-		List<Chest> chests = getBlocks().stream()
-			.filter(b -> b.getType() == Material.TRAPPED_CHEST)//TODO: Hard coding
+		List<Chest> chests = getBlocksExceptForAir().stream()
+			.filter(b -> b.getState() instanceof Chest)
 			.map(b -> (Chest) b.getState())
 			.collect(Collectors.toList());
 
 
-		//Set RepeatingEffects
-//		this.repeatingEffects.stream().forEach(e -> e.setRepeat(false));
-//		this.repeatingEffects = new HashSet<>();
-
-//		List<RepeatingEffect> effects = chests.stream()
-//			.flatMap(c -> ChestReader.findRepeatingEffects(c).stream())
-//			.collect(Collectors.toList());
-//
-//		this.repeatingEffects.addAll(effects);
-//		this.repeatingEffects.forEach(RepeatingEffect::startRepeating);
-
-
-		//Set Holograms
 		chests.forEach(c -> ChestReader.displayHolograms(c));
 
 	}
@@ -168,13 +108,6 @@ public class TBLTArena extends KotobaBlockStorage {
 	}
 
 
-	@Deprecated
-	public void stopRepeatingEffects(Location blockLocation) {
-//		this.repeatingEffects.stream()
-//			.filter(e -> e.getBlockLocation().clone().distance(blockLocation.clone()) == 0)
-//			.forEach(e -> e.setRepeat(false));
-	}
-
 	@Override
 	public KotobaBlockStorage create(String name) {
 		return new TBLTArena(name);
@@ -183,33 +116,6 @@ public class TBLTArena extends KotobaBlockStorage {
 	@Override
 	public File getDirectory() {
 		return DIRECTORY;
-	}
-
-
-	public List<Location> getCheckPoints() {
-		return checkPoints;
-	}
-
-	public Location getCurrentPoint() {
-		if(currentPoint == null) {
-			return getSpawn();
-		}
-		return currentPoint;
-	}
-
-	public void setCurrentPoint(Location location) {
-		findNearestCheckPoint(location)
-			.ifPresent(a -> this.currentPoint = a);
-	}
-
-	public ItemStack getPredictionWrittenBook() {
-		return predictionItem;
-	}
-
-	public void setPredictionItem(BookMeta bookMeta) {
-		ItemStack item = new ItemStack(Material.WRITTEN_BOOK);
-		item.setItemMeta(bookMeta);
-		this.predictionItem = item;
 	}
 
 

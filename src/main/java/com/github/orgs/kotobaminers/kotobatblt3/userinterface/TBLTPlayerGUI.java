@@ -12,9 +12,7 @@ import org.bukkit.inventory.ItemStack;
 import com.github.orgs.kotobaminers.kotobaapi.userinterface.ChestGUI;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaEffect;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStack;
-import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaSound;
 import com.github.orgs.kotobaminers.kotobatblt3.database.TBLTData;
-import com.github.orgs.kotobaminers.kotobatblt3.game.TBLTJob;
 
 public enum TBLTPlayerGUI implements ChestGUI {
 
@@ -114,24 +112,7 @@ public enum TBLTPlayerGUI implements ChestGUI {
 		}
 	},
 
-	SELECT_JOB("Select Job", ChestSize.MINIMUM) {
-		@Override
-		public void onInventoryClick(InventoryClickEvent event) {
-			event.setCancelled(true);
-			if(event.getWhoClicked() instanceof Player) {
-				Player player = (Player) event.getWhoClicked();
-				player.closeInventory();
-				Stream.of(TBLTJob.values())
-					.filter(job -> job.isSameIcon(event.getCurrentItem()))
-					.findFirst()
-					.ifPresent(job -> {
-						job.become(player);
-						KotobaSound.GOOD.play(player.getLocation());
-					});
-			}
-		}
-
-	},;
+	;
 
 	private String title;
 	private ChestSize chestSize;

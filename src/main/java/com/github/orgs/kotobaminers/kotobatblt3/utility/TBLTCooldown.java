@@ -8,7 +8,7 @@ import java.util.UUID;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaCooldown;
 
 public enum TBLTCooldown implements KotobaCooldown {
-	INTERACTIVE(1)
+	INTERACTIVE(10)
 	;
 
 

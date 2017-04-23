@@ -62,6 +62,9 @@ public class KotobaBlockData {
 		block.setTypeIdAndData(material.getId(), (byte) data, false);
 	}
 
+	public void setLocation(Location location) {
+		this.location = location;
+	}
 	public Location getLocation() {
 		return location;
 	}

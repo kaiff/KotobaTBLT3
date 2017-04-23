@@ -54,27 +54,6 @@ public enum TBLTInteractiveChestFinder implements InteractiveChestFinder {
 		),
 
 
-	@Deprecated
-	TWO_BY_SIX(
-			Arrays.asList(
-					new Vector(0,2,0),
-					new Vector(1,2,0),
-					new Vector(0,3,0),
-					new Vector(1,3,0),
-					new Vector(0,4,0),
-					new Vector(1,4,0),
-					new Vector(0,5,0),
-					new Vector(1,5,0),
-					new Vector(0,6,0),
-					new Vector(1,6,0),
-					new Vector(0,7,0),
-					new Vector(1,7,0),
-					new Vector(0,8,0),
-					new Vector(1,8,0)
-			),
-			InteractType.CLICKED,
-			true
-		),
 	;
 
 

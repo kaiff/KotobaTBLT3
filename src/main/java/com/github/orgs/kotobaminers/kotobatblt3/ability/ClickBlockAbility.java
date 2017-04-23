@@ -1,12 +1,10 @@
 package com.github.orgs.kotobaminers.kotobatblt3.ability;
 
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -18,17 +16,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.util.Vector;
 
 import com.github.orgs.kotobaminers.kotobaapi.ability.ClickBlockAbilityInterface;
 import com.github.orgs.kotobaminers.kotobaapi.block.KotobaBlockData;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaEffect;
-import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStack;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStackIcon;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaUtility;
 import com.github.orgs.kotobaminers.kotobatblt3.block.SwitchableChestManager;
-import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArena;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaMap;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTInteractiveChestFinder;
 import com.github.orgs.kotobaminers.kotobatblt3.kotobatblt3.Setting;
@@ -111,52 +106,6 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 		},
 
 
-	PREDICTION(
-		TBLTItemStackIcon.PREDICTION,
-		Arrays.asList(Action.RIGHT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR),
-		0
-	) {
-		@Override
-		public boolean perform(PlayerInteractEvent event) {
-			Player player = event.getPlayer();
-			ItemStack prediction = new TBLTArenaMap().findUnique(player.getLocation())
-				.map(a -> (TBLTArena) a)
-				.map(a -> {
-					ItemStack base = TBLTItemStackIcon.PREDICTION.create(1);
-					BookMeta baseMeta = (BookMeta) base.getItemMeta();
-					List<String> pages = ((BookMeta) a.getPredictionWrittenBook().getItemMeta()).getPages();
-					baseMeta.setPages(pages);
-					base.setItemMeta(baseMeta);
-					return base;
-				})
-				.orElse(null);
-			if(prediction == null) return false;
-			List<ItemStack> currentPrediction = Stream.of(player.getInventory().getContents())
-				.filter(i -> i != null)
-				.filter(i -> TBLTItemStackIcon.PREDICTION.isIconItemStack(i))
-				.collect(Collectors.toList());
-			int currentPage = currentPrediction.stream()
-					.map(i -> ((BookMeta) i.getItemMeta()).getPageCount())
-					.max(Comparator.naturalOrder()).orElse(0);
-
-			BookMeta meta = (BookMeta) prediction.getItemMeta();
-			if(currentPage < meta.getPageCount()) {
-				currentPrediction.forEach(i -> KotobaItemStack.consume(player.getInventory(), i, i.getAmount()));
-
-				meta.setPages(meta.getPages().subList(0, currentPage + 1));
-				meta.setAuthor(player.getName());
-				prediction.setItemMeta(meta);
-				player.getInventory().addItem(prediction);
-
-				KotobaEffect.MAGIC_MIDIUM.playSound(player.getLocation());
-
-				return true;
-			}
-			return false;
-		}
-	},
-
-
 	LOCK_PICKING(
 		TBLTItemStackIcon.LOCK_PICKING,
 		Arrays.asList(Action.RIGHT_CLICK_BLOCK),
@@ -178,32 +127,6 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 				return true;
 			}
 			return false;
-		}
-	},
-
-
-	REWIND_TIME(
-		TBLTItemStackIcon.REWIND_TIME,
-		Arrays.asList(Action.RIGHT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR),
-		0
-	) {
-		@Override
-		public boolean perform(PlayerInteractEvent event) {
-			Player player = event.getPlayer();
-
-			new TBLTArenaMap().findUnique(player.getLocation())
-				.ifPresent(arena -> {
-					List<Player> players = Bukkit.getOnlinePlayers().stream()
-						.filter(p -> arena.isIn(p.getLocation()))
-						.filter(p -> TBLTUtility.isTBLTPlayer(p))
-						.collect(Collectors.toList());
-					if(players.stream().allMatch(p -> p.isSneaking())) {
-						TBLTArena a = (TBLTArena) arena;
-						a.load();
-						players.forEach(p -> a.continueFromCurrent((Player) p));
-					}
-				});
-			return true;
 		}
 	},
 
