@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -17,6 +18,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 
 import com.github.orgs.kotobaminers.develop.TBLTTest;
 import com.github.orgs.kotobaminers.kotobaapi.block.KotobaStructure;
@@ -45,14 +47,6 @@ import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTUtility;
 public class TBLTCommandExecutor implements CommandExecutor {
 
 
-	private final KotobaTBLT3 plugin;
-
-
-	public TBLTCommandExecutor (KotobaTBLT3 plugin) {
-		this.plugin = plugin;
-	}
-
-
 	public enum PermissionEnum implements PermissionEnumInterface {
 		OP() {
 			@Override
@@ -74,6 +68,15 @@ public class TBLTCommandExecutor implements CommandExecutor {
 		TEST(Arrays.asList(Arrays.asList("test")), "", "Command Test", PermissionEnum.OP) {
 			@Override
 			public boolean perform(Player player , String[] args) {
+				player.setVelocity(player.getLocation().getDirection().add(new Vector(0,0.5,0)).multiply(2));
+				Runnable runnable = new Runnable() {
+					@Override
+					public void run() {
+						player.getWorld().playEffect(player.getLocation(), Effect.SMOKE, 4);
+					}
+				};
+
+				TBLTUtility.repeatRunnable(0, 1, 10, runnable);
 				return true;
 			}
 		},

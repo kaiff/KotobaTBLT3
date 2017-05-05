@@ -16,7 +16,7 @@ public class KotobaTBLT3 extends JavaPlugin {
 	@Override
 	public void onEnable() {
 
-		this.getCommand(PlayerCommand.LABEL).setExecutor(new TBLTCommandExecutor(this));
+		this.getCommand(PlayerCommand.LABEL).setExecutor(new TBLTCommandExecutor());
 
 		PluginManager pluginManager = getServer().getPluginManager();
 		pluginManager.registerEvents(new TBLTArenaListener(), this);

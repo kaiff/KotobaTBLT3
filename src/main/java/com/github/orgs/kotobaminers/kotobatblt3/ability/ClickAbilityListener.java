@@ -37,8 +37,7 @@ public class ClickAbilityListener implements Listener {
 
 		List<PlayerBlockInteractive> interactives = PlayerInteractiveManager.find(event);
 
-
-		if(0 < interactives.size()) {
+		if (0 < interactives.size()) {
 			event.setCancelled(true);
 			List<Boolean> success = interactives.stream().map(i -> i.interact(event)).collect(Collectors.toList());
 			if(!success.contains(true)) {

@@ -66,16 +66,29 @@ public class TBLTUtility {
 		return result;
 	}
 
+	public static void repeatRunnable(int delay, int interval, int times, Runnable runnable) {
+		int task = Bukkit.getScheduler().scheduleSyncRepeatingTask(Setting.getPlugin(), runnable, delay, interval);
+		Bukkit.getScheduler().scheduleSyncDelayedTask(Setting.getPlugin(), new Runnable() {
+			@Override
+			public void run() {
+				Bukkit.getScheduler().cancelTask(task);
+			}
+		}, interval * times);
+	}
+
+
 	public static void playJumpEffect(Entity entity) {
 		entity.getWorld().playEffect(entity.getLocation(), Effect.BLAZE_SHOOT, 4);
-		for(int i = 1; i < 6; i++) {
-	        Setting.getPlugin().getServer().getScheduler().scheduleSyncDelayedTask(Setting.getPlugin(), new Runnable() {
-	            @Override
-	            public void run() {
-					entity.getWorld().playEffect(entity.getLocation(), Effect.SMOKE, 4);
-	            }
-	        }, i);
-		}
+
+		int delay = 0;
+		int interval = 1;
+		int times = 10;
+		repeatRunnable(delay, interval, times, new Runnable() {
+			@Override
+			public void run() {
+				entity.getWorld().playEffect(entity.getLocation(), Effect.SMOKE, 4);
+			}
+		});
 	}
 
 	public static String patternProgress(String base, String unique, int length, int index, ChatColor color) {

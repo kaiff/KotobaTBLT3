@@ -22,6 +22,13 @@ public enum TBLTItemStackIcon implements KotobaItemStackIcon {
 			null,
 			IconFindType.SIMILAR
 	),
+	TEST_2(
+			Material.APPLE,
+			(short) 0,
+			"Test2",
+			null,
+			IconFindType.SIMILAR
+	),
 
 
 	//Ability
