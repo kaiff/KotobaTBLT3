@@ -21,10 +21,12 @@ import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.selections.Selection;
 
 public abstract class KotobaBlockStorage extends KotobaYamlConfiguration {
+
+
 	private enum Path {
+		ID("ID"),
 		NAME("NAME"),
 		WORLD("WORLD"),
-		SPAWN("SPAWN"),
 		BLOCKS("BLOCKS"),
 		CHESTS("CHESTS"),
 		TOP_CORNER("TOP_CORNER"),
@@ -40,9 +42,9 @@ public abstract class KotobaBlockStorage extends KotobaYamlConfiguration {
 	}
 
 
+	private int id;
 	private String name;
 	private World world;
-	private Location spawn;
 	private Integer xMax;
 	private Integer yMax;
 	private Integer zMax;
@@ -60,7 +62,8 @@ public abstract class KotobaBlockStorage extends KotobaYamlConfiguration {
 	protected abstract void saveOptions(YamlConfiguration config);
 	protected abstract void setOptions(YamlConfiguration config);
 
-	protected KotobaBlockStorage setData(String name, World world, Integer XMax, Integer YMax, Integer ZMax, Integer XMin, Integer YMin, Integer ZMin) {
+	protected KotobaBlockStorage setData(int id, String name, World world, Integer XMax, Integer YMax, Integer ZMax, Integer XMin, Integer YMin, Integer ZMin) {
+		this.id = id;
 		this.name = name;
 		this.world = world;
 		this.xMax = XMax;
@@ -72,7 +75,7 @@ public abstract class KotobaBlockStorage extends KotobaYamlConfiguration {
 		return this;
 	}
 
-	protected KotobaBlockStorage setData(String name, Player player) {
+	protected KotobaBlockStorage setData(int id, String name, Player player) {
 		WorldEditPlugin worldEdit = (WorldEditPlugin) Bukkit.getServer().getPluginManager().getPlugin("WorldEdit");
 		if (worldEdit == null) {
 			player.sendMessage("WorldEdit Not Load");
@@ -80,6 +83,7 @@ public abstract class KotobaBlockStorage extends KotobaYamlConfiguration {
 		}
 		Selection sel = worldEdit.getSelection(player);
 		return setData(
+			id,
 			name,
 			sel.getWorld(),
 			sel.getMaximumPoint().getBlockX(),
@@ -99,6 +103,7 @@ public abstract class KotobaBlockStorage extends KotobaYamlConfiguration {
 			.filter(w -> w.getName().equalsIgnoreCase(config.getString(Path.WORLD.getPath())))
 			.findFirst()
 			.ifPresent(world -> {
+				int id = config.getInt(Path.ID.getPath());
 				String name = config.getString(Path.NAME.getPath());
 
 				Location topCorner = (Location) config.get(Path.TOP_CORNER.getPath());
@@ -111,10 +116,7 @@ public abstract class KotobaBlockStorage extends KotobaYamlConfiguration {
 				int zMax = topCorner.getBlockZ();
 				int zMin = bottomCorner.getBlockZ();
 
-				setData(name, world, xMax, yMax, zMax, xMin, yMin, zMin);
-				if(config.contains(Path.SPAWN.getPath())) {
-					this.setSpawn((Location) config.get(Path.SPAWN.getPath()));
-				}
+				setData(id, name, world, xMax, yMax, zMax, xMin, yMin, zMin);
 				setOptions(config);
 			});
 		return this;
@@ -132,7 +134,7 @@ public abstract class KotobaBlockStorage extends KotobaYamlConfiguration {
 	}
 
 	public KotobaBlockStorage resize(Player player) {
-		return setData(this.getName(), player);
+		return setData(this.id, this.name, player);
 	}
 
 
@@ -153,9 +155,11 @@ public abstract class KotobaBlockStorage extends KotobaYamlConfiguration {
 		}
 		YamlConfiguration config = getConfiguration();
 
+		saveOptions(config);
+
+		config.set(Path.ID.getPath(), getId());
 		config.set(Path.NAME.getPath(), getName());
 		config.set(Path.WORLD.getPath(), getWorld().getName());
-		if(getSpawn() != null) config.set(Path.SPAWN.getPath(), spawn);
 		config.set(Path.BOTTOM_CORNER.getPath(), new Location(world, xMin, yMin, zMin));
 		config.set(Path.TOP_CORNER.getPath(), new Location(world, xMax, yMax, zMax));
 
@@ -168,7 +172,6 @@ public abstract class KotobaBlockStorage extends KotobaYamlConfiguration {
 			.collect(Collectors.toList());
 		KotobaYamlConfiguration.setChests(chests, config, Path.CHESTS.getPath());
 
-		saveOptions(config);
 
 		try {
 			config.save(file);
@@ -189,6 +192,8 @@ public abstract class KotobaBlockStorage extends KotobaYamlConfiguration {
 		KotobaYamlConfiguration.loadChests(config, Path.CHESTS.getPath(), Path.WORLD.getPath(), true);
 
 		loadFromWorld();
+
+		setOptions(config);
 	}
 
 
@@ -273,14 +278,15 @@ public abstract class KotobaBlockStorage extends KotobaYamlConfiguration {
 		return false;
 	}
 
+
+	public int getId() {
+		return id;
+	}
 	public String getName() {
 		return name;
 	}
 	public World getWorld() {
 		return world;
-	}
-	public Location getSpawn() {
-		return spawn;
 	}
 	public Integer getXMax() {
 		return xMax;
@@ -302,9 +308,6 @@ public abstract class KotobaBlockStorage extends KotobaYamlConfiguration {
 	}
 	protected void setName(String name) {
 		this.name= name;
-	}
-	public void setSpawn(Location location) {
-		this.spawn = location;
 	}
 
 	@Override

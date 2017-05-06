@@ -11,12 +11,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class KotobaAPICommandExecutor implements CommandExecutor {
-	private final KotobaAPI plugin;
-
-	public KotobaAPICommandExecutor (KotobaAPI plugin) {
-		this.plugin = plugin;
-	}
-
 	public enum PermissionEnum implements PermissionEnumInterface {
 		OP() {
 			@Override

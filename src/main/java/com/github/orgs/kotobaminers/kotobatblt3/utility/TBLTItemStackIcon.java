@@ -22,11 +22,72 @@ public enum TBLTItemStackIcon implements KotobaItemStackIcon {
 			null,
 			IconFindType.SIMILAR
 	),
-	TEST_2(
-			Material.APPLE,
+
+	//Arena Meta
+	ARENA_META(
+			Material.BOOK,
 			(short) 0,
-			"Test2",
+			"Arena Meata",
+			Arrays.asList("Settings"),
+			IconFindType.SIMILAR
+	),
+	ARENA_ID(
+			Material.BOOK,
+			(short) 0,
+			"Arena Meta: ID",
+			new ArrayList<>(),
+			IconFindType.SIMILAR
+	),
+	ARENA_NEXT(
+			Material.BOOK,
+			(short) 0,
+			"Arena Meta: Next Arena",
+			new ArrayList<>(),
+			IconFindType.SIMILAR
+	),
+	ARENA_SPAWN(
+			Material.BOOK,
+			(short) 0,
+			"Arena Setting: Spawn",
 			null,
+			IconFindType.SIMILAR
+	),
+	DIRECTION(
+			Material.COMPASS,
+			(short) 0,
+			"Direction",
+			Arrays.asList("/tblt util direction"),
+			IconFindType.EXCEPT_LORE
+	),
+	QUEST_PROGRESS(
+			Material.WRITTEN_BOOK,
+			(short) 0,
+			"Quest Progress",
+			Arrays.asList("Right click to read this"),
+			IconFindType.EXCEPT_LORE
+	),
+	JOB_ITEMS(
+			Material.BOOK,
+			(short) 0,
+			"Starter items for the specific job",
+			null,
+			IconFindType.EXCEPT_LORE
+	),
+
+
+	//Quest
+	CLICK_QUEST_CREATOR(
+			Material.IRON_SWORD,
+			(short) 0,
+			"Quest Creator",
+			Arrays.asList("Click Quest"),
+			IconFindType.SIMILAR
+	),
+	WALK_ON_QUEST_CREATOR(
+			Material.IRON_SWORD,
+			(short) 0,
+			"Quest Creator",
+			Arrays.asList("Walk On Quest"),
 			IconFindType.SIMILAR
 	),
 
@@ -237,14 +298,6 @@ public enum TBLTItemStackIcon implements KotobaItemStackIcon {
 			IconFindType.SIMILAR
 	),
 
-	DUMMY(
-			Material.BARRIER,
-			(short) 0,
-			"Temporaty Dummy",
-			null,
-			IconFindType.SIMILAR
-	),
-
 	PORTAL_NEXT_CRYSTAL(
 			Material.NETHER_STAR,
 			(short) 0,
@@ -268,64 +321,6 @@ public enum TBLTItemStackIcon implements KotobaItemStackIcon {
 			null,
 			IconFindType.SIMILAR
 		),
-
-	QUEST_LIST(
-			Material.BOOK_AND_QUILL,
-			(short) 0,
-			"Quest List",
-			Arrays.asList("See the list of your quests."),
-			IconFindType.EXCEPT_LORE
-	),
-
-
-	WRITTEN_PREDICTION(
-			Material.WRITTEN_BOOK,
-			(short) 0,
-			"A written prediction",
-			null,
-			IconFindType.EXCEPT_LORE
-	),
-
-	PREDICTION(
-			Material.ENCHANTED_BOOK,
-			(short) 0,
-			"Prediction",
-			Arrays.asList("Are you stuck?", "Use prediction to get a useful hint about what to do next."),
-			IconFindType.SIMILAR
-			),
-	LOCK_PICKING(
-			Material.IRON_HOE,
-			(short) 0,
-			"Lock picking",
-			Arrays.asList("With this tool you can pick any lock.", "Use the lock pick on locked chest to instantly receive the contents."),
-			IconFindType.SIMILAR
-			),
-	REWIND_TIME(
-			Material.WATCH,
-			(short) 0,
-			"Rewind Time",
-			Arrays.asList("You can go back in time to the last checkpoint with this item."),
-			IconFindType.SIMILAR
-			),
-
-	CLAIRVOYANCE(
-			Material.GLASS,
-			(short) 0,
-			"Clairvoyance",
-			Arrays.asList("You can see the contents of locked chests with this skill."),
-			IconFindType.SIMILAR
-	) ,
-
-
-	INVESTIGATE(
-			Material.TRIPWIRE_HOOK,
-			(short) 0,
-			"Investigate",
-			Arrays.asList("Investigate"),
-			IconFindType.SIMILAR
-	),
-
-
 	;
 
 

@@ -21,9 +21,130 @@ import com.github.orgs.kotobaminers.kotobaapi.userinterface.Holograms;
 import com.github.orgs.kotobaminers.kotobaapi.userinterface.RepeatingEffect;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStackIcon;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaUtility;
+import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArena;
+import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaMap;
+import com.github.orgs.kotobaminers.kotobatblt3.kotobatblt3.TBLTPlayer;
+import com.github.orgs.kotobaminers.kotobatblt3.quest.QuestManager;
 import com.github.orgs.kotobaminers.kotobatblt3.userinterface.RepeatingEffectHolderManager;
 
+import net.md_5.bungee.api.ChatColor;
+
 public class ChestReader {
+
+
+	public static List<ItemStack> extractItems(Chest chest) {
+		return Stream.of(chest.getInventory().getContents())
+				.filter(i -> i != null)
+				.collect(Collectors.toList());
+	}
+
+
+	public static void updateArena(Chest chest) {
+		new TBLTArenaMap().findUnique(chest.getLocation())
+			.map(a -> (TBLTArena) a)
+			.ifPresent(a -> {
+				List<ItemStack> items = extractItems(chest);
+				updateArenaSpawn(items, chest.getLocation(), a);
+				updateNextArena(items, a);
+				updateQuests(chest, a);
+				updateJobItems(items, a);
+			});
+	}
+
+	private static void updateJobItems(List<ItemStack> items, TBLTArena arena) {
+		TBLTItemStackIcon target = TBLTItemStackIcon.JOB_ITEMS;
+		if(!items.stream().anyMatch(i -> target.isIconItemStack(i))) return;
+
+		List<ItemStack> options = items.stream()
+			.filter(i -> !target.isIconItemStack(i))
+			.collect(Collectors.toList());
+		if(1 < options.size()) {
+			ItemStack o1 = options.get(0);
+			Stream.of(TBLTPlayer.values())
+				.filter(p -> p.getAbilityIcons().stream().anyMatch(icon -> icon.isIconItemStack(o1)))
+				.findFirst()
+				.ifPresent(p -> {
+					List<ItemStack> jobItems = Stream.iterate(1, i -> i + 1).limit(options.size() - 1).map(i -> options.get(i)).collect(Collectors.toList());
+					arena.getArenaMeta().getJobItems().put(p, jobItems);
+				});
+		}
+	}
+
+
+	private static void updateNextArena(List<ItemStack> items, TBLTArena arena) {
+		TBLTItemStackIcon target = TBLTItemStackIcon.ARENA_NEXT;
+		if(!items.stream().anyMatch(i -> target.isIconItemStack(i))) return;
+
+		List<ItemStack> options = items.stream()
+			.filter(i -> !target.isIconItemStack(i))
+			.collect(Collectors.toList());
+		if(0 < options.size()) {
+			ItemStack o1 = options.get(0);
+			List<String> lore = o1.getItemMeta().getLore();
+			if(0 < lore.size()) {
+				try {
+					int next = Integer.parseInt(ChatColor.stripColor(lore.get(0)));
+					System.out.println(next);
+					arena.getArenaMeta().setNext(next);
+					return;
+				} catch(NumberFormatException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	private static void updateQuests(Chest chest, TBLTArena arena) {
+		List<ItemStack> items = extractItems(chest);
+		QuestManager.QUESTS.stream()
+			.filter(q -> items.stream().anyMatch(item -> q.getIcon().isIconItemStack(item)))
+			.findFirst()
+			.ifPresent(q -> {
+				q.tryCreate(chest).ifPresent(quest -> arena.getArenaMeta().getQuests().add(quest));
+			});
+	}
+
+
+	private static void updateArenaSpawn(List<ItemStack> items, Location chestLocation, TBLTArena arena) {
+		TBLTItemStackIcon target = TBLTItemStackIcon.ARENA_SPAWN;
+		if(!items.stream().anyMatch(i -> target.isIconItemStack(i))) return;
+		List<ItemStack> options = items.stream()
+			.filter(i -> !target.isIconItemStack(i))
+			.collect(Collectors.toList());
+		if(0 < options.size()) {
+			ItemStack o1 = options.get(0);
+			if(TBLTItemStackIcon.DIRECTION.isIconItemStack(o1)) {
+				Location spawn = chestLocation.clone().add(0.5, 2, 0.5);
+				List<String> lore = o1.getItemMeta().getLore();
+				if(2 < lore.size()) {
+					lore = lore.stream().map(l -> ChatColor.stripColor(l)).collect(Collectors.toList());
+					try {
+						double x = Double.parseDouble(lore.get(0));
+						double y = Double.parseDouble(lore.get(1));
+						double z = Double.parseDouble(lore.get(2));
+						Vector direction = new Vector(x, y, z);
+						spawn.setDirection(direction);
+
+						if(1 < options.size()) {
+							ItemStack o2 = options.get(1);
+							Optional<TBLTPlayer> job = Stream.of(TBLTPlayer.values())
+									.filter(p -> p.getAbilityIcons().stream().anyMatch(i -> i.isIconItemStack(o2)))
+									.findFirst();
+							if(job.isPresent()) {
+								arena.getArenaMeta().getJobSpawn().put(job.get(), spawn);
+								return;
+							}
+						}
+						return;
+
+					} catch(NumberFormatException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+
+	}
 
 
 	public static List<ItemStack> findItemsInRow(Chest chest, int row) {

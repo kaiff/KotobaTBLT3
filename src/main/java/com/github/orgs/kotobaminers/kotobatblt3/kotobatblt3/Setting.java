@@ -4,7 +4,6 @@ import com.github.orgs.kotobaminers.kotobaapi.userinterface.Holograms;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaMap;
 import com.github.orgs.kotobaminers.kotobatblt3.database.PlayerDatabase;
 import com.github.orgs.kotobaminers.kotobatblt3.database.SentenceDatabase;
-import com.github.orgs.kotobaminers.kotobatblt3.game.TBLTPlayer;
 
 public class Setting {
 	private static KotobaTBLT3 plugin;

@@ -39,6 +39,7 @@ import com.sk89q.worldedit.bukkit.selections.Selection;
 public class KotobaUtility {
 
 
+	public static final int LORE_LENGTH = 25;
 	public static List<String> splitSentence(String sentence, int number) {
 		List<String> words = Arrays.asList(sentence.split(" "));
 		List<List<String>> groups = new ArrayList<>();
@@ -57,6 +58,9 @@ public class KotobaUtility {
 		}
 		groups.add(group);
 		return groups.stream().filter(g -> 0 < g.size()).map(g -> String.join(" ", g)).collect(Collectors.toList());
+	}
+	public static List<String> splitSentence(String sentence) {
+		return splitSentence(sentence, LORE_LENGTH);
 	}
 
 

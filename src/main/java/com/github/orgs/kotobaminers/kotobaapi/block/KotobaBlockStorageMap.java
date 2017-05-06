@@ -23,6 +23,11 @@ public abstract class KotobaBlockStorageMap {
 	}
 
 
+	public Optional<KotobaBlockStorage> find(int id) {
+		return getMap().values().stream().filter(s -> s.getId() == id).findFirst();
+	}
+
+
 	public Optional<KotobaBlockStorage> findUnique(String name) {
 		return Optional.ofNullable(getMap().get(name));
 	}

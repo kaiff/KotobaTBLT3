@@ -1,5 +1,8 @@
 package com.github.orgs.kotobaminers.kotobatblt3.userinterface;
 
+
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -13,11 +16,8 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import com.github.orgs.kotobaminers.kotobaapi.block.KotobaBlockStorage;
 import com.github.orgs.kotobaminers.kotobaapi.userinterface.IconListGUI;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStack;
-import com.github.orgs.kotobaminers.kotobatblt3.block.BlockReplacer;
-import com.github.orgs.kotobaminers.kotobatblt3.block.BlockReplacerMap;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArena;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaMap;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTItemStackIcon;
@@ -52,10 +52,11 @@ public enum TBLTIconListGUI implements IconListGUI {
 	ARENA("Arenas ") {
 		@Override
 		public List<ItemStack> getIcons() {
-			List<KotobaBlockStorage> arenas = new TBLTArenaMap().getStorages();
+			List<TBLTArena> arenas = new TBLTArenaMap().getMap().values().stream().map(a -> (TBLTArena) a).sorted(Comparator.comparing(a -> a.getId())).collect(Collectors.toList());
+
 			return Stream.iterate(0, i -> i + 1)
 				.limit(arenas.size())
-				.map(i -> KotobaItemStack.create(Material.GLASS, (short) 0, i + 1, arenas.get(i).getName(), null))
+				.map(i -> KotobaItemStack.create(Material.GLASS, (short) 0, i + 1, arenas.get(i).getName(), Arrays.asList(String.valueOf(arenas.get(i).getId()))))
 				.collect(Collectors.toList());
 		}
 
@@ -77,31 +78,7 @@ public enum TBLTIconListGUI implements IconListGUI {
 		}
 	},
 
-	BLOCK_REPLACER("Block Replacers ") {
-		@Override
-		public List<ItemStack> getIcons() {
-			List<KotobaBlockStorage> replacers = new BlockReplacerMap().getStorages();
-			return Stream.iterate(0, i -> i + 1)
-				.limit(replacers.size())
-				.map(i -> KotobaItemStack.create(Material.ANVIL, (short) 0, i + 1, replacers.get(i).getName(), null))
-				.collect(Collectors.toList());
-		}
 
-		@Override
-		public void onIconLeftClickEvent(InventoryClickEvent event) {
-			onIconClickEvent(event);
-		}
-		@Override
-		public void onIconRightClickEvent(InventoryClickEvent event) {
-			onIconClickEvent(event);
-		}
-		public void onIconClickEvent(InventoryClickEvent event) {
-			String name = event.getCurrentItem().getItemMeta().getDisplayName();
-			new BlockReplacerMap().findUnique(name)
-				.flatMap(arena -> TBLTPlayerGUI.BLOCK_REPLACER.create(IconCreatorUtility.getIcons((BlockReplacer) arena)))
-				.ifPresent(i -> event.getWhoClicked().openInventory(i));
-		}
-	},
 	SOLID_BLOCK("Blocks ") {
 		@Override
 		public List<ItemStack> getIcons() {

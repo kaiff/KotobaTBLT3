@@ -2,8 +2,12 @@ package com.github.orgs.kotobaminers.kotobatblt3.block;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
+
+import org.bukkit.GameMode;
+import org.bukkit.entity.Player;
 
 import com.github.orgs.kotobaminers.kotobaapi.block.KotobaBlockStorage;
 import com.github.orgs.kotobaminers.kotobaapi.block.KotobaBlockStorageMap;
@@ -30,6 +34,14 @@ public class TBLTArenaMap extends KotobaBlockStorageMap {
 		(new TBLTArena("dummy")).importAll().stream()
 			.forEach(storage -> put(storage));
 		return;
+	}
+
+
+	public Optional<TBLTArena> findPlayingMap(Player player) {
+		if(player.getGameMode() == GameMode.ADVENTURE) {
+			return findUnique(player.getLocation()).map(a -> (TBLTArena) a);
+		}
+		return Optional.empty();
 	}
 
 

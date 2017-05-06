@@ -8,7 +8,7 @@ public class KotobaAPI extends JavaPlugin {
 
 	@Override
 	public void onEnable() {
-		this.getCommand(CommandEnum.LABEL).setExecutor(new KotobaAPICommandExecutor(this));
+		this.getCommand(CommandEnum.LABEL).setExecutor(new KotobaAPICommandExecutor());
 
 	}
 

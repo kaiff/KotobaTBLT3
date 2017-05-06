@@ -8,8 +8,6 @@ import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStack;
-import com.github.orgs.kotobaminers.kotobatblt3.block.BlockReplacer;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArena;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTItemStackIcon;
 
@@ -17,39 +15,26 @@ public class IconCreatorUtility {
 	public static List<ItemStack> getIcons(TBLTArena arena) {
 		List<ItemStack> icons = new ArrayList<ItemStack>();
 
-		ItemStack information = TBLTIcon.INFORMATION.createItemStack(Arrays.asList(arena.getName()));
+		ItemStack info = TBLTIcon.INFORMATION.createItemStack(Arrays.asList(arena.getName(), String.valueOf(arena.getId())));
 
 		Location center = arena.getCenter();
 		ItemStack teleport = TBLTIcon.TELEPORT.createItemStack(Arrays.asList(arena.getWorld().getName(), String.valueOf(center.getBlockX()) + "," + String.valueOf(center.getBlockY()) + "," + String.valueOf(center.getBlockZ())));
 
-		ItemStack warp = TBLTItemStackIcon.PORTAL_NEXT_CRYSTAL.create(1);
-		ItemMeta warpMeta = warp.getItemMeta();
-		warpMeta.setLore(Arrays.asList(arena.getName()));
-		warp.setItemMeta(warpMeta);
+		ItemStack id = TBLTItemStackIcon.ARENA_ID.create(1);
+		ItemMeta idMeta = id.getItemMeta();
+		idMeta.setLore(Arrays.asList(String.valueOf(arena.getId())));
+		id.setItemMeta(idMeta);
 
-		icons.addAll(Arrays.asList(information, teleport, warp));
+		ItemStack next = TBLTItemStackIcon.ARENA_NEXT.create(1);
+		ItemMeta nextMeta = next.getItemMeta();
+		nextMeta.setLore(Arrays.asList(String.valueOf(arena.getArenaMeta().getNext())));
+		next.setItemMeta(nextMeta);
 
-		return icons;
-	}
+		icons.addAll(Arrays.asList(info, teleport, id, next));
 
-	public static List<ItemStack> getIcons(BlockReplacer replacer) {
-		List<ItemStack> icons = new ArrayList<ItemStack>();
-
-		ItemStack information = TBLTIcon.INFORMATION.createItemStack(Arrays.asList(replacer.getName()));
-
-		Location center = replacer.getCenter();
-		ItemStack teleport = TBLTIcon.TELEPORT.createItemStack(Arrays.asList(replacer.getWorld().getName(), String.valueOf(center.getBlockX()) + "," + String.valueOf(center.getBlockY()) + "," + String.valueOf(center.getBlockZ())));
-
-		icons.addAll(Arrays.asList(information, teleport));
-
-		if(replacer.getTrigger() != null) {
-			icons.add(KotobaItemStack.create(replacer.getTrigger(), (short) 0, 1, "Trigger", null));
-		}
-		if(replacer.getTarget() != null) {
-			icons.add(KotobaItemStack.create(replacer.getTarget(), (short) 0, 1, "Target", null));
-		}
 		return icons;
 	}
 
 
 }
+

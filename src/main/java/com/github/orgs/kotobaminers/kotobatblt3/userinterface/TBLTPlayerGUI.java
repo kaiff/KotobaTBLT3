@@ -1,6 +1,8 @@
 package com.github.orgs.kotobaminers.kotobatblt3.userinterface;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.bukkit.Material;
@@ -81,6 +83,7 @@ public enum TBLTPlayerGUI implements ChestGUI {
 		}
 	},
 
+
 	QUEST_LIST("Quests", ChestSize.MINIMUM) {
 		@Override
 		public void onInventoryClick(InventoryClickEvent event) {
@@ -88,29 +91,28 @@ public enum TBLTPlayerGUI implements ChestGUI {
 		}
 	},
 
-	BLOCK_REPLACER("Block Replacer", ChestSize.MINIMUM) {
-		@Override
-		public void onInventoryClick(InventoryClickEvent event) {
-			Optional<TBLTIcon> icon = Stream.of(TBLTIcon.values())
-				.filter(i -> i.isIcon(event.getCurrentItem()))
-				.findAny();
-			if(icon.isPresent()) {
-				icon.get().onClickEvent(event);
-			}
-		}
-	},
 
 	ARENA("Arena", ChestSize.MINIMUM) {
 		@Override
 		public void onInventoryClick(InventoryClickEvent event) {
-			Optional<TBLTIcon> icon = Stream.of(TBLTIcon.values())
-				.filter(i -> i.isIcon(event.getCurrentItem()))
-				.findAny();
-			if(icon.isPresent()) {
-				icon.get().onClickEvent(event);
+			ItemStack clicked = event.getCurrentItem();
+			List<TBLTIcon> icons = Stream.of(TBLTIcon.values())
+				.filter(i -> i.isIcon(clicked))
+				.collect(Collectors.toList());
+			if(0 < icons.size()) {
+				icons.forEach(i -> i.onClickEvent(event));
+			} else {
+				event.getWhoClicked().getInventory().addItem(clicked);
 			}
 		}
 	},
+
+	QUESTS("Quests", ChestSize.MINIMUM) {
+		@Override
+		public void onInventoryClick(InventoryClickEvent event) {
+		}
+	},
+
 
 	;
 

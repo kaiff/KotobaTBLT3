@@ -10,7 +10,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -32,8 +31,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.Potion;
 
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaEffect;
-import com.github.orgs.kotobaminers.kotobatblt3.ability.ProjectileAbility;
-import com.github.orgs.kotobaminers.kotobatblt3.game.TBLTPlayer;
+import com.github.orgs.kotobaminers.kotobatblt3.kotobatblt3.TBLTPlayer;
 import com.github.orgs.kotobaminers.kotobatblt3.userinterface.TBLTPlayerGUI;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTUtility;
 
@@ -56,10 +54,6 @@ public class TBLTArenaListener implements Listener {
 		if(new TBLTArenaMap().isInAny(damaged.getLocation())) {
 			if(damager.getType() == EntityType.PLAYER) {
 				event.setCancelled(true);
-			} else if(damager instanceof Projectile) {
-				Projectile projectile =(Projectile) damager;
-				ProjectileAbility.find(projectile)
-					.ifPresent(a -> event.setCancelled(true));
 			}
 		}
 	}

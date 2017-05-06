@@ -5,31 +5,22 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.block.Block;
-import org.bukkit.block.Chest;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Vector;
 
 import com.github.orgs.kotobaminers.kotobaapi.ability.ClickBlockAbilityInterface;
 import com.github.orgs.kotobaminers.kotobaapi.block.KotobaBlockData;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaEffect;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStackIcon;
-import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaUtility;
 import com.github.orgs.kotobaminers.kotobatblt3.block.SwitchableChestManager;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaMap;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTInteractiveChestFinder;
-import com.github.orgs.kotobaminers.kotobatblt3.kotobatblt3.Setting;
 import com.github.orgs.kotobaminers.kotobatblt3.userinterface.TBLTPlayerGUI;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTItemStackIcon;
-import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTUtility;
 
 public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 
@@ -95,157 +86,21 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 
 
 	QUEST_LIST(
-			TBLTItemStackIcon.QUEST_LIST,
-			Arrays.asList(Action.RIGHT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR),
+			TBLTItemStackIcon.QUEST_PROGRESS,
+			Arrays.asList(Action.RIGHT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR, Action.LEFT_CLICK_AIR, Action.LEFT_CLICK_BLOCK),
 			0
 		) {
 			@Override
 			public boolean perform(PlayerInteractEvent event) {
-				return false;
+				Player player = event.getPlayer();
+				new TBLTArenaMap().findPlayingMap(player)
+					.ifPresent(a ->
+						TBLTPlayerGUI.QUESTS.create(a.getArenaMeta().getQuests().stream().map(q -> q.createProgress()).collect(Collectors.toList()))
+							.ifPresent(i -> player.openInventory(i))
+					);
+				return true;
 			}
 		},
-
-
-	LOCK_PICKING(
-		TBLTItemStackIcon.LOCK_PICKING,
-		Arrays.asList(Action.RIGHT_CLICK_BLOCK),
-		0
-	) {
-		@Override
-		public boolean perform(PlayerInteractEvent event) {
-			Player player = event.getPlayer();
-			Block block = event.getClickedBlock();
-			if(block.getType() == Material.CHEST) {
-				Chest chest = (Chest) block.getState();
-				Stream.of(chest.getInventory().getContents())
-					.filter(i -> i != null)
-					.forEach(i -> player.getInventory().addItem(i));
-				player.playSound(player.getLocation(), Sound.ITEM_PICKUP, 1, 1);
-				KotobaEffect.CRIT_MIDIUM.playEffect(block.getLocation().add(0.5, 0.5, 0.5));
-				chest.getInventory().clear();
-				block.setType(Material.AIR);
-				return true;
-			}
-			return false;
-		}
-	},
-
-
-	CLAIRVOYANCE(
-		TBLTItemStackIcon.CLAIRVOYANCE,
-		Arrays.asList(Action.RIGHT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR),
-		0
-	) {
-		@Override
-		public boolean perform(PlayerInteractEvent event) {
-			Block block = event.getClickedBlock();
-			if(block == null) return false;
-			if(block.getType() == Material.CHEST) {
-				Chest chest = (Chest) block.getState();
-				List<ItemStack> icons = Stream.of(chest.getInventory().getContents())
-					.filter(i -> i != null)
-					.collect(Collectors.toList());
-				event.getPlayer().openInventory(TBLTPlayerGUI.CLAIRVOYANCE.create(icons).get());
-				return true;
-			}
-			return false;
-		}
-	},
-
-	PSYCHOKINESIS(
-		TBLTItemStackIcon.DUMMY,
-		Arrays.asList(Action.RIGHT_CLICK_BLOCK),
-		0
-	) {
-		@Deprecated
-		@Override
-		public boolean perform(PlayerInteractEvent event) {
-			Player player = event.getPlayer();
-			Entity entity = (Entity) player;
-			if(!entity.isOnGround()) return false;
-			Block block = event.getClickedBlock();
-			List<Material> cant = Arrays.asList(Material.GOLD_PLATE, Material.IRON_DOOR);//TODO
-			if(cant.contains(block.getType())) return false;
-			Location above = block.getLocation().clone().add(0, 1, 0);
-			if(above.distance(player.getLocation().getBlock().getLocation()) == 0) return false;
-
-			if(block.getWorld().getBlockAt(above).getType() == Material.AIR) {
-				FallingBlock falling = block.getWorld().spawnFallingBlock(block.getLocation(), block.getType(), (byte) block.getData());
-				falling.setVelocity(new Vector(0, 1.2, 0));
-				falling.setDropItem(false);
-				block.setType(Material.AIR);
-				TBLTUtility.playJumpEffect(falling);
-				int duration = 3;
-				TBLTUtility.stopPlayer(player, duration);
-				KotobaUtility.playCountDown(Setting.getPlugin(), Arrays.asList(player), duration);
-				return true;
-			}
-			return false;
-		}
-	},
-
-	TELEPORT(
-		TBLTItemStackIcon.DUMMY,
-		Arrays.asList(Action.RIGHT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR),
-		0
-	) {
-		@Override
-		public boolean perform(PlayerInteractEvent event) {
-			Player player = event.getPlayer();
-			player.getNearbyEntities(5, 5, 5).stream()
-				.filter(e -> e instanceof Player)
-				.map(e -> (Player) player)
-				.filter(p -> p.isSneaking())
-				.filter(p -> TBLTUtility.isTBLTPlayer(p))
-				.findFirst()
-				.ifPresent(e -> player.teleport(e.getLocation()));
-			return true;
-		}
-	},
-
-	TRANSITION(
-		TBLTItemStackIcon.DUMMY,
-		Arrays.asList(Action.RIGHT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR),
-		1
-	) {
-		@Override
-		public boolean perform(PlayerInteractEvent event) {
-			Player user = event.getPlayer();
-			return user.getNearbyEntities(5, 5, 5).stream()
-				.filter(e -> e instanceof Player)
-				.map(e -> (Player) e)
-				.filter(e -> new TBLTArenaMap().isInAny(e.getLocation()))
-				.filter(e -> e.isSneaking())
-				.findAny()
-				.map(e -> {
-					Location userLocation = e.getLocation();
-					Location entityLocation = user.getLocation();
-					user.teleport(userLocation);
-					e.teleport(entityLocation);
-					KotobaEffect.ENDER_SIGNAL.playEffect(user.getLocation());
-					KotobaEffect.ENDER_SIGNAL.playSound(user.getLocation());
-					KotobaEffect.ENDER_SIGNAL.playEffect(e.getLocation());
-					KotobaEffect.ENDER_SIGNAL.playSound(e.getLocation());
-					return true;
-				}).isPresent();
-		}
-	},
-
-	DISGUISE_BAT(
-		TBLTItemStackIcon.DUMMY,
-		Arrays.asList(Action.RIGHT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR),
-		1
-	) {
-		@Override
-		public boolean perform(PlayerInteractEvent event) {
-			Entity entity4 = event.getPlayer();
-			if(entity4.isOnGround()) {
-				Drone.performDrone(event.getPlayer(), 10);
-				return true;
-			}
-			return false;
-		}
-	},
 	;
 
 

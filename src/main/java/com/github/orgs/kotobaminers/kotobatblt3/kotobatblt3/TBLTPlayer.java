@@ -1,4 +1,4 @@
-package com.github.orgs.kotobaminers.kotobatblt3.game;
+package com.github.orgs.kotobaminers.kotobatblt3.kotobatblt3;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -16,8 +16,8 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import com.github.orgs.kotobaminers.kotobaapi.ability.ClickBlockAbilityInterface;
+import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStackIcon;
 import com.github.orgs.kotobaminers.kotobatblt3.ability.ClickBlockAbility;
-import com.github.orgs.kotobaminers.kotobatblt3.kotobatblt3.Setting;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTItemStackIcon;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTUtility;
 
@@ -40,7 +40,7 @@ import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTUtility;
 		NONE(
 			new LinkedHashMap<ClickBlockAbilityInterface, Integer>() {{
 			}},
-			TBLTItemStackIcon.DUMMY
+			TBLTItemStackIcon.TEST
 		),
 		;
 
@@ -55,6 +55,11 @@ import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTUtility;
 		private static final List<PotionEffect> effects = Arrays.asList(
 				new PotionEffect(PotionEffectType.JUMP, effectInterval + 20, -5, false, false)
 			);
+
+
+		public List<KotobaItemStackIcon> getAbilityIcons() {
+			return abilities.keySet().stream().map(a -> a.getIcon()).collect(Collectors.toList());
+		}
 
 
 		private TBLTPlayer(Map<ClickBlockAbilityInterface, Integer> abilities, TBLTItemStackIcon icon) {

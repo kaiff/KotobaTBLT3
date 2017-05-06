@@ -7,6 +7,7 @@ import com.github.orgs.kotobaminers.kotobatblt3.ability.ClickAbilityListener;
 import com.github.orgs.kotobaminers.kotobatblt3.ability.GeneratableBlockListener;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaListener;
 import com.github.orgs.kotobaminers.kotobatblt3.kotobatblt3.TBLTCommandExecutor.PlayerCommand;
+import com.github.orgs.kotobaminers.kotobatblt3.quest.QuestListener;
 import com.github.orgs.kotobaminers.kotobatblt3.userinterface.TBLTIconListGUIListener;
 import com.github.orgs.kotobaminers.kotobatblt3.userinterface.TBLTPlayerGUIListener;
 
@@ -25,6 +26,7 @@ public class KotobaTBLT3 extends JavaPlugin {
 		pluginManager.registerEvents(new GeneratableBlockListener(), this);
 		pluginManager.registerEvents(new TBLTPlayerGUIListener(), this);
 		pluginManager.registerEvents(new TBLTIconListGUIListener(), this);
+		pluginManager.registerEvents(new QuestListener(), this);
 
 		Setting.initialize(this);
 

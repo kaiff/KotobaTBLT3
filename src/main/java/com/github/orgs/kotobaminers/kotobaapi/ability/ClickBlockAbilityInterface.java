@@ -10,7 +10,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.github.orgs.kotobaminers.kotobaapi.block.PlayerBlockInteractive;
-import com.github.orgs.kotobaminers.kotobatblt3.database.TBLTData;
 
 public interface ClickBlockAbilityInterface extends ItemStackAbilityInterface, PlayerBlockInteractive {
 
@@ -45,7 +44,6 @@ public interface ClickBlockAbilityInterface extends ItemStackAbilityInterface, P
 			success = perform(event);
 			if(success) {
 				consumeInHand(player);
-				TBLTData.getOrDefault(player.getUniqueId()).updateAbilityUsed(this);
 				return true;
 			}
 		}

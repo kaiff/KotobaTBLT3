@@ -3,6 +3,7 @@ package com.github.orgs.kotobaminers.kotobatblt3.block;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.OptionalInt;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -24,8 +25,8 @@ import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaTitle.TitleOption;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaUtility;
 import com.github.orgs.kotobaminers.kotobatblt3.citizens.UniqueNPC;
 import com.github.orgs.kotobaminers.kotobatblt3.database.TBLTData;
-import com.github.orgs.kotobaminers.kotobatblt3.game.TBLTPlayer;
 import com.github.orgs.kotobaminers.kotobatblt3.kotobatblt3.Setting;
+import com.github.orgs.kotobaminers.kotobatblt3.kotobatblt3.TBLTPlayer;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.ChestReader;
 
 import net.md_5.bungee.api.ChatColor;
@@ -34,6 +35,12 @@ public class TBLTArena extends KotobaBlockStorage {
 
 
 	private static final File DIRECTORY = new File(Setting.getPlugin().getDataFolder().getAbsolutePath() + "/Arena/");
+	private TBLTArenaMeta meta = new TBLTArenaMeta();
+
+
+	public TBLTArenaMeta getArenaMeta() {
+		return meta;
+	}
 
 
 	protected TBLTArena(String name) {
@@ -42,13 +49,24 @@ public class TBLTArena extends KotobaBlockStorage {
 
 
 	public static TBLTArena create(String name, Player player) {
-		return (TBLTArena) (new TBLTArena(name)).setData(name, player);
+		int id = 1;
+		OptionalInt max = new TBLTArenaMap().getMap().values().stream()
+			.mapToInt(s -> s.getId())
+			.max();
+
+		if(max.isPresent()) {
+			id = max.getAsInt() + 1;
+		}
+		return (TBLTArena) (new TBLTArena(name)).setData(id, name, player);
 	}
 
 
 	private void start(Player player, Location location) {
 		TBLTPlayer.resetCurrentJob(player);
+		meta.giveJobItems(player);
+
 		TBLTData.getOrDefault(player.getUniqueId()).initialize();
+
 		player.teleport(location);
 		KotobaEffect.ENDER_SIGNAL.playEffect(location);
 		KotobaEffect.ENDER_SIGNAL.playSound(location);
@@ -57,9 +75,17 @@ public class TBLTArena extends KotobaBlockStorage {
 	}
 
 
+	public void startNext() {
+		new TBLTArenaMap().find(getArenaMeta().getNext())
+			.map(a -> (TBLTArena) a)
+			.ifPresent(a -> a.join(getTBLTPlayers()));
+		load();
+	}
+
+
 	public void restart() {
 		load();
-		getTBLTPlayers().forEach(p -> start(p, getSpawn()));
+		getTBLTPlayers().forEach(p -> start(p, findSpawn(p)));
 	}
 
 
@@ -67,8 +93,22 @@ public class TBLTArena extends KotobaBlockStorage {
 		load();
 		Stream.of(getTBLTPlayers(), additional)
 			.flatMap(p -> p.stream())
-			.forEach(p -> start(p, getSpawn()));
+			.forEach(p -> start(p, findSpawn(p)));
 	}
+
+
+	private Location findSpawn(Player player) {
+		TBLTPlayer job = TBLTPlayer.findJob(player);
+		switch(job) {
+		case ARTIFICER:
+		case MAGE:
+			return getArenaMeta().getJobSpawn().getOrDefault(job, player.getWorld().getSpawnLocation());
+		case NONE:
+		default:
+			return getArenaMeta().getJobSpawn().getOrDefault(TBLTPlayer.ARTIFICER, player.getWorld().getSpawnLocation());
+		}
+	}
+
 
 
 	@Override
@@ -81,7 +121,7 @@ public class TBLTArena extends KotobaBlockStorage {
 
 	@Override
 	protected void initialize() {
-		new BlockReplacerMap().getReplacers(this).forEach(r -> r.setBefore());
+		meta = new TBLTArenaMeta();
 		Holograms.removeHolograms(Setting.getPlugin(), this);
 		initializeUniqueNPCs();
 	}
@@ -94,7 +134,10 @@ public class TBLTArena extends KotobaBlockStorage {
 			.collect(Collectors.toList());
 
 
-		chests.forEach(c -> ChestReader.displayHolograms(c));
+		chests.forEach(c -> {
+			ChestReader.displayHolograms(c);
+			ChestReader.updateArena(c);
+		});
 
 	}
 

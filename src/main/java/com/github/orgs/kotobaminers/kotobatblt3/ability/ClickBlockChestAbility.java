@@ -19,20 +19,16 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import com.github.orgs.kotobaminers.kotobaapi.ability.ClickBlockAbilityInterface;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaBook;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaEffect;
-import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStack;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStackIcon;
-import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaUtility;
 import com.github.orgs.kotobaminers.kotobatblt3.block.ChestPortal;
 import com.github.orgs.kotobaminers.kotobatblt3.block.SwitchableChestManager;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaMap;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTInteractiveChestFinder;
 import com.github.orgs.kotobaminers.kotobatblt3.userinterface.InteractEffect;
-import com.github.orgs.kotobaminers.kotobatblt3.userinterface.TBLTPlayerGUI;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.ChestChecker;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.ChestReader;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTItemStackIcon;
@@ -173,7 +169,7 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface, Intera
 
 
 	UPDATE_BOOK(
-		TBLTItemStackIcon.DUMMY,
+		TBLTItemStackIcon.TEST,
 		0,
 		TBLTInteractiveChestFinder.VERTICAL,
 		KotobaEffect.TWINCLE_MIDIUM,
@@ -244,45 +240,6 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface, Intera
 			book.setTitle(MEMORY);
 			book.giveOpenURLBook(player, TEXT, url);
 			player.getWorld().playSound(player.getLocation(), Sound.SPIDER_WALK, 1f, 0.5f);
-		}
-	},
-
-
-	INVESTIGATE(
-		TBLTItemStackIcon.INVESTIGATE,
-		0,
-		TBLTInteractiveChestFinder.VERTICAL,
-		KotobaEffect.TWINCLE_MIDIUM,
-		KotobaEffect.MUTE
-	) {
-		@Override
-		public boolean interactWithChests(PlayerInteractEvent event) {
-			List<ItemStack> options = getChestFinder().findChests(event, getIcon()).stream()
-					.flatMap(c -> ChestReader.findOptions(c, getIcon(), new ArrayList<>()).stream())
-					.collect(Collectors.toList());
-
-			List<ItemStack> informations = options.stream()
-				.filter(i -> i.getType() == Material.BOOK_AND_QUILL)
-				.map(i -> (BookMeta) i.getItemMeta())
-				.map(meta -> KotobaUtility.toStringListFromBookMeta(meta))
-				.map(lore -> {
-					lore = 	lore.stream().flatMap(sentence -> KotobaUtility.splitSentence(sentence, KotobaItemStackIcon.LORE_LENGTH).stream()).collect(Collectors.toList());
-					ItemStack item = KotobaItemStack.setColoredLore(getIcon().create(1), ChatColor.RESET, lore);
-					ItemMeta itemMeta = item.getItemMeta();
-					item.setItemMeta(itemMeta);
-					return item;
-				})
-				.collect(Collectors.toList());
-
-			informations.addAll(options);
-			if(0 < informations.size()) {
-				TBLTPlayerGUI.INVESTIGATE.create(informations)
-					.ifPresent(inventory -> {
-						event.getPlayer().openInventory(inventory);
-					});
-				return true;
-			}
-			return false;
 		}
 	},
 

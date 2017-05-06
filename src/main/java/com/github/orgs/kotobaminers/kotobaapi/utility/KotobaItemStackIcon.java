@@ -15,7 +15,6 @@ public interface KotobaItemStackIcon {
 
 
 	static final List<ItemFlag> FLAGS = Arrays.asList(ItemFlag.HIDE_ATTRIBUTES);
-	static final int LORE_LENGTH = 25;
 
 
 	Material getMaterial();
@@ -32,7 +31,7 @@ public interface KotobaItemStackIcon {
 	default ItemStack create(int amount) {
 		ItemStack item = new ItemStack(getMaterial(), amount, getData());
 		if(getLore() != null) {
-			List<String> splited = getLore().stream().flatMap(line -> KotobaUtility.splitSentence(line, LORE_LENGTH).stream()).collect(Collectors.toList());
+			List<String> splited = getLore().stream().flatMap(line -> KotobaUtility.splitSentence(line).stream()).collect(Collectors.toList());
 			item = KotobaItemStack.setColoredLore(item, ChatColor.RESET, splited);
 		}
 

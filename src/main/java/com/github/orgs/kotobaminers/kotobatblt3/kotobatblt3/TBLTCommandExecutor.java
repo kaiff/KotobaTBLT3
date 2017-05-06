@@ -3,14 +3,11 @@ package com.github.orgs.kotobaminers.kotobatblt3.kotobatblt3;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
 import org.bukkit.command.Command;
@@ -18,6 +15,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
 
 import com.github.orgs.kotobaminers.develop.TBLTTest;
@@ -27,8 +26,6 @@ import com.github.orgs.kotobaminers.kotobaapi.kotobaapi.CommandEnumInterface;
 import com.github.orgs.kotobaminers.kotobaapi.kotobaapi.PermissionEnumInterface;
 import com.github.orgs.kotobaminers.kotobaapi.userinterface.Holograms;
 import com.github.orgs.kotobaminers.kotobatblt3.ability.TBLTGem;
-import com.github.orgs.kotobaminers.kotobatblt3.block.BlockReplacer;
-import com.github.orgs.kotobaminers.kotobatblt3.block.BlockReplacerMap;
 import com.github.orgs.kotobaminers.kotobatblt3.block.InteractiveStructure;
 import com.github.orgs.kotobaminers.kotobatblt3.block.ReplacerSwitchChest;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArena;
@@ -38,10 +35,10 @@ import com.github.orgs.kotobaminers.kotobatblt3.database.PlayerData;
 import com.github.orgs.kotobaminers.kotobatblt3.database.PlayerDatabase;
 import com.github.orgs.kotobaminers.kotobatblt3.database.SentenceDatabase;
 import com.github.orgs.kotobaminers.kotobatblt3.database.TBLTConversationEditorMap;
-import com.github.orgs.kotobaminers.kotobatblt3.game.TBLTPlayer;
 import com.github.orgs.kotobaminers.kotobatblt3.userinterface.IconCreatorUtility;
 import com.github.orgs.kotobaminers.kotobatblt3.userinterface.TBLTIconListGUI;
 import com.github.orgs.kotobaminers.kotobatblt3.userinterface.TBLTPlayerGUI;
+import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTItemStackIcon;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTUtility;
 
 public class TBLTCommandExecutor implements CommandExecutor {
@@ -68,15 +65,7 @@ public class TBLTCommandExecutor implements CommandExecutor {
 		TEST(Arrays.asList(Arrays.asList("test")), "", "Command Test", PermissionEnum.OP) {
 			@Override
 			public boolean perform(Player player , String[] args) {
-				player.setVelocity(player.getLocation().getDirection().add(new Vector(0,0.5,0)).multiply(2));
-				Runnable runnable = new Runnable() {
-					@Override
-					public void run() {
-						player.getWorld().playEffect(player.getLocation(), Effect.SMOKE, 4);
-					}
-				};
-
-				TBLTUtility.repeatRunnable(0, 1, 10, runnable);
+				System.out.println(new TBLTArenaMap().getStorages().size());
 				return true;
 			}
 		},
@@ -317,7 +306,6 @@ public class TBLTCommandExecutor implements CommandExecutor {
 				List<String> options = takeOptions(args);
 				if(0 < options.size()) {
 					TBLTArena arena = TBLTArena.create(options.get(0), player);
-					arena.setSpawn(player.getLocation());
 					new TBLTArenaMap().put(arena);
 					arena.save();
 					return true;
@@ -429,18 +417,6 @@ public class TBLTCommandExecutor implements CommandExecutor {
 			}
 		},
 
-		ARENA_SETSPAWN_HERE(Arrays.asList(Arrays.asList("arena", "a"), Arrays.asList("setspawnhere", "ssh")), "", "Set arena spawn", PermissionEnum.OP) {
-			@Override
-			public boolean perform(Player player , String[] args) {
-				return new TBLTArenaMap().findUnique(player.getLocation())
-					.map(arena -> {
-						arena.setSpawn(player.getLocation());
-						arena.save();
-						return true;
-					}).orElse(false);
-			}
-		},
-
 
 		ARENA_JOIN_HERE(Arrays.asList(Arrays.asList("arena", "a"), Arrays.asList("joinhere", "jh")), "", "Join arena where you are", PermissionEnum.OP) {
 			@Override
@@ -500,136 +476,6 @@ public class TBLTCommandExecutor implements CommandExecutor {
 		},
 
 
-		REPLACER_CREATE(Arrays.asList(Arrays.asList("replacer", "r"), Arrays.asList("create", "c")), "<Arena>", "Create Arena", PermissionEnum.OP) {
-			@Override
-			public boolean perform(Player player, String[] args) {
-				List<String> options = takeOptions(args);
-				if(0 < options.size()) {
-					BlockReplacer replacer = BlockReplacer.create(options.get(0), player);
-					replacer.setSpawn(player.getLocation());
-					new BlockReplacerMap().put(replacer);
-					replacer.save();
-					return true;
-				}
-				return false;
-			}
-		},
-
-		REPLACER_UPDATE_HERE(Arrays.asList(Arrays.asList("replacer", "r"), Arrays.asList("updatehere", "uh")), "", "Update where you are", PermissionEnum.OP) {
-			@Override
-			public boolean perform(Player player, String[] args) {
-				return new BlockReplacerMap().findUnique(player.getLocation())
-						.map(replacer -> {
-							replacer.save();
-							return true;
-						}).orElse(false);
-			}
-		},
-
-		REPLACER_AFTER_HERE(Arrays.asList(Arrays.asList("replacer", "r"), Arrays.asList("afterhere", "ah")), "", "Replace as after where you are", PermissionEnum.OP) {
-			@Override
-			public boolean perform(Player player, String[] args) {
-				return new BlockReplacerMap().findUnique(player.getLocation())
-						.map(replacer -> {
-							replacer.load();
-							return true;
-						}).orElse(false);
-			}
-		},
-
-		REPLACER_BEFORE_HERE(Arrays.asList(Arrays.asList("replacer", "r"), Arrays.asList("beforehere", "bh")), "", "Replace as before where you are", PermissionEnum.OP) {
-			@Override
-			public boolean perform(Player player, String[] args) {
-				return false;//TODO not implemented yet
-//			return new DevReplacerMap().findUnique(player.getLocation())
-//				.map(replacer -> {
-//					Location center = replacer.getCenter();
-//					new DevArenaMap().findUnique(center)
-//						.map(arena -> arena.getBlocks())
-//						.ifPresent(blocks -> {
-//							blocks.stream()
-//								.filter(block -> replacer.isIn(block.getLocation()))
-//								.forEach(block -> block. setType(block.getType()));
-//						});
-//					return true;
-//				}).orElse(false);
-			}
-		},
-
-		REPLACER_REMOVE_HERE(Arrays.asList(Arrays.asList("replacer", "r"), Arrays.asList("removehere")), "", "Remove arena where you are", PermissionEnum.OP) {
-			@Override
-			public boolean perform(Player player, String[] args) {
-				BlockReplacerMap replacers = new BlockReplacerMap();
-				return replacers.findUnique(player.getLocation())
-						.map(replacer -> {
-							replacers.remove(replacer);
-							replacer.delete();
-							return true;
-						}).orElse(false);
-			}
-		},
-
-		REPLACER_SETTRIGGER(Arrays.asList(Arrays.asList("replacer", "r"), Arrays.asList("settrigger", "st")), "", "Set trigger and target", PermissionEnum.OP) {
-			@Override
-			public boolean perform(Player player , String[] args) {
-				Block block = player.getTargetBlock((Set<Material>) null, 10);
-				if(block.getType().equals(Material.AIR)) {
-					player.sendMessage("No block");
-					return true;
-				}
-
-				return new BlockReplacerMap().findUnique(block.getLocation())
-						.map(replacer -> {
-							BlockReplacer r = (BlockReplacer) replacer;
-							Material trigger = player.getItemInHand().getType();
-							Material target = block.getType();
-							r.setTriggers(trigger, target);
-							r.save();
-							TBLTPlayerGUI.BLOCK_REPLACER.create(IconCreatorUtility.getIcons(r))
-							.ifPresent(inventory -> player.openInventory(inventory));
-							return true;
-						}).orElse(false);
-			}
-		},
-
-		REPLACER_LIST(Arrays.asList(Arrays.asList("replacer", "r"), Arrays.asList("list", "l")), "", "List replacers", PermissionEnum.OP) {
-			@Override
-			public boolean perform(Player player , String[] args) {
-				player.openInventory(TBLTIconListGUI.BLOCK_REPLACER.createInventory(1));
-				return true;
-			}
-		},
-
-		REPLACER_HERE(Arrays.asList(Arrays.asList("replacer", "r"), Arrays.asList("here", "h")), "", "Replacer where you are", PermissionEnum.OP) {
-			@Override
-			public boolean perform(Player player , String[] args) {
-				return new BlockReplacerMap().findUnique(player.getLocation())
-						.map(arena -> {
-							TBLTPlayerGUI.BLOCK_REPLACER.create(IconCreatorUtility.getIcons((BlockReplacer) arena)).ifPresent(player::openInventory);;
-							return true;
-						}).orElse(false);
-			}
-		},
-//		ARENA_JOIN(Arrays.asList(Arrays.asList("arena", "a"), Arrays.asList("join", "j")), "<Arena>", "Join Arena", PermissionEnum.PLAYER) {
-//			@Override
-//			public boolean perform(Player player , String[] args) {
-//				List<String> options = takeOptions(args);
-//				if(0 < options.size()) {
-//					TBLTArena.getArenas().stream()
-//						.filter(arena -> arena.getName().equalsIgnoreCase(options.get(0)) && arena.getSpawn() != null)
-//						.findAny()
-//						.ifPresent(arena -> arena.join(player));
-//					return true;
-//				}
-//				return false;
-//			}
-//		},
-//		ARENA_LEAVE(Arrays.asList(Arrays.asList("arena", "a"), Arrays.asList("leave", "l")), "<Arena>", "Leave Arena", PermissionEnum.OP) {
-//			@Override
-//			public boolean perform(Player player , String[] args) {
-//				return false;
-//			}
-//		},
 		GUI_EFFECT(Arrays.asList(Arrays.asList("gui"), Arrays.asList("effect", "e")), "", "Command Test", PermissionEnum.OP) {
 			@Override
 			public boolean perform(Player player , String[] args) {
@@ -644,6 +490,27 @@ public class TBLTCommandExecutor implements CommandExecutor {
 				return true;
 			}
 		},
+
+
+		//Util
+		DIRECTION(Arrays.asList(Arrays.asList("util", "utility", "u"), Arrays.asList("direction", "d")), "", "Getting Direction Item", PermissionEnum.OP) {
+			@Override
+			public boolean perform(Player player , String[] args) {
+				Vector d = player.getLocation().getDirection();
+				List<String> lore = Stream.of(d.getX(), d.getY(), d.getZ())
+					.map(value -> String.valueOf(value))
+					.collect(Collectors.toList());
+
+				ItemStack icon = TBLTItemStackIcon.DIRECTION.create(64);
+				ItemMeta meta = icon.getItemMeta();
+				meta.setLore(lore);
+				icon.setItemMeta(meta);
+
+				player.getInventory().addItem(icon);
+				return true;
+			}
+		},
+
 		;
 
 		public static final String LABEL = "tblt";
