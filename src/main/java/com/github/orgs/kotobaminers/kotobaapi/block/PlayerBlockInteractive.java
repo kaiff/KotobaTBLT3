@@ -2,7 +2,9 @@ package com.github.orgs.kotobaminers.kotobaapi.block;
 
 import org.bukkit.event.player.PlayerInteractEvent;
 
-public interface PlayerBlockInteractive {
+import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaPriority;
+
+public interface PlayerBlockInteractive extends KotobaPriority {
 
 
 	boolean interact(PlayerInteractEvent event);

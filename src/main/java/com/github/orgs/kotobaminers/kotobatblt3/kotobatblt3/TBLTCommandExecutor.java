@@ -65,7 +65,7 @@ public class TBLTCommandExecutor implements CommandExecutor {
 		TEST(Arrays.asList(Arrays.asList("test")), "", "Command Test", PermissionEnum.OP) {
 			@Override
 			public boolean perform(Player player , String[] args) {
-				System.out.println(new TBLTArenaMap().getStorages().size());
+				System.out.println(player.getInventory().getSize());
 				return true;
 			}
 		},

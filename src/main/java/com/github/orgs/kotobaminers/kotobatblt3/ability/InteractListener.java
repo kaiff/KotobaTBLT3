@@ -16,13 +16,14 @@ import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaSound;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTCooldown;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTUtility;
 
-public class ClickAbilityListener implements Listener {
+public class InteractListener implements Listener {
+	private static final List<Action> CLICKS = Arrays.asList(Action.LEFT_CLICK_AIR, Action.LEFT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR, Action.RIGHT_CLICK_BLOCK);
+
 	@EventHandler
 	void onPlayerInteractBlock(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
 
-		List<Action> clicks = Arrays.asList(Action.LEFT_CLICK_AIR, Action.LEFT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR, Action.RIGHT_CLICK_BLOCK);
-		if(!clicks.contains(event.getAction())) return;
+		if(!CLICKS.contains(event.getAction())) return;
 
 		if(TBLTCooldown.INTERACTIVE.isCooldown(player.getUniqueId())) return;
 		if(!TBLTUtility.isTBLTPlayer(player)) return;

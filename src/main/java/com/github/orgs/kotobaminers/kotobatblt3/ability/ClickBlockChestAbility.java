@@ -24,8 +24,8 @@ import com.github.orgs.kotobaminers.kotobaapi.ability.ClickBlockAbilityInterface
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaBook;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaEffect;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStackIcon;
+import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaPriorityValue;
 import com.github.orgs.kotobaminers.kotobatblt3.block.ChestPortal;
-import com.github.orgs.kotobaminers.kotobatblt3.block.SwitchableChestManager;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaMap;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTInteractiveChestFinder;
 import com.github.orgs.kotobaminers.kotobatblt3.userinterface.InteractEffect;
@@ -47,10 +47,10 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface, Intera
 		@Override
 		public boolean interactWithChests(PlayerInteractEvent event) {
 			getChestFinder().findTargetBlock(event)
-			.ifPresent(b -> {
-				TBLTGem.GREEN_GEM.place(b.getLocation());
-				ChestPortal.GEM_PORTAL.findCenters(b.getLocation()).forEach(c -> ChestPortal.GEM_PORTAL.tryOpen(c));
-			});
+				.ifPresent(b -> {
+					TBLTGem.GREEN_GEM.place(event.getPlayer(), b.getLocation());
+					ChestPortal.GEM_PORTAL.findCenters(b.getLocation()).forEach(c -> ChestPortal.GEM_PORTAL.tryOpen(c));
+				});
 			return true;
 		}
 
@@ -69,7 +69,7 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface, Intera
 			Optional<Block> findTargetBlock = getChestFinder().findTargetBlock(event);
 			findTargetBlock
 				.ifPresent(b -> {
-					TBLTGem.BLUE_GEM.place(b.getLocation());
+					TBLTGem.BLUE_GEM.place(event.getPlayer(), b.getLocation());
 					ChestPortal.GEM_PORTAL.findCenters(b.getLocation()).forEach(c -> ChestPortal.GEM_PORTAL.tryOpen(c));
 				});
 			return true;
@@ -88,84 +88,12 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface, Intera
 		public boolean interactWithChests(PlayerInteractEvent event) {
 			getChestFinder().findTargetBlock(event)
 				.ifPresent(b -> {
-					TBLTGem.RED_GEM.place(b.getLocation());
+					TBLTGem.RED_GEM.place(event.getPlayer(), b.getLocation());
 					ChestPortal.GEM_PORTAL.findCenters(b.getLocation()).forEach(c -> ChestPortal.GEM_PORTAL.tryOpen(c));
 				});
 			return true;
 		}
 	},
-
-
-	GREEN_GEM_BASE(
-		TBLTItemStackIcon.GREEN_GEM,
-		1,
-		TBLTInteractiveChestFinder.BASE,
-		KotobaEffect.TWINCLE_SMALL,
-		KotobaEffect.MUTE
-	) {
-		private final TBLTGem gem = TBLTGem.GREEN_GEM;
-
-		@Override
-		public boolean interactWithChests(PlayerInteractEvent event) {
-			getChestFinder().findTargetBlock(event)
-			.ifPresent(b -> {
-				gem.place(b.getLocation());
-				getChestFinder().findChests(b.getLocation()).stream()
-					.flatMap(c -> TBLTSwitch.findPoweredChests(c, gem).stream())
-					.forEach(c -> SwitchableChestManager.find(c).stream().forEach(s -> s.turnOn(c)));
-			});
-			return true;
-		}
-
-	},
-
-
-	RED_GEM_BASE(
-			TBLTItemStackIcon.RED_GEM,
-			1,
-			TBLTInteractiveChestFinder.BASE,
-			KotobaEffect.TWINCLE_SMALL,
-			KotobaEffect.MUTE
-		) {
-			private final TBLTGem gem = TBLTGem.RED_GEM;
-
-			@Override
-			public boolean interactWithChests(PlayerInteractEvent event) {
-				getChestFinder().findTargetBlock(event)
-				.ifPresent(b -> {
-					gem.place(b.getLocation());
-					getChestFinder().findChests(b.getLocation()).stream()
-					.flatMap(c -> TBLTSwitch.findPoweredChests(c, gem).stream())
-					.forEach(c -> SwitchableChestManager.find(c).stream().forEach(s -> s.turnOn(c)));
-				});
-				return true;
-			}
-
-		},
-
-
-	BLUE_GEM_BASE(
-			TBLTItemStackIcon.BLUE_GEM,
-			1,
-			TBLTInteractiveChestFinder.BASE,
-			KotobaEffect.TWINCLE_SMALL,
-			KotobaEffect.MUTE
-		) {
-			private final TBLTGem gem = TBLTGem.BLUE_GEM;
-
-			@Override
-			public boolean interactWithChests(PlayerInteractEvent event) {
-				getChestFinder().findTargetBlock(event)
-				.ifPresent(b -> {
-					gem.place(b.getLocation());
-					getChestFinder().findChests(b.getLocation()).stream()
-					.flatMap(c -> TBLTSwitch.findPoweredChests(c, gem).stream())
-					.forEach(c -> SwitchableChestManager.find(c).stream().forEach(s -> s.turnOn(c)));
-				});
-				return true;
-			}
-
-		},
 
 
 	UPDATE_BOOK(
@@ -302,6 +230,10 @@ public enum ClickBlockChestAbility implements ClickBlockAbilityInterface, Intera
 		return consume;
 	}
 
+	@Override
+	public KotobaPriorityValue getPriority() {
+		return KotobaPriorityValue.MIDIUM;
+	}
 
 }
 

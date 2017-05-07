@@ -23,7 +23,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.vehicle.VehicleExitEvent;
@@ -31,20 +30,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.Potion;
 
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaEffect;
-import com.github.orgs.kotobaminers.kotobatblt3.kotobatblt3.TBLTPlayer;
 import com.github.orgs.kotobaminers.kotobatblt3.userinterface.TBLTPlayerGUI;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTUtility;
 
 public class TBLTArenaListener implements Listener {
-
-
-	@EventHandler
-	void onPlayerJoin(PlayerJoinEvent event) {
-		Player player = event.getPlayer();
-		if(TBLTUtility.isTBLTPlayer(player)) {
-			TBLTPlayer.updatePotionEffects(player);
-		}
-	}
 
 
 	@EventHandler
@@ -199,10 +188,12 @@ public class TBLTArenaListener implements Listener {
 
 	@EventHandler
 	public void onPlayerPortalEvent(PlayerPortalEvent event) {
-		if(TBLTUtility.isTBLTPlayer(event.getPlayer())) {
+		Player player = event.getPlayer();
+		if(TBLTUtility.isTBLTPlayer(player)) {
 			event.setCancelled(true);
 			Stream.of(ChestPortal.values())
-				.forEach(p -> p.findChests(event.getFrom()).forEach(c -> p.goThroughPortal(event)));
+				.filter(p -> p.getPortal() == player.getLocation().getBlock().getType())
+				.forEach(p -> p.goThroughPortal(event));
 		}
 	}
 

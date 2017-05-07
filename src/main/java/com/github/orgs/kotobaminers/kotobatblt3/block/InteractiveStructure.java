@@ -22,7 +22,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.util.Vector;
 
-import com.github.orgs.kotobaminers.kotobaapi.block.KotobaBlockData;
 import com.github.orgs.kotobaminers.kotobaapi.block.KotobaStructure;
 import com.github.orgs.kotobaminers.kotobaapi.block.PlayerBlockInteractive;
 import com.github.orgs.kotobaminers.kotobaapi.userinterface.RepeatingEffect;
@@ -30,13 +29,11 @@ import com.github.orgs.kotobaminers.kotobaapi.userinterface.RepeatingEffectHolde
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaBook;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaEffect;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStackIcon;
+import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaPriorityValue;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaStructureUtility;
-import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaUtility;
 import com.github.orgs.kotobaminers.kotobatblt3.ability.InteractiveChestFinderHolder;
 import com.github.orgs.kotobaminers.kotobatblt3.citizens.UniqueNPC;
-import com.github.orgs.kotobaminers.kotobatblt3.database.TBLTData;
 import com.github.orgs.kotobaminers.kotobatblt3.userinterface.InteractEffect;
-import com.github.orgs.kotobaminers.kotobatblt3.userinterface.TBLTPlayerGUI;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.ChestChecker;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.ChestReader;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTItemStackIcon;
@@ -44,131 +41,6 @@ import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTItemStackIcon;
 import net.citizensnpcs.api.npc.NPC;
 
 public enum InteractiveStructure implements KotobaStructure, PlayerBlockInteractive, RepeatingEffectHolder, InteractiveChestFinderHolder {
-
-
-	STAND(
-			TBLTItemStackIcon.STAND_KEY,
-			new HashMap<Vector, Material>() {{
-				put(new Vector(0,2,0), Material.ANVIL);
-				put(new Vector(0,3,0), Material.GLOWSTONE);
-				put(new Vector(0,4,0), Material.AIR);
-				put(new Vector(0,5,0), Material.AIR);
-			}},
-			TBLTInteractiveChestFinder.ONE_BY_FOUR,
-			false
-		) {
-			@Override
-			public boolean interactWithChests(PlayerInteractEvent event) {
-				Player player = event.getPlayer();
-				Block clicked = event.getClickedBlock();
-				if(clicked.getType() != getStructure().get(new Vector(0,3,0))) return false;
-				getChestFinder().findChests(clicked.getLocation()).stream()
-					.map(c -> KotobaUtility.getBlockCenter(c.getBlock()).add(0, 4, 0))
-					.forEach(l -> {
-						l.setDirection(player.getLocation().getDirection());
-						player.teleport(l);
-						KotobaEffect.ENDER_SIGNAL.playEffect(l);
-						KotobaEffect.ENDER_SIGNAL.playSound(l);
-					});
-				return true;
-			}
-
-		},
-	ITEM_GATE(
-		TBLTItemStackIcon.ITEM_GATE_KEY,
-		new HashMap<Vector, Material>() {{
-			put(new Vector(0,2,0), Material.STAINED_GLASS_PANE);
-			put(new Vector(0,3,0), Material.STAINED_GLASS_PANE);
-			put(new Vector(0,4,0), Material.STAINED_GLASS_PANE);
-			put(new Vector(0,5,0), Material.STAINED_GLASS_PANE);
-		}},
-		TBLTInteractiveChestFinder.ONE_BY_FOUR,
-		false
-	) {
-		@Override
-		public boolean interactWithChests(PlayerInteractEvent event) {
-			if(0 == KotobaStructureUtility.findOrigins(getStructure(), event.getClickedBlock().getLocation(), hasRotations()).size()) return false;
-
-			Player player = event.getPlayer();
-
-			if(event.getClickedBlock().getType() == Material.STAINED_GLASS_PANE) {
-				Block opposite = event.getClickedBlock().getRelative(event.getBlockFace().getOppositeFace());
-				if(opposite.getType() == Material.AIR) {
-					Location from = player.getLocation();
-					Location to = opposite.getLocation().clone().add(0.5,0,0.5);
-					Vector direction = from.getDirection();
-					to.setDirection(direction);
-					player.teleport(to);
-					KotobaEffect.ENDER_SIGNAL.playEffect(from);
-					KotobaEffect.ENDER_SIGNAL.playEffect(to);
-					to.getWorld().playSound(to, Sound.PORTAL_TRIGGER, 1, 1);
-				}
-				return true;
-			}
-			return false;
-
-		}
-
-	},
-
-
-	ONE_TIME_GATE(
-			TBLTItemStackIcon.ONE_TIME_GATE_KEY,
-			new HashMap<Vector, Material>() {{
-				put(new Vector(0,2,0), Material.STAINED_GLASS_PANE);
-				put(new Vector(0,3,0), Material.STAINED_GLASS_PANE);
-				put(new Vector(0,4,0), Material.STAINED_GLASS_PANE);
-				put(new Vector(0,5,0), Material.STAINED_GLASS_PANE);
-			}},
-			TBLTInteractiveChestFinder.ONE_BY_FOUR,
-			false
-		) {
-			@Override
-			public boolean interactWithChests(PlayerInteractEvent event) {
-				if(0 == KotobaStructureUtility.findOrigins(getStructure(), event.getClickedBlock().getLocation(), hasRotations()).size()) return false;
-					if(event.getClickedBlock().getType() == Material.STAINED_GLASS_PANE) {
-						Block opposite = event.getClickedBlock().getRelative(event.getBlockFace().getOppositeFace());
-						if(opposite.getType() == Material.AIR) {
-							Player player = event.getPlayer();
-							Location from = player.getLocation();
-							Location to = opposite.getLocation().clone().add(0.5,0,0.5);
-							Vector direction = from.getDirection();
-							to.setDirection(direction);
-							player.teleport(to);
-							KotobaEffect.ENDER_SIGNAL.playEffect(from);
-							KotobaEffect.ENDER_SIGNAL.playEffect(to);
-							to.getWorld().playSound(to, Sound.PORTAL_TRIGGER, 1, 1);
-							KotobaStructureUtility.findExistings(getStructure(), event.getClickedBlock().getLocation(), hasRotations())
-								.forEach(structure -> structure.stream().filter(b -> b.getType() == Material.STAINED_GLASS_PANE).forEach(b -> new KotobaBlockData(b.getLocation(), Material.OBSIDIAN, 0).placeBlock()));
-						}
-					return true;
-				}
-				return false;
-			}
-		},
-
-
-	CHOOSE_ONE(
-			TBLTItemStackIcon.CHOOSE_ONE_KEY,
-			new HashMap<Vector, Material>() {{
-				put(new Vector(0,2,0), Material.ENCHANTMENT_TABLE);
-			}},
-			TBLTInteractiveChestFinder.VERTICAL,
-			false
-		) {
-			@Override
-			public boolean interactWithChests(PlayerInteractEvent event) {
-				List<ItemStack> options = getChestFinder().findChests(event, getIcon()).stream()
-						.flatMap(c -> ChestReader.findOptions(c, getIcon(), new ArrayList<>()).stream())
-						.collect(Collectors.toList());
-				TBLTPlayerGUI.ITEM_EXCHANGER.create(options)
-					.ifPresent(i -> {
-						TBLTData.getOrDefault(event.getPlayer().getUniqueId()).target(event.getClickedBlock());
-						event.getPlayer().openInventory(i);
-					});
-				return true;
-			}
-		},
 
 
 	UPDATE_BOOK(
@@ -254,7 +126,6 @@ public enum InteractiveStructure implements KotobaStructure, PlayerBlockInteract
 				}
 				return false;
 			}
-
 		},
 
 
@@ -348,7 +219,6 @@ public enum InteractiveStructure implements KotobaStructure, PlayerBlockInteract
 		},
 	;
 
-
 	private KotobaItemStackIcon icon;
 	private Map<Vector, Material> structure;
 	private TBLTInteractiveChestFinder chestFinder;
@@ -376,17 +246,6 @@ public enum InteractiveStructure implements KotobaStructure, PlayerBlockInteract
 		}
 
 		return false;
-
-//		if(chests.stream().allMatch(c -> ChestReader.hasTriggersItem(c, event.getPlayer()))) {
-//			chests.forEach(c -> InteractEffect.playEffect(c, event));
-//			return interactWithChests(event);
-//		} else {
-//			TBLTPlayerGUI.YOU_NEED.create(
-//				chests.stream()
-//					.flatMap(c -> ChestReader.findTriggersItem(c).stream())
-//					.collect(Collectors.toList())
-//			).ifPresent(i -> event.getPlayer().openInventory(i));
-//		}
 	}
 
 	@Override
@@ -449,6 +308,10 @@ public enum InteractiveStructure implements KotobaStructure, PlayerBlockInteract
 		return hasRotaions;
 	}
 
+	@Override
+	public KotobaPriorityValue getPriority() {
+		return KotobaPriorityValue.MIDIUM;
+	}
 
 }
 

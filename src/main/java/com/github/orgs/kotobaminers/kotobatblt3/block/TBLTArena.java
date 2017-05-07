@@ -91,6 +91,7 @@ public class TBLTArena extends KotobaBlockStorage {
 
 	public void join(List<Player> additional) {
 		load();
+			
 		Stream.of(getTBLTPlayers(), additional)
 			.flatMap(p -> p.stream())
 			.forEach(p -> start(p, findSpawn(p)));
@@ -108,7 +109,6 @@ public class TBLTArena extends KotobaBlockStorage {
 			return getArenaMeta().getJobSpawn().getOrDefault(TBLTPlayer.ARTIFICER, player.getWorld().getSpawnLocation());
 		}
 	}
-
 
 
 	@Override

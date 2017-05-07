@@ -1,6 +1,5 @@
 package com.github.orgs.kotobaminers.kotobatblt3.kotobatblt3;
 
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,18 +7,14 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import com.github.orgs.kotobaminers.kotobaapi.ability.ClickBlockAbilityInterface;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStackIcon;
 import com.github.orgs.kotobaminers.kotobatblt3.ability.ClickBlockAbility;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTItemStackIcon;
-import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTUtility;
 
 
 	public enum TBLTPlayer {
@@ -49,13 +44,6 @@ import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTUtility;
 		private TBLTItemStackIcon icon;
 		private GameMode mode = GameMode.ADVENTURE;
 
-		private static int initialId = -1;
-		private static int effectId = initialId;
-		private static final int effectInterval = 20 * 60;
-		private static final List<PotionEffect> effects = Arrays.asList(
-				new PotionEffect(PotionEffectType.JUMP, effectInterval + 20, -5, false, false)
-			);
-
 
 		public List<KotobaItemStackIcon> getAbilityIcons() {
 			return abilities.keySet().stream().map(a -> a.getIcon()).collect(Collectors.toList());
@@ -77,13 +65,18 @@ import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTUtility;
 
 		private void setInventory(Player player) {
 			player.getInventory().clear();
-			abilities.entrySet().stream().forEach(entry ->player.getInventory().addItem(entry.getKey().getIcon().create(entry.getValue())));
+			List<ItemStack> items = abilities.entrySet().stream()
+				.map(entry -> entry.getKey().getIcon().create(entry.getValue()))
+				.collect(Collectors.toList());
+			int max = player.getInventory().getSize() - 1;
+			Stream.iterate(0, i -> i - 1)
+				.limit(Math.min(max, items.size()))
+				.forEach(i -> player.getInventory().setItem(max - i, items.get(i)));
 		}
 
 
 		public void become(Player player) {
 			player.setGameMode(mode);
-			effects.forEach(e -> player.addPotionEffect(e));
 			setInventory(player);
 		}
 
@@ -101,30 +94,6 @@ import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTUtility;
 				.filter(job -> items.stream().anyMatch(i -> job.icon.isIconItemStack(i)))
 				.findFirst()
 				.orElse(NONE);
-		}
-
-
-		public static void scheduleRepeatingEffects() {
-			if(effectId != initialId) {
-				Bukkit.getScheduler().cancelTask(effectId);
-			}
-			int id = Bukkit.getScheduler().scheduleSyncRepeatingTask(Setting.getPlugin(), new Runnable() {
-				@Override
-				public void run() {
-					Bukkit.getOnlinePlayers().stream()
-						.filter(p -> TBLTUtility.isTBLTPlayer(p))
-						.forEach(p -> updatePotionEffects(p));
-				}
-			}, 5, effectInterval);
-			effectId = id;
-		}
-
-
-		public static void updatePotionEffects(Player player) {
-			effects.forEach(e -> {
-				player.removePotionEffect(e.getType());
-				player.addPotionEffect(e);
-			});
 		}
 
 

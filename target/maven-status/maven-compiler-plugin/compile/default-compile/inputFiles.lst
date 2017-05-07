@@ -2,6 +2,7 @@ C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminer
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\block\KotobaStructure.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\quest\KotobaQuest.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\block\TBLTArenaMap.java
+C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\block\InteractiveBlock.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\block\KotobaPortal.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\block\SwitchableChest.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\sentence\ConversationGUIIcon.java
@@ -18,11 +19,13 @@ C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminer
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\kotobaapi\CommandEnumInterface.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\block\KotobaBlockStorage.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\database\DatabaseManager.java
+C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\utility\KotobaPriority.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\ability\PlayerInteractiveManager.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\database\TBLTConversationEditor.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\kotobatblt3\Setting.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\userinterface\Toggler.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\utility\KotobaItemStack.java
+C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\utility\KotobaPriorityValue.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\ability\TBLTSwitch.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\userinterface\GUIIcon.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\userinterface\TBLTIconListGUIListener.java
@@ -40,6 +43,7 @@ C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminer
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\block\InteractiveChestFinder.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\ability\InteractiveChestFinderHolder.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\database\PlayerDatabase.java
+C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\ability\InteractListener.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\userinterface\InteractEffect.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\citizens\KotobaCitizensManager.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\ability\ClickBlockAbility.java
@@ -55,7 +59,6 @@ C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminer
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\ability\ItemStackConsumer.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\ability\GeneratableBlockListener.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\kotobaapi\MessageEnumInterface.java
-C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\ability\ClickAbilityListener.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\quest\QuestListener.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\sentence\ConversationEditorMap.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\quest\ClickQuest.java

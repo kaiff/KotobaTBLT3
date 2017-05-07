@@ -17,7 +17,6 @@ public class Setting {
 		new TBLTArenaMap().importAll();
 
 		Holograms.removeAllHolograms(plugin);
-		TBLTPlayer.scheduleRepeatingEffects();
 
 	}
 

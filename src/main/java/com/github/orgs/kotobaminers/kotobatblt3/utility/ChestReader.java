@@ -48,8 +48,18 @@ public class ChestReader {
 				updateNextArena(items, a);
 				updateQuests(chest, a);
 				updateJobItems(items, a);
+				updatePlayerNumber(items, a);
 			});
 	}
+
+	private static void updatePlayerNumber(List<ItemStack> items, TBLTArena a) {
+		TBLTItemStackIcon target = TBLTItemStackIcon.PLAYER_NUMBER_MULTIPLE;
+		items.stream()
+			.filter(i -> target.isIconItemStack(i))
+			.findAny()
+			.ifPresent(i -> a.getArenaMeta().setMultiplePlayers());
+	}
+
 
 	private static void updateJobItems(List<ItemStack> items, TBLTArena arena) {
 		TBLTItemStackIcon target = TBLTItemStackIcon.JOB_ITEMS;
@@ -84,7 +94,6 @@ public class ChestReader {
 			if(0 < lore.size()) {
 				try {
 					int next = Integer.parseInt(ChatColor.stripColor(lore.get(0)));
-					System.out.println(next);
 					arena.getArenaMeta().setNext(next);
 					return;
 				} catch(NumberFormatException e) {
@@ -238,6 +247,41 @@ public class ChestReader {
 
 
 	public static Optional<Map<Vector, Material>> findPattern3By3(Chest chest) {
+		boolean is3x3 = Stream.of(chest.getInventory().getContents())
+			.filter(i -> i != null)
+			.anyMatch(i -> TBLTItemStackIcon.GEM_PORTAL_KEY_3x3.isIconItemStack(i));
+
+		if(!is3x3) return Optional.empty();
+
+		Map<Vector, Material> pattern = new HashMap<Vector, Material>();
+		Map<Vector, Integer> index = new HashMap<Vector, Integer>() {{
+			put(new Vector(-1,0,-1), 3);
+			put(new Vector(0,0,-1), 4);
+			put(new Vector(1,0,-1), 5);
+			put(new Vector(-1,0,0), 12);
+			put(new Vector(0,0,0), 13);
+			put(new Vector(1,0,0), 14);
+			put(new Vector(-1,0,1), 21);
+			put(new Vector(0,0,1), 22);
+			put(new Vector(1,0,1), 23);
+		}};
+
+		Inventory inventory = chest.getInventory();
+		index.entrySet().stream()
+			.forEach(e -> {
+				ItemStack item = inventory.getItem(e.getValue());
+				if(item == null) {
+					item = new ItemStack(Material.AIR);
+				}
+				pattern.put(e.getKey(), item.getType());
+			});
+
+		return Optional.of(pattern);
+
+	}
+
+
+	public static Optional<Map<Vector, Material>> findPattern3By3_2(Chest chest) {
 		boolean is3x3 = Stream.of(chest.getInventory().getContents())
 			.filter(i -> i != null)
 			.anyMatch(i -> TBLTItemStackIcon.GEM_PORTAL_KEY_3x3.isIconItemStack(i));

@@ -59,6 +59,13 @@ public enum TBLTItemStackIcon implements KotobaItemStackIcon {
 			Arrays.asList("/tblt util direction"),
 			IconFindType.EXCEPT_LORE
 	),
+	PLAYER_NUMBER_MULTIPLE(
+			Material.BOOK,
+			(short) 0,
+			"Arena Setting: Multiple Players",
+			Arrays.asList("Set the arena for multi players.(Default is for single.)"),
+			IconFindType.EXCEPT_LORE
+	),
 	QUEST_PROGRESS(
 			Material.WRITTEN_BOOK,
 			(short) 0,
@@ -69,8 +76,8 @@ public enum TBLTItemStackIcon implements KotobaItemStackIcon {
 	JOB_ITEMS(
 			Material.BOOK,
 			(short) 0,
-			"Starter items for the specific job",
-			null,
+			"Arena Setting: Job Items",
+			Arrays.asList("Starter items for the specific job"),
 			IconFindType.EXCEPT_LORE
 	),
 

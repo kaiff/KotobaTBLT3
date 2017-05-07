@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
@@ -13,9 +12,8 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.github.orgs.kotobaminers.kotobaapi.ability.ClickBlockAbilityInterface;
-import com.github.orgs.kotobaminers.kotobaapi.block.KotobaBlockData;
-import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaEffect;
 import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaItemStackIcon;
+import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaPriorityValue;
 import com.github.orgs.kotobaminers.kotobatblt3.block.SwitchableChestManager;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaMap;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTInteractiveChestFinder;
@@ -39,17 +37,11 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 					.filter(g -> block.getType() == g.getIcon().getMaterial())
 					.findFirst()
 					.map(g -> {
-						new KotobaBlockData(block.getLocation(), Material.AIR, 0).placeBlock();
-						event.getPlayer().getInventory().addItem(g.getIcon().create(1));
-
+						g.take(event.getPlayer(), block);
 						TBLTInteractiveChestFinder.BASE.findChests(block.getLocation()).stream()
 							.flatMap(c -> TBLTSwitch.findPoweredChests(c, g).stream())
 							.forEach(c -> SwitchableChestManager.find(c).stream().forEach(s -> s.turnOff(c)));
-
-						KotobaEffect.MAGIC_MIDIUM.playEffect(block.getLocation());
-						KotobaEffect.MAGIC_MIDIUM.playSound(block.getLocation());
 						return true;
-
 					}).orElse(false);
 			}
 		},
@@ -69,17 +61,11 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 					.filter(g -> block.getType() == g.getIcon().getMaterial())
 					.findFirst()
 					.map(g -> {
-						new KotobaBlockData(block.getLocation(), Material.AIR, 0).placeBlock();
-						event.getPlayer().getInventory().addItem(g.getIcon().create(1));
-
-						KotobaEffect.MAGIC_MIDIUM.playEffect(block.getLocation());
-						KotobaEffect.MAGIC_MIDIUM.playSound(block.getLocation());
-
+						g.take(event.getPlayer(), block);
 						TBLTInteractiveChestFinder.BASE.findChests(block.getLocation()).stream()
 							.flatMap(c -> TBLTSwitch.findPoweredChests(c, g).stream())
 							.forEach(c -> SwitchableChestManager.find(c).stream().forEach(s -> s.turnOff(c)));
 						return true;
-
 					}).orElse(false);
 			}
 		},
@@ -138,6 +124,10 @@ public enum ClickBlockAbility implements ClickBlockAbilityInterface {
 		return consume;
 	}
 
+	@Override
+	public KotobaPriorityValue getPriority() {
+		return KotobaPriorityValue.MIDIUM;
+	}
 
 }
 
