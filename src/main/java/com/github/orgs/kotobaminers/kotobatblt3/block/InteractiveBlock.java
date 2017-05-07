@@ -3,6 +3,7 @@ package com.github.orgs.kotobaminers.kotobatblt3.block;
 import java.util.Optional;
 
 import org.bukkit.Material;
+import org.bukkit.entity.Entity;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 import com.github.orgs.kotobaminers.kotobaapi.block.PlayerBlockInteractive;
@@ -14,16 +15,15 @@ public enum InteractiveBlock implements PlayerBlockInteractive {
 
 	GREEN_GEM(Material.EMERALD_BLOCK) {
 		@Override
-		public boolean interact(PlayerInteractEvent event) {
+		public boolean interactMain(PlayerInteractEvent event) {
 			return TBLTGem.GREEN_GEM.take(event.getPlayer(), event.getClickedBlock());
 		}
-
 	},
 
 
 	BLUE_GEM(Material.DIAMOND_BLOCK) {
 		@Override
-		public boolean interact(PlayerInteractEvent event) {
+		public boolean interactMain(PlayerInteractEvent event) {
 			return TBLTGem.BLUE_GEM.take(event.getPlayer(), event.getClickedBlock());
 		}
 	},
@@ -31,7 +31,7 @@ public enum InteractiveBlock implements PlayerBlockInteractive {
 
 	RED_GEM(Material.REDSTONE_BLOCK) {
 		@Override
-		public boolean interact(PlayerInteractEvent event) {
+		public boolean interactMain(PlayerInteractEvent event) {
 			return TBLTGem.RED_GEM.take(event.getPlayer(), event.getClickedBlock());
 		}
 	},
@@ -46,6 +46,16 @@ public enum InteractiveBlock implements PlayerBlockInteractive {
 	private InteractiveBlock(Material material) {
 		this.material = material;
 	}
+
+
+	@Override
+	public boolean interact(PlayerInteractEvent event) {
+		if(!((Entity) event.getPlayer()).isOnGround()) return false;
+		return interactMain(event);
+	}
+
+
+	abstract boolean interactMain(PlayerInteractEvent event);
 
 
 	@Override

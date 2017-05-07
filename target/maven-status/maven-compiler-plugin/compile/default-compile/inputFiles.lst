@@ -8,7 +8,6 @@ C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminer
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\sentence\ConversationGUIIcon.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\quest\WalkOnQuest.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\block\KotobaYamlConfiguration.java
-C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\userinterface\TBLTIcon.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\ability\ClickBlockChestAbility.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\citizens\UniqueNPC.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\utility\KotobaStructureUtility.java
@@ -37,6 +36,7 @@ C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminer
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\userinterface\RepeatingEffectHolder.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\userinterface\IconListGUI.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\database\TBLTConversationEditorMap.java
+C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\userinterface\TBLTGUIIcon.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\ability\Drone.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobatblt3\quest\QuestManager.java
 C:\Soft\pleiades\workspace\KotobaTBLT3\src\main\java\com\github\orgs\kotobaminers\kotobaapi\kotobaapi\KotobaAPI.java

@@ -15,6 +15,7 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
@@ -235,6 +236,8 @@ public enum InteractiveStructure implements KotobaStructure, PlayerBlockInteract
 
 	@Override
 	public boolean interact(PlayerInteractEvent event) {
+		Player player = event.getPlayer();
+		if(!((Entity) player).isOnGround()) return false;
 		List<Chest> chests = getChestFinder().findChests(event, getIcon());
 		chests = chests.stream()
 			.filter(c -> ChestChecker.checkTriggers(c, event.getPlayer()))

@@ -19,6 +19,17 @@ import com.github.orgs.kotobaminers.kotobatblt3.database.TBLTData;
 public enum TBLTPlayerGUI implements ChestGUI {
 
 
+	ARENA_MENU("Menu", ChestSize.MINIMUM) {
+		@Override
+		public void onInventoryClick(InventoryClickEvent event) {
+			ItemStack clicked = event.getCurrentItem();
+			Stream.of(TBLTGUIIcon.values())
+				.filter(i -> i.isIcon(clicked))
+				.forEach(i -> i.onClickEvent(event));
+		}
+	},
+
+
 	YOU_NEED("You need...", ChestSize.MINIMUM) {
 		@Override
 		public void onInventoryClick(InventoryClickEvent event) {
@@ -96,7 +107,7 @@ public enum TBLTPlayerGUI implements ChestGUI {
 		@Override
 		public void onInventoryClick(InventoryClickEvent event) {
 			ItemStack clicked = event.getCurrentItem();
-			List<TBLTIcon> icons = Stream.of(TBLTIcon.values())
+			List<TBLTGUIIcon> icons = Stream.of(TBLTGUIIcon.values())
 				.filter(i -> i.isIcon(clicked))
 				.collect(Collectors.toList());
 			if(0 < icons.size()) {

@@ -65,7 +65,6 @@ public class TBLTCommandExecutor implements CommandExecutor {
 		TEST(Arrays.asList(Arrays.asList("test")), "", "Command Test", PermissionEnum.OP) {
 			@Override
 			public boolean perform(Player player , String[] args) {
-				System.out.println(player.getInventory().getSize());
 				return true;
 			}
 		},
@@ -443,7 +442,7 @@ public class TBLTCommandExecutor implements CommandExecutor {
 			public boolean perform(Player player , String[] args) {
 				return new TBLTArenaMap().findUnique(player.getLocation())
 					.map(arena -> {
-						TBLTPlayerGUI.ARENA.create(IconCreatorUtility.getIcons((TBLTArena) arena)).ifPresent(player::openInventory);;
+						TBLTPlayerGUI.ARENA.create(IconCreatorUtility.createArenaInfo((TBLTArena) arena)).ifPresent(player::openInventory);;
 						return true;
 					}).orElse(false);
 			}

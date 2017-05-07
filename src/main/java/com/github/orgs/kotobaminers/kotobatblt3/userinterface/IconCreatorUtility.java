@@ -12,13 +12,13 @@ import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArena;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTItemStackIcon;
 
 public class IconCreatorUtility {
-	public static List<ItemStack> getIcons(TBLTArena arena) {
+	public static List<ItemStack> createArenaInfo(TBLTArena arena) {
 		List<ItemStack> icons = new ArrayList<ItemStack>();
 
-		ItemStack info = TBLTIcon.INFORMATION.createItemStack(Arrays.asList(arena.getName(), String.valueOf(arena.getId())));
+		ItemStack info = TBLTGUIIcon.INFORMATION.createItemStack(Arrays.asList(arena.getName(), String.valueOf(arena.getId())));
 
 		Location center = arena.getCenter();
-		ItemStack teleport = TBLTIcon.TELEPORT.createItemStack(Arrays.asList(arena.getWorld().getName(), String.valueOf(center.getBlockX()) + "," + String.valueOf(center.getBlockY()) + "," + String.valueOf(center.getBlockZ())));
+		ItemStack teleport = TBLTGUIIcon.TELEPORT.createItemStack(Arrays.asList(arena.getWorld().getName(), String.valueOf(center.getBlockX()) + "," + String.valueOf(center.getBlockY()) + "," + String.valueOf(center.getBlockZ())));
 
 		ItemStack id = TBLTItemStackIcon.ARENA_ID.create(1);
 		ItemMeta idMeta = id.getItemMeta();
@@ -36,5 +36,9 @@ public class IconCreatorUtility {
 	}
 
 
+	public static List<ItemStack> createArenaMenu(TBLTArena arena) {
+		ItemStack restart = TBLTGUIIcon.RESTART.createItemStack();
+		return Arrays.asList(restart);
+	}
 }
 

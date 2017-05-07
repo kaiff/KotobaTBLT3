@@ -5,12 +5,25 @@ import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
 import com.github.orgs.kotobaminers.kotobaapi.userinterface.GUIIcon;
+import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaMap;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTItemStackIcon;
 
-public enum TBLTIcon implements GUIIcon {
+public enum TBLTGUIIcon implements GUIIcon {
+	RESTART(Material.WATCH, 1, (short) 0, "Restart the game", null) {
+		@Override
+		public void onClickEvent(InventoryClickEvent event) {
+			if(event.getWhoClicked() instanceof Player) {
+				Player player = (Player) event.getWhoClicked();
+				new TBLTArenaMap().findPlayingMap(player)
+					.ifPresent(a -> a.restart());
+			}
+		}
+	},
+
 	INFORMATION(Material.BOOK, 1, (short) 0, "Information", null) {
 		@Override
 		public void onClickEvent(InventoryClickEvent event) {
@@ -83,7 +96,7 @@ public enum TBLTIcon implements GUIIcon {
 	private String displayName;
 	private List<String> lore;
 
-	private TBLTIcon(Material material, int amount, short data, String displayName, List<String> lore) {
+	private TBLTGUIIcon(Material material, int amount, short data, String displayName, List<String> lore) {
 		setMaterial(material);
 		setAmount(amount);
 		setData(data);

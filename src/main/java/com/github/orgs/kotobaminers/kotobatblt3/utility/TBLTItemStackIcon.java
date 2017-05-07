@@ -100,6 +100,15 @@ public enum TBLTItemStackIcon implements KotobaItemStackIcon {
 
 
 	//Ability
+	ARENA_MENU(
+			Material.CHEST,
+			(short) 0,
+			"Open Menu",
+			Arrays.asList("Open an arena menu"),
+			IconFindType.SIMILAR
+	),
+
+
 	MAGIC_WAND(
 			Material.REDSTONE_TORCH_ON,
 			(short) 0,

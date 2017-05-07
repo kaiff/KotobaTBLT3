@@ -1,5 +1,6 @@
 package com.github.orgs.kotobaminers.kotobatblt3.kotobatblt3;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +39,11 @@ import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTItemStackIcon;
 			TBLTItemStackIcon.TEST
 		),
 		;
+
+
+		private static final Map<Integer, TBLTItemStackIcon> INITIAL_ITEMS = new HashMap<Integer, TBLTItemStackIcon>() {{
+			put(8, TBLTItemStackIcon.ARENA_MENU);
+		}};
 
 
 		private Map<ClickBlockAbilityInterface, Integer> abilities;
@@ -83,6 +89,7 @@ import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTItemStackIcon;
 
 		public static void resetCurrentJob(Player player) {
 			findJob(player).become(player);
+			giveInitialItems(player);
 		}
 
 
@@ -97,5 +104,11 @@ import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTItemStackIcon;
 		}
 
 
+		private static void giveInitialItems(Player player) {
+			int size = player.getInventory().getSize();
+			INITIAL_ITEMS.entrySet().stream()
+				.filter(e -> e.getKey() < size && player.getInventory().getItem(e.getKey()) == null)
+				.forEach(e -> player.getInventory().setItem(e.getKey(), e.getValue().create(1)));
+		}
 	}
 

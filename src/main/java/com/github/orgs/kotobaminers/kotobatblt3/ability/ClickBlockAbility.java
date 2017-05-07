@@ -17,10 +17,28 @@ import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaPriorityValue;
 import com.github.orgs.kotobaminers.kotobatblt3.block.SwitchableChestManager;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaMap;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTInteractiveChestFinder;
+import com.github.orgs.kotobaminers.kotobatblt3.userinterface.IconCreatorUtility;
 import com.github.orgs.kotobaminers.kotobatblt3.userinterface.TBLTPlayerGUI;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTItemStackIcon;
 
 public enum ClickBlockAbility implements ClickBlockAbilityInterface {
+
+
+	ARENA_MENU(
+			TBLTItemStackIcon.ARENA_MENU,
+			Arrays.asList(Action.RIGHT_CLICK_BLOCK, Action.LEFT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR, Action.LEFT_CLICK_AIR),
+			0
+		) {
+			@Override
+			public boolean perform(PlayerInteractEvent event) {
+				Player player = event.getPlayer();
+				new TBLTArenaMap().findPlayingMap(player)
+					.map(a -> IconCreatorUtility.createArenaMenu(a))
+					.flatMap(l -> TBLTPlayerGUI.ARENA_MENU.create(l))
+					.ifPresent(i -> player.openInventory(i));
+				return true;
+			}
+		},
 
 
 	MAGIC_WAND(
