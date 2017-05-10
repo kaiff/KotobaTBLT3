@@ -3,7 +3,6 @@ package com.github.orgs.kotobaminers.kotobatblt3.userinterface;
 import java.util.Arrays;
 
 import org.bukkit.Material;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -23,33 +22,35 @@ public class TBLTIconListGUIListener implements Listener {
 				}
 
 				event.setCancelled(true);
-				HumanEntity clicker = event.getWhoClicked();
 				int rawSlot = event.getRawSlot();
 				Inventory inventory = event.getInventory();
+				if(event.getWhoClicked() instanceof Player) {
+					Player player = (Player) event.getWhoClicked();
+					if(gui.isPreviousClicked(rawSlot)) {
+						KotobaSound.CLICK.play(player.getLocation());
+						player.openInventory(gui.createInventory(player, gui.getPreviousPage(player, inventory)));
+						return;
+					}
+					if(gui.isNextClicked(rawSlot)) {
+						KotobaSound.CLICK.play(player.getLocation());
+						player.openInventory(gui.createInventory(player, gui.getNextPage(player, inventory)));
+						return;
+					}
+					if(gui.isIconClicked(rawSlot)) {
+						ClickType click = event.getClick();
+						if(Arrays.asList(ClickType.LEFT, ClickType.SHIFT_LEFT).contains(click)) {
+							KotobaSound.CLICK.play(player.getLocation());
+							gui.onIconLeftClickEvent(event);
+							return;
+						}
+						if(Arrays.asList(ClickType.RIGHT, ClickType.SHIFT_RIGHT).contains(click)) {
+							KotobaSound.CLICK.play(player.getLocation());
+							gui.onIconRightClickEvent(event);
+							return;
+						}
+					}
+				}
 
-				if(gui.isPreviousClicked(rawSlot)) {
-					KotobaSound.CLICK.play(((Player) event.getWhoClicked()).getLocation());
-					clicker.openInventory(gui.createInventory(gui.getPreviousPage(inventory)));
-					return;
-				}
-				if(gui.isNextClicked(rawSlot)) {
-					KotobaSound.CLICK.play(((Player) event.getWhoClicked()).getLocation());
-					clicker.openInventory(gui.createInventory(gui.getNextPage(inventory)));
-					return;
-				}
-				if(gui.isIconClicked(rawSlot)) {
-					ClickType click = event.getClick();
-					if(Arrays.asList(ClickType.LEFT, ClickType.SHIFT_LEFT).contains(click)) {
-						KotobaSound.CLICK.play(((Player) event.getWhoClicked()).getLocation());
-						gui.onIconLeftClickEvent(event);
-						return;
-					}
-					if(Arrays.asList(ClickType.RIGHT, ClickType.SHIFT_RIGHT).contains(click)) {
-						KotobaSound.CLICK.play(((Player) event.getWhoClicked()).getLocation());
-						gui.onIconRightClickEvent(event);
-						return;
-					}
-				}
 				return;
 			});
 	}

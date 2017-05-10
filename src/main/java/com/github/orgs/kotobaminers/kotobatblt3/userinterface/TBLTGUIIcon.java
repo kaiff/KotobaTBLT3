@@ -10,7 +10,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 
 import com.github.orgs.kotobaminers.kotobaapi.userinterface.GUIIcon;
 import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaMap;
-import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTItemStackIcon;
 
 public enum TBLTGUIIcon implements GUIIcon {
 	RESTART(Material.WATCH, 1, (short) 0, "Restart the game", null) {
@@ -21,6 +20,15 @@ public enum TBLTGUIIcon implements GUIIcon {
 				new TBLTArenaMap().findPlayingMap(player)
 					.ifPresent(a -> a.restart());
 			}
+		}
+	},
+
+	SEE_HINTS(Material.BOOK_AND_QUILL, 1, (short) 0, "See hints", null) {
+		@Override
+		public void onClickEvent(InventoryClickEvent event) {
+				Player player = (Player) event.getWhoClicked();
+				new TBLTArenaMap().findPlayingMap(player)
+					.ifPresent(a -> player.openInventory(TBLTIconListGUI.HINT.createInventory(player, 1)));
 		}
 	},
 
@@ -82,12 +90,6 @@ public enum TBLTGUIIcon implements GUIIcon {
 		}
 	},
 
-	WARP_CRYSTAL(Material.NETHER_STAR, 1, (short) 0, TBLTItemStackIcon.PORTAL_NEXT_CRYSTAL.getName(), null) {
-		@Override
-		public void onClickEvent(InventoryClickEvent event) {
-			event.getWhoClicked().getInventory().addItem(event.getCurrentItem());
-		}
-	},
 	;
 
 	private Material material;

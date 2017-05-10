@@ -90,7 +90,7 @@ public class TBLTCommandExecutor implements CommandExecutor {
 		ITEM(Arrays.asList(Arrays.asList("item")), "", "Get Items", PermissionEnum.OP) {
 			@Override
 			public boolean perform(Player player , String[] args) {
-				player.openInventory(TBLTIconListGUI.ITEM.createInventory(1));
+				player.openInventory(TBLTIconListGUI.ITEM.createInventory(player, 1));
 				return true;
 			}
 		},
@@ -432,7 +432,7 @@ public class TBLTCommandExecutor implements CommandExecutor {
 		ARENA_LIST(Arrays.asList(Arrays.asList("arena", "a"), Arrays.asList("list", "l")), "", "List arenas", PermissionEnum.OP) {
 			@Override
 			public boolean perform(Player player , String[] args) {
-				player.openInventory(TBLTIconListGUI.ARENA.createInventory(1));
+				player.openInventory(TBLTIconListGUI.ARENA.createInventory(player, 1));
 				return true;
 			}
 		},
@@ -478,14 +478,14 @@ public class TBLTCommandExecutor implements CommandExecutor {
 		GUI_EFFECT(Arrays.asList(Arrays.asList("gui"), Arrays.asList("effect", "e")), "", "Command Test", PermissionEnum.OP) {
 			@Override
 			public boolean perform(Player player , String[] args) {
-				player.openInventory(TBLTIconListGUI.EFFECT.createInventory(1));
+				player.openInventory(TBLTIconListGUI.EFFECT.createInventory(player, 1));
 				return true;
 			}
 		},
 		GUI_SOUND(Arrays.asList(Arrays.asList("gui"), Arrays.asList("sound", "s")), "", "Command Test", PermissionEnum.OP) {
 			@Override
 			public boolean perform(Player player , String[] args) {
-				player.openInventory(TBLTIconListGUI.SOUND.createInventory(1));
+				player.openInventory(TBLTIconListGUI.SOUND.createInventory(player, 1));
 				return true;
 			}
 		},

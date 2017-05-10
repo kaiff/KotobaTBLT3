@@ -1,6 +1,10 @@
 package com.github.orgs.kotobaminers.kotobatblt3.utility;
 
+
+import static com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTItemStackIcon.*;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +14,7 @@ import java.util.stream.Stream;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -49,11 +54,90 @@ public class ChestReader {
 				updateQuests(chest, a);
 				updateJobItems(items, a);
 				updatePlayerNumber(items, a);
+				updatePlayerHint(chest, a);
 			});
 	}
 
+
+	private static final List<TBLTItemStackIcon> HINTS = Arrays.asList(
+			RED_GEM,
+			GREEN_GEM,
+			BLUE_GEM,
+			LOCKED,
+			UNKNOWN
+		);
+	private static final Integer[][] VECTORS = {{-1,0,0}, {0,0,-1}, {1,0,0}, {0,0,1}};
+
+
+	private static void updatePlayerHint(Chest chest, TBLTArena a) {
+		TBLTItemStackIcon icon = ARENA_HINT;
+		List<ItemStack> contents = ChestReader.extractItems(chest);
+		Stream.of(TBLTPlayer.values())
+			.filter(job -> job.getAbilityIcons().stream().anyMatch(i -> contents.stream().anyMatch(c -> i.isIconItemStack(c))))
+			.forEach(job -> {
+				if(contents.stream().anyMatch(i -> icon.isIconItemStack(i))) {
+					int width = 3;
+					int height = 3;
+					Stream.of(VECTORS)
+						.map(d -> new Vector(d[0], d[1], d[2]))
+						.map(v -> {
+							Location center = chest.getLocation().clone().add(v.clone().multiply(2));
+							Vector rotation = new Vector(-v.getBlockZ(), 0, v.getBlockX());
+							Location start = center.clone().add(rotation).add(0,1,0);
+							List<Material> list = Stream.iterate(0, h -> h + 1)
+								.limit(height)
+								.flatMap(h ->
+									Stream.iterate(0, w -> w + 1)
+										.limit(width)
+										.map(w -> {
+											return start.clone().add(0,-h,0).add(rotation.clone().multiply(-w)).getBlock().getType();
+										})
+								)
+								.collect(Collectors.toList());
+							if(list.stream().allMatch(m -> m == Material.AIR)) {
+								return new ArrayList<>();
+							}
+							placeBarriers(center, v);
+							return list;
+						})
+						.filter(l -> l.size() == width * height)
+						.forEach(l -> {
+							List<ItemStack> items = l.stream()
+								.map(m -> HINTS.stream().filter(h -> h.getMaterial() == m).findFirst().map(ic -> ic.create(1)).orElse(new ItemStack(Material.AIR)))
+								.collect(Collectors.toList());
+							a.getArenaMeta().setHint(job, items);
+							});
+				}
+			});
+	}
+
+
+	private static void placeBarriers(Location center, Vector toFront) {
+		Material back = Material.NETHER_BRICK;
+		Material front = Material.BARRIER;
+		Vector rotation = new Vector(-toFront.getBlockZ(), 0, toFront.getBlockX());
+		Location start = center.clone().add(rotation).add(0,1,0);
+		int width = 3;
+		int height = 3;
+		Stream.iterate(0, h -> h + 1)
+			.limit(height)
+			.forEach(h ->
+				Stream.iterate(0, w -> w + 1)
+					.limit(width)
+					.forEach(w -> {
+						Location between = start.clone().add(0,-h,0).add(rotation.clone().multiply(-w));
+						Block frontBlock = between.clone().add(toFront).getBlock();
+						if(frontBlock.getType() == Material.AIR) frontBlock.setType(front);
+						Block backBlock = between.clone().add(toFront.clone().multiply(-1)).getBlock();
+						if(backBlock.getType() == Material.AIR) backBlock.setType(back);
+					})
+				);
+
+	}
+
+
 	private static void updatePlayerNumber(List<ItemStack> items, TBLTArena a) {
-		TBLTItemStackIcon target = TBLTItemStackIcon.PLAYER_NUMBER_MULTIPLE;
+		TBLTItemStackIcon target = PLAYER_NUMBER_MULTIPLE;
 		items.stream()
 			.filter(i -> target.isIconItemStack(i))
 			.findAny()
@@ -62,7 +146,7 @@ public class ChestReader {
 
 
 	private static void updateJobItems(List<ItemStack> items, TBLTArena arena) {
-		TBLTItemStackIcon target = TBLTItemStackIcon.JOB_ITEMS;
+		TBLTItemStackIcon target = JOB_ITEMS;
 		if(!items.stream().anyMatch(i -> target.isIconItemStack(i))) return;
 
 		List<ItemStack> options = items.stream()
@@ -82,7 +166,7 @@ public class ChestReader {
 
 
 	private static void updateNextArena(List<ItemStack> items, TBLTArena arena) {
-		TBLTItemStackIcon target = TBLTItemStackIcon.ARENA_NEXT;
+		TBLTItemStackIcon target = ARENA_NEXT;
 		if(!items.stream().anyMatch(i -> target.isIconItemStack(i))) return;
 
 		List<ItemStack> options = items.stream()
@@ -115,14 +199,14 @@ public class ChestReader {
 
 
 	private static void updateArenaSpawn(List<ItemStack> items, Location chestLocation, TBLTArena arena) {
-		TBLTItemStackIcon target = TBLTItemStackIcon.ARENA_SPAWN;
+		TBLTItemStackIcon target = ARENA_SPAWN;
 		if(!items.stream().anyMatch(i -> target.isIconItemStack(i))) return;
 		List<ItemStack> options = items.stream()
 			.filter(i -> !target.isIconItemStack(i))
 			.collect(Collectors.toList());
 		if(0 < options.size()) {
 			ItemStack o1 = options.get(0);
-			if(TBLTItemStackIcon.DIRECTION.isIconItemStack(o1)) {
+			if(DIRECTION.isIconItemStack(o1)) {
 				Location spawn = chestLocation.clone().add(0.5, 2, 0.5);
 				List<String> lore = o1.getItemMeta().getLore();
 				if(2 < lore.size()) {
@@ -200,17 +284,17 @@ public class ChestReader {
 			.map(i -> ChestReader.findItemsInRow(chest, i))
 			.filter(list ->
 				list.stream()
-					.anyMatch(i -> TBLTItemStackIcon.TRIGGER_ITEM_AT_LEAST.isIconItemStack(i))
+					.anyMatch(i -> TRIGGER_ITEM_AT_LEAST.isIconItemStack(i))
 			)
 			.flatMap(list -> list.stream())
-			.filter(i -> !TBLTItemStackIcon.TRIGGER_ITEM_AT_LEAST.isIconItemStack(i))
+			.filter(i -> !TRIGGER_ITEM_AT_LEAST.isIconItemStack(i))
 			.collect(Collectors.toList());
 	}
 
 
 	public static void displayHolograms(Chest chest) {
 		Inventory inventory = chest.getInventory();
-		if(!Stream.of(inventory.getContents()).filter(i -> i != null).anyMatch(i -> TBLTItemStackIcon.CHEST_HOLOGRAMS.isIconItemStack(i))) {
+		if(!Stream.of(inventory.getContents()).filter(i -> i != null).anyMatch(i -> CHEST_HOLOGRAMS.isIconItemStack(i))) {
 			return;
 		}
 

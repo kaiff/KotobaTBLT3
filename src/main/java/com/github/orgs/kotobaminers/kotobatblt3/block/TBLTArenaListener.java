@@ -4,13 +4,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Vehicle;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -25,11 +22,10 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
-import org.bukkit.event.vehicle.VehicleExitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.Potion;
 
-import com.github.orgs.kotobaminers.kotobaapi.utility.KotobaEffect;
+import com.github.orgs.kotobaminers.kotobatblt3.userinterface.TBLTIconListGUI;
 import com.github.orgs.kotobaminers.kotobatblt3.userinterface.TBLTPlayerGUI;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTUtility;
 
@@ -90,41 +86,6 @@ public class TBLTArenaListener implements Listener {
 
 
 	@EventHandler
-	void onPlayerFallBottom(PlayerInteractEvent event) {
-		Player player = (Player) event.getPlayer();
-
-		Location location = player.getLocation();
-
-		if(TBLTUtility.isTBLTPlayer(player)) {
-			new TBLTArenaMap().findUnique(location)
-			.ifPresent(storage -> {
-				TBLTArena arena = (TBLTArena) storage;
-				if(arena.getYMin() == location.getBlockY() - 1) {
-					event.setCancelled(true);
-					arena.restart();
-				}
-			});
-		}
-	}
-
-
-	@EventHandler
-	void onVehicleExit(VehicleExitEvent event) {
-		LivingEntity exited = event.getExited();
-		if(exited instanceof Player) {
-			Player player = (Player) exited;
-			if(TBLTUtility.isTBLTPlayer(player)) {
-				Vehicle vehicle = event.getVehicle();
-				Location location = exited.getLocation();
-				KotobaEffect.MAGIC_MIDIUM.playEffect(location);
-				KotobaEffect.MAGIC_MIDIUM.playSound(location);
-				vehicle.remove();
-			}
-		}
-	}
-
-
-	@EventHandler
 	void onItemPickup(PlayerPickupItemEvent event) {
 		if(TBLTUtility.isTBLTPlayer(event.getPlayer())) {
 			event.setCancelled(true);
@@ -164,7 +125,7 @@ public class TBLTArenaListener implements Listener {
 		if(event.getPlayer() instanceof Player) {
 			Player player = (Player) event.getPlayer();
 			if(TBLTUtility.isTBLTPlayer(player)) {
-				if(!TBLTPlayerGUI.find(event.getInventory()).isPresent()) {
+				if(!TBLTPlayerGUI.find(event.getInventory()).isPresent() && !TBLTIconListGUI.find(event.getInventory()).isPresent()) {
 					event.setCancelled(true);
 				}
 			}

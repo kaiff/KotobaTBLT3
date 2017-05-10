@@ -59,6 +59,13 @@ public enum TBLTItemStackIcon implements KotobaItemStackIcon {
 			Arrays.asList("/tblt util direction"),
 			IconFindType.EXCEPT_LORE
 	),
+	ARENA_HINT(
+			Material.BOOK,
+			(short) 0,
+			"Arena Setting: Hint",
+			null,
+			IconFindType.SIMILAR
+	),
 	PLAYER_NUMBER_MULTIPLE(
 			Material.BOOK,
 			(short) 0,
@@ -314,29 +321,22 @@ public enum TBLTItemStackIcon implements KotobaItemStackIcon {
 			IconFindType.SIMILAR
 	),
 
-	PORTAL_NEXT_CRYSTAL(
-			Material.NETHER_STAR,
+	LOCKED(
+			Material.OBSIDIAN,
 			(short) 0,
-			"Portal Crystal",
-			Arrays.asList("This special item is used to open the time travel portal to your next location."),
-			IconFindType.EXCEPT_LORE
-	),
-
-	PORTAL_ELEVATOR_CRYSTAL(
-			Material.NETHER_STAR,
-			(short) 0,
-			"Portal Elevator Crystal",
-			Arrays.asList("Elevator Crystal"),
-			IconFindType.EXCEPT_LORE
-	),
-
-	SINGLE_PORTAL(
-			Material.NETHER_STAR,
-			(short) 0,
-			"Single portal key",
+			"Locked",
 			null,
 			IconFindType.SIMILAR
-		),
+	),
+
+	UNKNOWN(
+			Material.GLASS,
+			(short) 0,
+			"Unknow",
+			null,
+			IconFindType.SIMILAR
+	),
+
 	;
 
 

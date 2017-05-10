@@ -1,6 +1,7 @@
 package com.github.orgs.kotobaminers.kotobatblt3.userinterface;
 
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -12,6 +13,7 @@ import org.bukkit.Effect;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -23,9 +25,47 @@ import com.github.orgs.kotobaminers.kotobatblt3.block.TBLTArenaMap;
 import com.github.orgs.kotobaminers.kotobatblt3.utility.TBLTItemStackIcon;
 
 public enum TBLTIconListGUI implements IconListGUI {
+	HINT("Hints ") {
+		@Override
+		public List<ItemStack> getIcons(Player player) {
+			List<ItemStack> items = new ArrayList<ItemStack>();
+			List<ItemStack> fillings = Stream.iterate(0, i -> i + 1).limit(3).map(i -> new ItemStack(Material.AIR)).collect(Collectors.toList());
+
+			new TBLTArenaMap().findPlayingMap(player)
+				.ifPresent(a -> {
+					a.getArenaMeta().getHint(player).stream()
+						.forEach(list -> {
+							Stream.iterate(0, i -> i + 1)
+								.limit(3)
+								.forEach(i -> items.addAll(fillings));
+							Stream.iterate(0, i -> i + 1)
+								.limit(list.size())
+								.forEach(i -> {
+									if(i % 3 == 0) items.addAll(fillings);
+									items.add(list.get(i));
+									if(i % 3 == 2) items.addAll(fillings);
+								});
+							Stream.iterate(0, i -> i + 1)
+								.limit(3)
+								.forEach(i -> items.addAll(fillings));
+						});
+				});
+			return items;
+		}
+
+		@Override
+		public void onIconLeftClickEvent(InventoryClickEvent event) {
+		}
+
+		@Override
+		public void onIconRightClickEvent(InventoryClickEvent event) {
+		}
+
+	},
+
 	ITEM("Items ") {
 		@Override
-		public List<ItemStack> getIcons() {
+		public List<ItemStack> getIcons(Player player) {
 			return Stream.of(
 					Stream.of(TBLTItemStackIcon.values()).map(i -> i.create(1)),
 					Stream.of(InteractEffect.values()).map(i -> i.create(1))
@@ -51,7 +91,7 @@ public enum TBLTIconListGUI implements IconListGUI {
 
 	ARENA("Arenas ") {
 		@Override
-		public List<ItemStack> getIcons() {
+		public List<ItemStack> getIcons(Player player) {
 			List<TBLTArena> arenas = new TBLTArenaMap().getMap().values().stream().map(a -> (TBLTArena) a).sorted(Comparator.comparing(a -> a.getId())).collect(Collectors.toList());
 
 			return Stream.iterate(0, i -> i + 1)
@@ -81,7 +121,7 @@ public enum TBLTIconListGUI implements IconListGUI {
 
 	SOLID_BLOCK("Blocks ") {
 		@Override
-		public List<ItemStack> getIcons() {
+		public List<ItemStack> getIcons(Player player) {
 			return Stream.of(Material.values())
 				.filter(m -> m.isBlock() && m.isSolid())
 				.map(m -> KotobaItemStack.create(m, (short) 0, 1, m.name(), null))
@@ -97,7 +137,7 @@ public enum TBLTIconListGUI implements IconListGUI {
 	},
 	EFFECT("Effect ") {
 		@Override
-		public List<ItemStack> getIcons() {
+		public List<ItemStack> getIcons(Player player) {
 			return Stream.of(Effect.values())
 				.map(e -> KotobaItemStack.create(Material.NETHER_STAR, (short) 0, 1, e.name(), null))
 				.collect(Collectors.toList());
@@ -125,7 +165,7 @@ public enum TBLTIconListGUI implements IconListGUI {
 	},
 	SOUND("Sound ") {
 		@Override
-		public List<ItemStack> getIcons() {
+		public List<ItemStack> getIcons(Player player) {
 			return Stream.of(Sound.values())
 				.map(s -> KotobaItemStack.create(Material.NOTE_BLOCK, (short) 0, 1, s.name(), null))
 				.collect(Collectors.toList());

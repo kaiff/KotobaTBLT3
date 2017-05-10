@@ -109,6 +109,7 @@ public enum TBLTGem {
 	}
 
 
+	@SuppressWarnings("deprecation")
 	private void toggleGem(Block block) {
 		Optional<TBLTGem> gem = Stream.of(TBLTGem.values())
 			.filter(g -> block.getType() == g.getIcon().getMaterial())

@@ -37,8 +37,9 @@ public class IconCreatorUtility {
 
 
 	public static List<ItemStack> createArenaMenu(TBLTArena arena) {
+		ItemStack hint = TBLTGUIIcon.SEE_HINTS.createItemStack();
 		ItemStack restart = TBLTGUIIcon.RESTART.createItemStack();
-		return Arrays.asList(restart);
+		return Arrays.asList(hint, restart);
 	}
 }
 

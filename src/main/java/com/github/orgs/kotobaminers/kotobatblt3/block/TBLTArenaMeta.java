@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
 
@@ -24,6 +25,7 @@ public class TBLTArenaMeta {
 	private Map<TBLTPlayer, List<ItemStack>> jobItems = new HashMap<>();
 	private List<KotobaQuest> quests = new ArrayList<>();
 	private Map<UUID, List<Block>> getOwners = new HashMap<>();
+	private Map<TBLTPlayer, List<List<ItemStack>>> hints = new HashMap<>();
 
 
 	private PlayerNumber playerNumber = PlayerNumber.SINGLE;
@@ -105,6 +107,18 @@ public class TBLTArenaMeta {
 		List<Block> ownings = getOwners.getOrDefault(uuid, new ArrayList<>());
 		ownings.remove(block);
 		getOwners.put(uuid, ownings);
+	}
+
+
+	public List<List<ItemStack>> getHint(Player player) {
+		return Optional.ofNullable(hints.getOrDefault(TBLTPlayer.findJob(player), null)).orElse(new ArrayList<>());
+	}
+
+
+	public void setHint(TBLTPlayer job, List<ItemStack> items) {
+		List<List<ItemStack>> current = hints.getOrDefault(job, new ArrayList<>());
+		current.add(items);
+		hints.put(job, current);
 	}
 
 

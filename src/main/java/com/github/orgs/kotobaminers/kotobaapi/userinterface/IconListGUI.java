@@ -5,6 +5,7 @@ import java.util.stream.Stream;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -19,16 +20,20 @@ public interface IconListGUI {
 	public static final String PREVIOUS = "<= Previous =";
 	public static final String NEXT = "= Next =>";
 
-	abstract List<ItemStack> getIcons();
+	abstract List<ItemStack> getIcons(Player player);
 	abstract String getTitle();
 	abstract void onIconLeftClickEvent(InventoryClickEvent event);
 	abstract void onIconRightClickEvent(InventoryClickEvent event);
 
-	default public Inventory createInventory(int page) {
-		List<ItemStack> items = getIcons();
+	default public Inventory createInventory(Player player, int page) {
+		List<ItemStack> items = getIcons(player);
 		int start = (page - 1) * ICON_NUMBER;
 		int limit = Math.min(ICON_NUMBER + start, items.size());
 		Inventory inventory = Bukkit.createInventory(null, INVENGTORY_SIZE, getTitle() + String.valueOf(page));
+		if(items.size() == 0) {
+			Inventory inventory2 = Bukkit.createInventory(null, INVENGTORY_SIZE, getTitle() + String.valueOf(1));
+			return inventory2;
+		}
 		Stream.iterate(start, i -> i + 1)
 			.limit(limit - start)
 			.forEach(i -> inventory.setItem(i - start, items.get(i)));
@@ -47,23 +52,23 @@ public interface IconListGUI {
 		}
 		return PAGE_FAILED;
 	}
-	default Integer getMaxPage() {
-		if(getIcons().size() % ICON_NUMBER == 0) {
-			return getIcons().size() / ICON_NUMBER;
+	default Integer getMaxPage(Player player) {
+		if(getIcons(player).size() % ICON_NUMBER == 0) {
+			return getIcons(player).size() / ICON_NUMBER;
 		}
-		return getIcons().size() / ICON_NUMBER + 1;
+		return getIcons(player).size() / ICON_NUMBER + 1;
 	}
-	default Integer getPreviousPage(Inventory inventory) {
+	default Integer getPreviousPage(Player player, Inventory inventory) {
 		int page = getCurrentPage(inventory);
 		if(page == 1) {
-			return getMaxPage();
+			return getMaxPage(player);
 		} else {
 			return page - 1;
 		}
 	}
-	default Integer getNextPage(Inventory inventory) {
+	default Integer getNextPage(Player player, Inventory inventory) {
 		int page = getCurrentPage(inventory);
-		if(page == getMaxPage()) {
+		if(page == getMaxPage(player)) {
 			return 1;
 		} else {
 			return page + 1;

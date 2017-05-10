@@ -19,6 +19,13 @@ import com.github.orgs.kotobaminers.kotobatblt3.database.TBLTData;
 public enum TBLTPlayerGUI implements ChestGUI {
 
 
+	ARENA_HINT("Hint", ChestSize.MINIMUM) {
+		@Override
+		public void onInventoryClick(InventoryClickEvent event) {
+		}
+	},
+
+
 	ARENA_MENU("Menu", ChestSize.MINIMUM) {
 		@Override
 		public void onInventoryClick(InventoryClickEvent event) {
